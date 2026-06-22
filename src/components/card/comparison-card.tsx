@@ -2,14 +2,9 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { CARD_HEIGHT, CARD_WIDTH } from "./card-dimensions";
 import { PLAYER_META } from "./player-meta";
 import { PhotoSlot } from "./photo-slot";
-import {
-  contextChips,
-  formatStatValue,
-  selectionLabel,
-  STAT_ICONS,
-  statLabel,
-} from "./card-labels";
+import { contextChips, selectionLabel, STAT_ICONS, statLabel } from "./card-labels";
 import type { CardSlice, CardStatRow, CardViewModel } from "./card-model";
+import { AnimatedBarFill, CountUpValue, CardPulse } from "./card-animations";
 
 /**
  * The hero artifact (SPEC §4). A self-contained, theme-tokened vertical 2:3
@@ -20,14 +15,23 @@ import type { CardSlice, CardStatRow, CardViewModel } from "./card-model";
  * The card carries its own fixed 1080×1620 box; the render route screenshots it
  * at that size, the UI scales it down with CSS transform.
  */
+/**
+ * `animated` is OFF by default — the static branch renders EXACTLY the original
+ * deterministic output that the headless /render/card route screenshots into a
+ * PNG. No hooks-driven animation runs when `animated` is false (the animated
+ * subcomponents fall back to the plain static markup). Only the live preview
+ * (CardPreview) opts in via `animated`.
+ */
 export function ComparisonCard({
   model,
   slice,
   t,
+  animated = false,
 }: {
   model: CardViewModel;
   slice: CardSlice;
   t: Dictionary;
+  animated?: boolean;
 }) {
   const messi = PLAYER_META.messi;
   const ronaldo = PLAYER_META.ronaldo;
@@ -53,10 +57,16 @@ export function ComparisonCard({
         className="pointer-events-none absolute inset-5 rounded-[var(--radius-xl)]"
         style={{ border: "1px solid rgba(255,255,255,0.05)" }}
       />
+      {animated && <CardPulse />}
       <CardHeader messiClub={model.messi.club} ronaldoClub={model.ronaldo.club} />
       <PeriodPlaque slice={slice} t={t} />
-      <StatList rows={model.rows} t={t} />
-      <ResultFooter score={model.score} contested={model.contested} t={t} />
+      <StatList rows={model.rows} t={t} animated={animated} />
+      <ResultFooter
+        score={model.score}
+        contested={model.contested}
+        t={t}
+        animated={animated}
+      />
       <Watermark />
 
       {/* hidden labels for clarity in the rendered DOM (used by name header) */}
@@ -210,17 +220,25 @@ function PeriodPlaque({ slice, t }: { slice: CardSlice; t: Dictionary }) {
 
 /* ----------------------------- Stat list ----------------------------- */
 
-function StatList({ rows, t }: { rows: CardStatRow[]; t: Dictionary }) {
+function StatList({
+  rows,
+  t,
+  animated,
+}: {
+  rows: CardStatRow[];
+  t: Dictionary;
+  animated: boolean;
+}) {
   return (
     <div className="flex flex-1 flex-col justify-center gap-3.5">
       {rows.map((row) => (
-        <StatRow key={row.key} row={row} t={t} />
+        <StatRow key={row.key} row={row} t={t} animated={animated} />
       ))}
     </div>
   );
 }
 
-function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
+function StatRow({ row, t, animated }: { row: CardStatRow; t: Dictionary; animated: boolean }) {
   const Icon = STAT_ICONS[row.key];
   const messiWins = row.winner === "messi";
   const ronaldoWins = row.winner === "ronaldo";
@@ -240,7 +258,12 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
             opacity: messiWins ? 1 : 0.82,
           }}
         >
-          {formatStatValue(row.key, row.messiValue, row.decimals)}
+          <CountUpValue
+            statKey={row.key}
+            value={row.messiValue}
+            decimals={row.decimals}
+            animated={animated}
+          />
         </span>
 
         <span className="flex items-center gap-2 whitespace-nowrap text-[18px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-secondary)]">
@@ -259,7 +282,12 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
             opacity: ronaldoWins ? 1 : 0.82,
           }}
         >
-          {formatStatValue(row.key, row.ronaldoValue, row.decimals)}
+          <CountUpValue
+            statKey={row.key}
+            value={row.ronaldoValue}
+            decimals={row.decimals}
+            animated={animated}
+          />
         </span>
       </div>
 
@@ -271,6 +299,7 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
           brightVar="--color-messi-bright"
           win={messiWins}
           direction="rtl"
+          animated={animated}
         />
         <span
           aria-hidden
@@ -283,6 +312,7 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
           brightVar="--color-ronaldo-bright"
           win={ronaldoWins}
           direction="ltr"
+          animated={animated}
         />
       </div>
     </div>
@@ -295,18 +325,28 @@ function Bar({
   brightVar,
   win,
   direction,
+  animated,
 }: {
   fraction: number;
   colorVar: string;
   brightVar: string;
   win: boolean;
   direction: "ltr" | "rtl";
+  animated: boolean;
 }) {
   const justify = direction === "rtl" ? "flex-end" : "flex-start";
   const gradient =
     direction === "rtl"
       ? `linear-gradient(270deg, var(${brightVar}), var(${colorVar}))`
       : `linear-gradient(90deg, var(${colorVar}), var(${brightVar}))`;
+  const fillStyle = {
+    width: `${Math.max(fraction * 100, 5)}%`,
+    background: gradient,
+    opacity: win ? 1 : 0.78,
+    boxShadow: win
+      ? `0 0 18px color-mix(in srgb, var(${colorVar}) 80%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)`
+      : "inset 0 1px 0 rgba(255,255,255,0.12)",
+  } as const;
   return (
     <div
       className="flex h-[18px] flex-1 items-center overflow-hidden rounded-full"
@@ -317,16 +357,11 @@ function Bar({
         boxShadow: "inset 0 1px 2px rgba(0,0,0,0.35)",
       }}
     >
-      <div
+      <AnimatedBarFill
         className="h-full rounded-full"
-        style={{
-          width: `${Math.max(fraction * 100, 5)}%`,
-          background: gradient,
-          opacity: win ? 1 : 0.78,
-          boxShadow: win
-            ? `0 0 18px color-mix(in srgb, var(${colorVar}) 80%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)`
-            : "inset 0 1px 0 rgba(255,255,255,0.12)",
-        }}
+        style={fillStyle}
+        direction={direction}
+        animated={animated}
       />
     </div>
   );
@@ -338,10 +373,12 @@ function ResultFooter({
   score,
   contested,
   t,
+  animated,
 }: {
   score: { messi: number; ronaldo: number };
   contested: number;
   t: Dictionary;
+  animated: boolean;
 }) {
   const messiLeads = score.messi > score.ronaldo;
   const ronaldoLeads = score.ronaldo > score.messi;
@@ -384,6 +421,7 @@ function ResultFooter({
           brightVar="--color-messi-bright"
           lead={messiLeads}
           align="right"
+          animated={animated}
         />
         <span className="font-[family-name:var(--font-display)] text-[40px] font-bold text-[var(--color-text-muted)]">
           :
@@ -395,6 +433,7 @@ function ResultFooter({
           brightVar="--color-ronaldo-bright"
           lead={ronaldoLeads}
           align="left"
+          animated={animated}
         />
       </div>
       <span className="tabular text-[20px] font-medium text-[var(--color-text-secondary)]">
@@ -412,6 +451,7 @@ function ScoreSide({
   brightVar,
   lead,
   align,
+  animated,
 }: {
   name: string;
   value: number;
@@ -419,6 +459,7 @@ function ScoreSide({
   brightVar: string;
   lead: boolean;
   align: "left" | "right";
+  animated: boolean;
 }) {
   return (
     <div className={`flex flex-col ${align === "right" ? "items-end" : "items-start"}`}>
@@ -432,7 +473,7 @@ function ScoreSide({
           opacity: lead ? 1 : 0.78,
         }}
       >
-        {value}
+        <CountUpValue value={value} decimals={0} animated={animated} />
       </span>
       <span className="text-[16px] font-semibold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
         {name}

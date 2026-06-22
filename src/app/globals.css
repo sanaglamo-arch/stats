@@ -52,6 +52,12 @@
   --shadow-glow-messi: 0 0 24px rgba(233, 30, 140, 0.45);
   --shadow-glow-ronaldo: 0 0 24px rgba(46, 168, 255, 0.45);
   --shadow-glow-gold: 0 0 24px rgba(245, 196, 81, 0.5);
+
+  /* Volumetric "hero" lift for the card stage — deep stacked shadow that floats
+     the card off the backdrop, with a faint dual-accent halo. */
+  --shadow-hero:
+    0 2px 8px rgba(0, 0, 0, 0.3), 0 18px 50px rgba(0, 0, 0, 0.55),
+    0 40px 120px rgba(0, 0, 0, 0.5);
 }
 
 :root {
@@ -87,6 +93,56 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   box-shadow: var(--shadow-glass);
+}
+
+/*
+  Premium layered glass (used for the control rail, the mobile sheet, the player
+  panels). Adds a real top inner-highlight + soft inner darkening at the base so
+  the surface reads as a lit pane of glass with depth, not a flat translucent
+  rectangle. Pairs the outer shadow with two inset highlights.
+*/
+.glass-panel {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015) 42%),
+    var(--color-surface);
+  border: 1px solid var(--color-border-glass);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(22px) saturate(140%);
+  -webkit-backdrop-filter: blur(22px) saturate(140%);
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -20px 40px -28px rgba(0, 0, 0, 0.6);
+}
+
+/*
+  Fixed ambient backdrop for the full-length cinematic page: a dual-accent
+  gradient mesh (Messi pink biased left, Ronaldo blue biased right) over a soft
+  purple glow, pinned to the viewport so it sits behind every scrolled section
+  without repainting/stretching. Static — purely CSS, no motion.
+*/
+.studio-aura-fixed {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(50% 40% at 18% 12%, rgba(233, 30, 140, 0.16), transparent 70%),
+    radial-gradient(50% 40% at 84% 22%, rgba(46, 168, 255, 0.16), transparent 70%),
+    radial-gradient(60% 50% at 50% 80%, rgba(168, 85, 247, 0.08), transparent 75%);
+}
+
+/* Centered halo directly behind the hero card for a focused neon lift. */
+.card-halo {
+  position: absolute;
+  inset: -14% -10%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(45% 42% at 32% 40%, rgba(233, 30, 140, 0.4), transparent 72%),
+    radial-gradient(45% 42% at 68% 40%, rgba(46, 168, 255, 0.4), transparent 72%);
+  filter: blur(46px);
 }
 
 @media (prefers-reduced-motion: reduce) {

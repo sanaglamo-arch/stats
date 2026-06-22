@@ -5,6 +5,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Download, Loader2, Share2 } from "lucide-react";
 import { paramsFromSlice, type CardSlice } from "@/components/card";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
+import { Magnetic } from "@/components/motion/magnetic";
+import { SPRING } from "@/lib/motion/tokens";
 
 const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]";
@@ -120,38 +122,42 @@ export function ShareActions({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-3 sm:flex-row">
-        <motion.button
-          type="button"
-          onClick={handleDownload}
-          disabled={busy}
-          whileTap={busy ? undefined : tap}
-          transition={{ type: "spring", stiffness: 420, damping: 30 }}
-          className={`flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 text-sm font-bold uppercase tracking-wide text-[var(--color-bg-base)] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${busy ? "" : "cursor-pointer"}`}
-          style={{ background: "var(--color-gold)", boxShadow: "var(--shadow-glow-gold)" }}
-        >
-          {status.kind === "busy" && status.action === "download" ? (
-            <Loader2 size={18} className="animate-spin" aria-hidden />
-          ) : (
-            <Download size={18} aria-hidden />
-          )}
-          {status.kind === "busy" && status.action === "download" ? t.downloading : t.download}
-        </motion.button>
+        <Magnetic className="flex-1">
+          <motion.button
+            type="button"
+            onClick={handleDownload}
+            disabled={busy}
+            whileTap={busy ? undefined : tap}
+            transition={SPRING.press}
+            className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 text-sm font-bold uppercase tracking-wide text-[var(--color-bg-base)] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${busy ? "" : "cursor-pointer"}`}
+            style={{ background: "var(--color-gold)", boxShadow: "var(--shadow-glow-gold)" }}
+          >
+            {status.kind === "busy" && status.action === "download" ? (
+              <Loader2 size={18} className="animate-spin" aria-hidden />
+            ) : (
+              <Download size={18} aria-hidden />
+            )}
+            {status.kind === "busy" && status.action === "download" ? t.downloading : t.download}
+          </motion.button>
+        </Magnetic>
 
-        <motion.button
-          type="button"
-          onClick={handleShare}
-          disabled={busy}
-          whileTap={busy ? undefined : tap}
-          transition={{ type: "spring", stiffness: 420, damping: 30 }}
-          className={`flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface-strong)] px-5 text-sm font-bold uppercase tracking-wide text-[var(--color-text)] transition-all duration-200 hover:bg-[var(--color-surface)] disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${busy ? "" : "cursor-pointer"}`}
-        >
-          {status.kind === "busy" && status.action === "share" ? (
-            <Loader2 size={18} className="animate-spin" aria-hidden />
-          ) : (
-            <Share2 size={18} aria-hidden />
-          )}
-          {t.share}
-        </motion.button>
+        <Magnetic className="flex-1">
+          <motion.button
+            type="button"
+            onClick={handleShare}
+            disabled={busy}
+            whileTap={busy ? undefined : tap}
+            transition={SPRING.press}
+            className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface-strong)] px-5 text-sm font-bold uppercase tracking-wide text-[var(--color-text)] transition-all duration-200 hover:bg-[var(--color-surface)] disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${busy ? "" : "cursor-pointer"}`}
+          >
+            {status.kind === "busy" && status.action === "share" ? (
+              <Loader2 size={18} className="animate-spin" aria-hidden />
+            ) : (
+              <Share2 size={18} aria-hidden />
+            )}
+            {t.share}
+          </motion.button>
+        </Magnetic>
       </div>
 
       <p

@@ -10,6 +10,7 @@ import {
   type CardViewModel,
 } from "@/components/card";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { DURATION, EASE } from "@/lib/motion/tokens";
 
 /**
  * Responsive live preview. The card paints at its fixed 1080×1620 box; we scale
@@ -72,10 +73,14 @@ export function CardPreview({
                 initial={{ opacity: 0, scale: 0.985 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: DURATION.morph, ease: EASE.inOut }}
                 style={{ position: "absolute", inset: 0 }}
               >
-                <ComparisonCard model={model} slice={slice} t={t} />
+                {/* `animated` lights up the bar springs, count-ups and pulse —
+                    live preview only; the PNG route never passes it. The
+                    crossfade key re-mounts on slice change so the card morphs
+                    and re-fills/re-counts instead of hard-swapping. */}
+                <ComparisonCard model={model} slice={slice} t={t} animated />
               </motion.div>
             </AnimatePresence>
           )}

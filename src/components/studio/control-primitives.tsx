@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { SPRING } from "@/lib/motion/tokens";
 
 /**
  * Low-level, theme-tokened, accessible control primitives for the studio.
@@ -105,18 +107,28 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={active}
             onClick={() => onChange(item.value)}
-            className={`min-h-[40px] cursor-pointer rounded-[var(--radius-sm)] px-2 text-xs font-semibold transition-all duration-200 ${FOCUS_RING} ${
+            className={`relative min-h-[40px] cursor-pointer rounded-[var(--radius-sm)] px-2 text-xs font-semibold transition-colors duration-200 ${FOCUS_RING} ${
               active
                 ? "text-[var(--color-bg-base)]"
                 : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"
             }`}
-            style={
-              active
-                ? { background: accent, boxShadow: `0 0 16px color-mix(in srgb, ${accent} 60%, transparent)` }
-                : undefined
-            }
           >
-            {item.label}
+            {/* Shared-layout thumb glides under the active item (transform-only
+                via framer layout). Reduced-motion → instant via the layout
+                spring being effectively skipped by the project-wide gate. */}
+            {active && (
+              <motion.span
+                layoutId={`seg-${id}`}
+                aria-hidden
+                className="absolute inset-0 -z-0 rounded-[var(--radius-sm)]"
+                style={{
+                  background: accent,
+                  boxShadow: `0 0 16px color-mix(in srgb, ${accent} 60%, transparent)`,
+                }}
+                transition={SPRING.press}
+              />
+            )}
+            <span className="relative z-10">{item.label}</span>
           </button>
         );
       })}
@@ -137,6 +149,7 @@ export function PenaltiesToggle({
   accent: string;
   onChange: (checked: boolean) => void;
 }) {
+  const reduce = useReducedMotion();
   return (
     <div className="flex items-center justify-between gap-3">
       <label
@@ -155,10 +168,14 @@ export function PenaltiesToggle({
         className={`relative h-[28px] w-[52px] shrink-0 cursor-pointer rounded-full border border-[var(--color-border-glass)] transition-colors duration-200 ${FOCUS_RING}`}
         style={{ background: checked ? accent : "var(--color-surface-strong)" }}
       >
-        <span
+        {/* Thumb slides via transform-x (not `left`) on a spring; the project's
+            reduced-motion CSS gate also flattens it instantly. */}
+        <motion.span
           aria-hidden
-          className="absolute top-1/2 h-[20px] w-[20px] -translate-y-1/2 rounded-full bg-white shadow transition-[left] duration-200"
-          style={{ left: checked ? 28 : 4 }}
+          className="absolute left-1 top-1/2 h-[20px] w-[20px] rounded-full bg-white shadow"
+          style={{ y: "-50%" }}
+          animate={{ x: checked ? 24 : 0 }}
+          transition={reduce ? { duration: 0 } : SPRING.press}
         />
       </button>
     </div>

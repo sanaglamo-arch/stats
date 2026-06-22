@@ -78,17 +78,17 @@ export function PlayerControls({
   return (
     <section
       aria-label={meta.name}
-      className="glass flex flex-col gap-5 rounded-[var(--radius-lg)] p-5"
-      style={{ borderColor: "color-mix(in srgb, " + accent + " 40%, var(--color-border-glass))" }}
+      className="glass-panel flex flex-col gap-4 p-4"
+      style={{ borderColor: "color-mix(in srgb, " + accent + " 38%, var(--color-border-glass))" }}
     >
-      <header className="flex items-center gap-3">
+      <header className="flex items-center gap-2.5">
         <span
           aria-hidden
-          className="h-3 w-3 rounded-full"
+          className="h-2.5 w-2.5 rounded-full"
           style={{ background: accent, boxShadow: `0 0 12px ${accent}` }}
         />
         <h3
-          className="font-[family-name:var(--font-display)] text-lg font-black uppercase tracking-wide"
+          className="font-[family-name:var(--font-display)] text-sm font-black uppercase tracking-[0.12em]"
           style={{ color: accent }}
         >
           {meta.name}

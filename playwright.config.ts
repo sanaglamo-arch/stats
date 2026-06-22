@@ -1,7 +1,9 @@
 import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3000;
+// Port 3000 hosts the live production site in this environment — the dev/e2e
+// server must use 3100 so they never collide.
+const PORT = 3100;
 const baseURL = `http://localhost:${PORT}`;
 
 // Prefer the bundled Playwright browser; fall back to a system Chrome when the
@@ -24,6 +26,11 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
+    // Functional e2e runs with motion collapsed so the experience is
+    // deterministic: emulating prefers-reduced-motion disables Lenis (native
+    // scroll), the hero stagger, the card pulse/count-up/bar springs, parallax
+    // and magnetic effects — every motion path is gated on this preference.
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [
     {
@@ -37,7 +44,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm dev",
+    command: `pnpm exec next dev -p ${PORT}`,
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: !process.env.CI,

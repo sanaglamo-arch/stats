@@ -12,6 +12,16 @@ const en = {
   vs: "VS",
   overallResult: "Overall Result",
   categoriesWon: "categories won",
+
+  // Cinematic homepage
+  scrollCue: "Scroll to build your card",
+  studioKicker: "The Studio",
+  studioTitle: "Build the card. Tweak the slice.",
+  verdictKicker: "The Verdict",
+  verdictTitle: "Settle the debate.",
+  verdictBody:
+    "No opinions — just the score by categories. Pick a season, a competition, an age, and let the card do the arguing.",
+  footerNote: "A card for every argument.",
   period: "Period",
   download: "Download PNG",
   share: "Share",
@@ -21,6 +31,8 @@ const en = {
   // Studio / controls
   preview: "Live preview",
   controls: "Controls",
+  customize: "Customize",
+  done: "Done",
   periodMode: "Period",
   competition: "Competition",
   penalties: "Penalties",
@@ -78,6 +90,15 @@ const ru: Dictionary = {
   vs: "VS",
   overallResult: "Общий итог",
   categoriesWon: "категорий выиграно",
+
+  scrollCue: "Листай — собери карточку",
+  studioKicker: "Студия",
+  studioTitle: "Собери карточку. Настрой срез.",
+  verdictKicker: "Вердикт",
+  verdictTitle: "Закрой спор.",
+  verdictBody:
+    "Без мнений — только счёт по категориям. Выбери сезон, турнир, возраст — и пусть карточка спорит за тебя.",
+  footerNote: "Карточка для любого спора.",
   period: "Период",
   download: "Скачать PNG",
   share: "Поделиться",
@@ -86,6 +107,8 @@ const ru: Dictionary = {
 
   preview: "Живой предпросмотр",
   controls: "Настройки",
+  customize: "Настроить",
+  done: "Готово",
   periodMode: "Период",
   competition: "Турнир",
   penalties: "Пенальти",
