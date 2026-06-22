@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" role="img" aria-label="Stylized neon silhouette placeholder">
+  <defs>
+    <radialGradient id="mGlow" cx="50%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#ff5fb0" stop-opacity="0.55"/>
+      <stop offset="55%" stop-color="#e91e8c" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#e91e8c" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="mFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ff7ec2"/>
+      <stop offset="100%" stop-color="#e91e8c"/>
+    </linearGradient>
+    <filter id="mBlur" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="3.5"/>
+    </filter>
+  </defs>
+  <rect width="200" height="240" fill="url(#mGlow)"/>
+  <!-- Abstract footballer silhouette (generic, no likeness) -->
+  <g filter="url(#mBlur)" opacity="0.9">
+    <path d="M100 44c14 0 24 11 24 25s-10 25-24 25-24-11-24-25 10-25 24-25z" fill="url(#mFill)"/>
+    <path d="M62 196c0-30 16-66 38-66s38 36 38 66c0 8-76 8-76 0z" fill="url(#mFill)"/>
+  </g>
+  <g stroke="#ff5fb0" stroke-width="2.5" fill="none" opacity="0.95">
+    <path d="M100 44c14 0 24 11 24 25s-10 25-24 25-24-11-24-25 10-25 24-25z"/>
+    <path d="M62 196c0-30 16-66 38-66s38 36 38 66"/>
+  </g>
+</svg>

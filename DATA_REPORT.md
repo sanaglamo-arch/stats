@@ -75,6 +75,16 @@ launch, the owner MUST either:
 Real photos at viral scale = copyright + personality-rights exposure. The photo
 component takes a `src`, so swapping assets is a one-line change.
 
+**Phase 2 status (Card/Design):** the MVP intentionally ships **stylized neon
+silhouette placeholders** (`public/players/messi.svg`, `public/players/ronaldo.svg`)
+instead of real photos — no copyrighted likeness is embedded, so the build is
+legal and works offline. National-team flags (`public/flags/ar.svg`,
+`public/flags/pt.svg`) are simple renderings of public-domain national symbols.
+The `<PhotoSlot src=…>` component takes a replaceable `src`; dropping in a
+licensed photo later is a one-line change per player in
+`src/components/card/player-meta.ts`. The before-launch decision (licence real
+photos **or** commission art) is unchanged.
+
 ## How to regenerate
 
 ```bash

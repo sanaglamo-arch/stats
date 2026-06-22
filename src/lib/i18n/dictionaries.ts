@@ -17,6 +17,36 @@ const en = {
   share: "Share",
   language: "Language",
   buildingSoon: "The card studio is coming together. Pick a slice, get a card.",
+
+  // Period / context plaque
+  career: "Career",
+  lastNSeasons: "Last {n} seasons",
+  atAge: "At age {age}",
+  // Competition filters
+  compAll: "All competitions",
+  compLeague: "League",
+  compChampionsLeague: "Champions League",
+  compDomesticCup: "Domestic Cup",
+  compSuperCup: "Super Cup",
+  compClubWorldCup: "Club World Cup",
+  compNationalTeam: "National Team",
+  // Penalties filter chip
+  penaltiesIncluded: "Penalties incl.",
+  penaltiesExcluded: "Penalties excl.",
+
+  // Stat labels (SPEC §7)
+  statGoals: "Goals",
+  statAssists: "Assists",
+  statMatches: "Matches",
+  statMinutes: "Minutes",
+  statGoalsPer90: "Goals / 90",
+  statShotConversion: "Shot conversion",
+  statXg: "Expected goals (xG)",
+  statXa: "Expected assists (xA)",
+  statTrophies: "Trophies",
+  statBallonDor: "Ballon d'Or",
+  statYellowCards: "Yellow cards",
+  statRedCards: "Red cards",
 } as const;
 
 export type Dictionary = Record<keyof typeof en, string>;
@@ -32,6 +62,32 @@ const ru: Dictionary = {
   share: "Поделиться",
   language: "Язык",
   buildingSoon: "Студия карточек собирается. Выбери срез — получи карточку.",
+
+  career: "Карьера",
+  lastNSeasons: "Последние {n} сезонов",
+  atAge: "В возрасте {age}",
+  compAll: "Все турниры",
+  compLeague: "Лига",
+  compChampionsLeague: "Лига чемпионов",
+  compDomesticCup: "Кубок страны",
+  compSuperCup: "Суперкубок",
+  compClubWorldCup: "Клубный чемпионат мира",
+  compNationalTeam: "Сборная",
+  penaltiesIncluded: "С пенальти",
+  penaltiesExcluded: "Без пенальти",
+
+  statGoals: "Голы",
+  statAssists: "Ассисты",
+  statMatches: "Матчи",
+  statMinutes: "Минуты",
+  statGoalsPer90: "Голы / 90",
+  statShotConversion: "Конверсия ударов",
+  statXg: "Ожидаемые голы (xG)",
+  statXa: "Ожидаемые ассисты (xA)",
+  statTrophies: "Трофеи",
+  statBallonDor: "Золотой мяч",
+  statYellowCards: "Жёлтые карточки",
+  statRedCards: "Красные карточки",
 };
 
 export const dictionaries: Record<Locale, Dictionary> = { en, ru };

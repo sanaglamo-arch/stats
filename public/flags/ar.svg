@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 24" role="img" aria-label="Argentina">
+  <rect width="36" height="24" fill="#74ACDF"/>
+  <rect y="8" width="36" height="8" fill="#fff"/>
+  <circle cx="18" cy="12" r="2.6" fill="#F6B40E" stroke="#85340A" stroke-width="0.4"/>
+</svg>

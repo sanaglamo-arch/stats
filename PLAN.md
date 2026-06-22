@@ -22,10 +22,10 @@
 - [x] P1-8 Юнит-тесты нормализации и агрегации (фикстуры, без сети) — 41 тест зелёный (P1 commit)
 
 ## Фаза 2 — Генератор карточки (Card/Design Engineer + `ui-ux-pro-max`)
-- [ ] P2-1 Компонент карточки по эталону SPEC §4 (шапка, период, двойные бары, счёт по категориям, вотермарк), вертикаль 2:3
-- [ ] P2-2 Слот фото игрока (2 реальных ассета Месси/Роналду; before-launch TODO — права)
-- [ ] P2-3 Рендер карточки в PNG через **headless-браузер (Playwright screenshot)**, эндпоинт `/api/card`
-- [ ] P2-4 Тесты рендера (карточка генерится без ошибок на разных срезах)
+- [x] P2-1 Компонент карточки по эталону SPEC §4, вертикаль 2:3 (1080×1620) — glass+неон, дивергентные бары, mechanical score, вотермарк (P2 commit)
+- [x] P2-2 Слот фото игрока — replaceable src + 2 стилизованных SVG-силуэта (права = before-launch TODO в DATA_REPORT) (P2 commit)
+- [x] P2-3 Рендер в PNG через Playwright screenshot + `/api/card` — fallback на системный Chrome; контракт query→PNG (P2 commit)
+- [x] P2-4 Тесты рендера (view-model на срезах, browser-free) — 13 тестов карточки; реальные превью 1080×1620 в preview/ (P2 commit)
 
 ## Фаза 3 — Интерфейс (UI Engineer)
 - [ ] P3-1 Страница: выбор двух игроков (хардкод Месси/Роналду) + селекторы 4 срезов
@@ -48,3 +48,4 @@
 - 2026-06-21 ШАГ 0 — тулчейн node20 + pnpm9.15 (corepack-wrapper вместо сломанного self-exec shim); надёжный git-push с токеном через trap-scrub; реконсайл с непустым remote; docs запушены.
 - 2026-06-21 Фаза 0 (P0-1..P0-5) — Next15/React19/TS-strict/Tailwind v4, dark-neon токены (Orbitron+Inter, glass), i18n RU/EN, ESLint/Prettier/Vitest/Playwright. Гейты: typecheck ✓ lint ✓ test 4/4 ✓ build ✓. ВАЖНО: билд гнать с отключённым sandbox (иначе SIGKILL/exit144). Каркас собран дирижёром из-за временного 529 на спавне субагентов; гейты прогнаны прозрачно.
 - 2026-06-21 Фаза 1 (P1-1..P1-8) — ingestion-pipeline за `DataSource`: схема PlayerSeasonComp, адаптеры Wikidata/Understat/FBref (реальный парс + фолбэк на seed), резалки 4 срезов + производные + compare(). Датасет 112 строк (Месси 55, Роналду 57, 6 типов турниров), все verified:false, DATA_REPORT.md. Делегировано Data Engineer; отдельные Tester (гейты PASS) и Reviewer (APPROVE-WITH-NITS); фиксы по ревью (Understat league-keying баг, удалён dead code, общий enrich-хелпер, compare по ключам). Гейты: typecheck ✓ lint ✓ test 41/41 ✓ build ✓.
+- 2026-06-21 Фаза 2 (P2-1..P2-4) — карточка по SPEC §4 (Orbitron+tabular, дивергентные бары, mechanical verdict, вотермарк), 2:3 1080×1620; PNG-рендер через Playwright (`/api/card`, fallback на системный Chrome); слот фото + 2 SVG-силуэта. Делегировано Card Engineer (ui-ux-pro-max); Tester PASS (54 теста, превью 1080×1620 реальные), Reviewer APPROVE-WITH-NITS; убрано мёртвое поле accentBrightVar. Дирижёр глазами одобрил превью (owner checkpoint). ⚠️ Данные seed: счёт перекошен (напр. Ballon d'Or Месси показывает 4 вместо 8) — на сверку владельцу (verified:false). Гейты: typecheck ✓ lint ✓ test 54/54 ✓ build ✓.

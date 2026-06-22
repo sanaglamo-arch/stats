@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 24" role="img" aria-label="Portugal">
+  <rect width="36" height="24" fill="#FF0000"/>
+  <rect width="14.4" height="24" fill="#006600"/>
+  <circle cx="14.4" cy="12" r="4" fill="#FFD700" stroke="#fff" stroke-width="0.5"/>
+  <rect x="12.4" y="10" width="4" height="4" fill="#FF0000" stroke="#fff" stroke-width="0.4"/>
+</svg>
