@@ -5,11 +5,11 @@
 Формат: `- [x] PXX-N ... — заметка (commit)`.
 
 ## Фаза 0 — Каркас (Architect)
-- [ ] P0-1 Скаффолд Next.js 15 + React 19 + TS strict + Tailwind v4, src/, алиас `@/`, pnpm
-- [ ] P0-2 Тулинг: ESLint+Prettier, Vitest, Playwright; скрипты typecheck/lint/test/build/e2e
-- [ ] P0-3 Дизайн-токены: тёмный-неон шаблон, CSS-переменные, шрифты (через `ui-ux-pro-max`)
-- [ ] P0-4 i18n-каркас (RU+EN словари, переключатель)
-- [ ] P0-5 CI-гейты локально зелёные на пустом каркасе
+- [x] P0-1 Скаффолд Next.js 15 + React 19 + TS strict + Tailwind v4, src/, алиас `@/`, pnpm — (P0 commit)
+- [x] P0-2 Тулинг: ESLint+Prettier, Vitest, Playwright; скрипты typecheck/lint/test/build/e2e — (P0 commit)
+- [x] P0-3 Дизайн-токены: тёмный-неон шаблон, CSS-переменные, шрифты (через `ui-ux-pro-max`) — Orbitron+Inter, glassmorphism+неон (P0 commit)
+- [x] P0-4 i18n-каркас (RU+EN словари, переключатель) — типизированный словарь + провайдер + тоггл (P0 commit)
+- [x] P0-5 CI-гейты локально зелёные на пустом каркасе — typecheck/lint/test(4)/build ✓ (P0 commit)
 
 ## Фаза 1 — Данные / ingestion-pipeline (Data Engineer)
 - [ ] P1-1 Схема `PlayerSeasonComp` (types.ts) + интерфейс `DataSource`
@@ -45,3 +45,5 @@
 
 ## Журнал прогресса (агенты дописывают снизу)
 <!-- 2026-XX-XX PX-Y done — заметка, commit -->
+- 2026-06-21 ШАГ 0 — тулчейн node20 + pnpm9.15 (corepack-wrapper вместо сломанного self-exec shim); надёжный git-push с токеном через trap-scrub; реконсайл с непустым remote; docs запушены.
+- 2026-06-21 Фаза 0 (P0-1..P0-5) — Next15/React19/TS-strict/Tailwind v4, dark-neon токены (Orbitron+Inter, glass), i18n RU/EN, ESLint/Prettier/Vitest/Playwright. Гейты: typecheck ✓ lint ✓ test 4/4 ✓ build ✓. ВАЖНО: билд гнать с отключённым sandbox (иначе SIGKILL/exit144). Каркас собран дирижёром из-за временного 529 на спавне субагентов; гейты прогнаны прозрачно.

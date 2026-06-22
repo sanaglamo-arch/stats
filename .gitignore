@@ -1,4 +1,20 @@
+# local push helper (reads token at runtime, never stores it)
 .gitpush.sh
+
+# deps
 node_modules/
+
+# next
 .next/
+out/
+
+# test / build artifacts
+playwright-report/
+test-results/
+coverage/
+*.tsbuildinfo
+
+# misc
 *.log
+.DS_Store
+.vercel

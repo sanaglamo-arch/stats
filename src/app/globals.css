@@ -1,0 +1,100 @@
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/*
+  FootyCompare design tokens — dark glassmorphism + neon.
+  Single cohesive theme. Messi = pink zone, Ronaldo = blue zone, Gold = "win" highlight.
+  Designed via the ui-ux-pro-max skill.
+*/
+@theme {
+  /* Fonts */
+  --font-display: "Orbitron", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Base surfaces */
+  --color-bg-base: #0a0e1a;
+  --color-bg-elevated: #0f172a;
+  --color-surface: rgba(255, 255, 255, 0.04);
+  --color-surface-strong: rgba(255, 255, 255, 0.07);
+  --color-border-glass: rgba(255, 255, 255, 0.1);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+
+  /* Text */
+  --color-text: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+
+  /* Messi (pink) zone */
+  --color-messi: #e91e8c;
+  --color-messi-bright: #ff5fb0;
+  --color-messi-soft: rgba(233, 30, 140, 0.18);
+
+  /* Ronaldo (blue) zone */
+  --color-ronaldo: #2ea8ff;
+  --color-ronaldo-bright: #6fc8ff;
+  --color-ronaldo-soft: rgba(46, 168, 255, 0.18);
+
+  /* Win / gold highlight */
+  --color-gold: #f5c451;
+  --color-gold-bright: #ffd75e;
+
+  /* Focus ring */
+  --color-ring: #a855f7;
+
+  /* Radius scale */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+
+  /* Neon glow shadows */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-glow-messi: 0 0 24px rgba(233, 30, 140, 0.45);
+  --shadow-glow-ronaldo: 0 0 24px rgba(46, 168, 255, 0.45);
+  --shadow-glow-gold: 0 0 24px rgba(245, 196, 81, 0.5);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background:
+    radial-gradient(1200px 800px at 15% -10%, rgba(233, 30, 140, 0.12), transparent 60%),
+    radial-gradient(1200px 800px at 85% 110%, rgba(46, 168, 255, 0.12), transparent 60%),
+    var(--color-bg-base);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Tabular numerals for all stat figures */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* Glass surface helper */
+.glass {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--shadow-glass);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
