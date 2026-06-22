@@ -1,0 +1,4 @@
+.gitpush.sh
+node_modules/
+.next/
+*.log
