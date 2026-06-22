@@ -1,7 +1,18 @@
+import { existsSync } from "node:fs";
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3000;
 const baseURL = `http://localhost:${PORT}`;
+
+// Prefer the bundled Playwright browser; fall back to a system Chrome when the
+// download is unavailable (the sandbox here ships Chrome but no PW browser).
+const SYSTEM_CHROME = [
+  process.env.CHROME_PATH,
+  "/opt/google/chrome/chrome",
+  "/usr/bin/google-chrome",
+  "/usr/bin/chromium-browser",
+  "/usr/bin/chromium",
+].find((p): p is string => Boolean(p) && existsSync(p as string));
 
 export default defineConfig({
   testDir: "./e2e",
@@ -17,7 +28,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        ...(SYSTEM_CHROME
+          ? { launchOptions: { executablePath: SYSTEM_CHROME, args: ["--no-sandbox"] } }
+          : {}),
+      },
     },
   ],
   webServer: {
