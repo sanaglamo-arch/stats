@@ -1,18 +1,24 @@
 "use client";
 
 import { Users } from "lucide-react";
+import type { MetricKey } from "@/lib/data";
 import type { CardSlice, SideOptions } from "@/components/card";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { PlayerControls } from "./player-controls";
-import { Select } from "./control-primitives";
+import { NeonSelect } from "./control-primitives";
+import { StatPicker } from "./stat-picker";
 import type { PlayerSliceOptions } from "./slice-options";
 
 /**
- * The studio control set — both per-player slice panels + the same-age
- * convenience. Rendered once and re-homed by CSS: it is the quiet glass rail on
- * desktop (≥lg) and the body of the mobile bottom-sheet below lg. Keeping a
- * single instance avoids duplicate ARIA regions (the e2e selectors and screen
- * readers see exactly one "Lionel Messi" / "Cristiano Ronaldo" region).
+ * The studio control set — clear top-down hierarchy (P6-8 + P6-10):
+ *   1. per-player period blocks (mode segmented control + value pickers);
+ *   2. a same-age convenience;
+ *   3. the stat-selection block (chips + group presets + reorder).
+ *
+ * The global competition TABS live one level up (full-width, above the rail/card)
+ * in <Studio>. This set is rendered once and re-homed by CSS (desktop rail /
+ * mobile sheet) so there is a single instance of every ARIA region (one
+ * "Lionel Messi" / "Cristiano Ronaldo" region) for screen readers and e2e.
  */
 export function StudioControls({
   slice,
@@ -23,6 +29,7 @@ export function StudioControls({
   onMessiChange,
   onRonaldoChange,
   onSameAge,
+  onMetricsChange,
 }: {
   slice: CardSlice;
   messiOptions: PlayerSliceOptions;
@@ -32,6 +39,7 @@ export function StudioControls({
   onMessiChange: (next: SideOptions) => void;
   onRonaldoChange: (next: SideOptions) => void;
   onSameAge: (age: number) => void;
+  onMetricsChange: (next: MetricKey[]) => void;
 }) {
   // Same-age is active only when both sides already point at the same age value.
   const sameAgeValue =
@@ -65,17 +73,18 @@ export function StudioControls({
             {t.sameAge}
           </label>
         </div>
-        <Select
+        <NeonSelect
           id="same-age"
+          ariaLabel={t.sameAge}
+          placeholder="—"
           value={sameAgeValue === null ? "" : String(sameAgeValue)}
           onChange={(raw) => onSameAge(Number.parseInt(raw, 10))}
-          options={[
-            { value: "", label: "—" },
-            ...sharedAges.map((age) => ({ value: String(age), label: String(age) })),
-          ]}
+          options={sharedAges.map((age) => ({ value: String(age), label: String(age) }))}
         />
         <p className="text-xs leading-relaxed text-[var(--color-text-muted)]">{t.sameAgeHint}</p>
       </section>
+
+      <StatPicker metrics={slice.metrics} t={t} onChange={onMetricsChange} />
     </div>
   );
 }

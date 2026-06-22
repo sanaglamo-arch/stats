@@ -1,6 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
+import * as RadixSelect from "@radix-ui/react-select";
+import { Check, ChevronDown } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { SPRING } from "@/lib/motion/tokens";
 
@@ -37,42 +39,65 @@ export function Field({
 
 export type Option = { value: string; label: string };
 
-export function Select({
+/**
+ * Site-style value picker built on @radix-ui/react-select — replaces the native
+ * `<select>` entirely. The trigger is a dark-neon glass pill with a chevron; the
+ * content is a glass popover that scales/fades up on open (`.neon-popover`,
+ * reduced-motion safe) with a check-marked selected item. Radix supplies full
+ * keyboard + a11y (the trigger reports `role="combobox"`, the list `listbox`,
+ * items `option`). `placeholder` shows when `value` is empty.
+ */
+export function NeonSelect({
   id,
   value,
   options,
   onChange,
+  ariaLabel,
+  placeholder = "—",
 }: {
   id: string;
   value: string;
   options: Option[];
   onChange: (value: string) => void;
+  ariaLabel?: string;
+  placeholder?: string;
 }) {
   return (
-    <div className="relative">
-      <select
+    <RadixSelect.Root value={value || undefined} onValueChange={onChange}>
+      <RadixSelect.Trigger
         id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={`tabular w-full min-h-[44px] cursor-pointer appearance-none rounded-[var(--radius-md)] border border-[var(--color-border-glass)] bg-[var(--color-surface-strong)] px-4 pr-10 text-sm font-medium text-[var(--color-text)] transition-colors duration-200 hover:border-[var(--color-border-strong)] ${FOCUS_RING}`}
+        aria-label={ariaLabel}
+        className={`tabular flex min-h-[44px] w-full cursor-pointer items-center justify-between gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-glass)] bg-[var(--color-surface-strong)] px-4 text-sm font-medium text-[var(--color-text)] transition-colors duration-200 hover:border-[var(--color-border-strong)] data-[state=open]:border-[var(--color-border-strong)] ${FOCUS_RING}`}
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value} className="bg-[var(--color-bg-elevated)]">
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <svg
-        aria-hidden
-        viewBox="0 0 20 20"
-        className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--color-text-muted)]"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path d="M6 8l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    </div>
+        <RadixSelect.Value placeholder={placeholder} />
+        <RadixSelect.Icon className="text-[var(--color-text-muted)]">
+          <ChevronDown size={16} aria-hidden className="transition-transform duration-200" />
+        </RadixSelect.Icon>
+      </RadixSelect.Trigger>
+
+      <RadixSelect.Portal>
+        <RadixSelect.Content
+          position="popper"
+          sideOffset={6}
+          className="neon-popover z-[1000] max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-bg-elevated)]/95 shadow-[var(--shadow-glass)] backdrop-blur-2xl"
+        >
+          <RadixSelect.Viewport className="p-1.5">
+            {options.map((opt) => (
+              <RadixSelect.Item
+                key={opt.value}
+                value={opt.value}
+                className={`tabular relative flex min-h-[40px] cursor-pointer select-none items-center gap-2 rounded-[var(--radius-sm)] px-3 pr-8 text-sm font-medium text-[var(--color-text-secondary)] outline-none data-[highlighted]:bg-[var(--color-surface-strong)] data-[highlighted]:text-[var(--color-text)] data-[state=checked]:text-[var(--color-text)]`}
+              >
+                <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
+                <RadixSelect.ItemIndicator className="absolute right-2.5 inline-flex">
+                  <Check size={16} aria-hidden className="text-[var(--color-gold)]" />
+                </RadixSelect.ItemIndicator>
+              </RadixSelect.Item>
+            ))}
+          </RadixSelect.Viewport>
+        </RadixSelect.Content>
+      </RadixSelect.Portal>
+    </RadixSelect.Root>
   );
 }
 

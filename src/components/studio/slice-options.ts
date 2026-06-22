@@ -4,7 +4,7 @@ import { rowsForPlayer, type PlayerId, type PlayerSeasonComp } from "@/lib/data"
  * Valid selector domains for one player, derived from the dataset (never
  * hardcoded — SPEC §6). Seasons are newest-first (so the default-open option is
  * the most recent), ages ascending. The studio uses these to populate the
- * season <select> and the age slider/select per player.
+ * per-player season / age value pickers (NeonSelect, Radix-based).
  */
 export type PlayerSliceOptions = {
   /** Season labels available for this player, newest first. */

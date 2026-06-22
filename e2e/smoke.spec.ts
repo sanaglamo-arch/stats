@@ -8,6 +8,10 @@ test("studio renders the matchup, controls, preview, actions and i18n toggle", a
   await expect(heading).toContainText("MESSI");
   await expect(heading).toContainText("RONALDO");
 
+  // Global competition context tabs (P6-10) render as a tablist.
+  await expect(page.getByRole("tab", { name: /Champions League/i })).toBeVisible();
+  await expect(page.getByRole("tab", { name: /^All$/i })).toBeVisible();
+
   // Per-player control panels render with their period segmented control.
   const messiPanel = page.getByRole("region", { name: "Lionel Messi" });
   const ronaldoPanel = page.getByRole("region", { name: "Cristiano Ronaldo" });
@@ -35,6 +39,17 @@ test("studio renders the matchup, controls, preview, actions and i18n toggle", a
   );
   // The card period plaque now reads "Career" (default Messi was a single season).
   await expect(page.getByText("Career").first()).toBeVisible();
+
+  // Toggling a stat chip (P6-8) changes the card: dropping "Goals" lowers the
+  // contested-categories total shown in the card's result footer.
+  const contestedBefore = await page.getByText(/categories won/i).first().textContent();
+  const goalsChip = page.getByRole("switch", { name: /^Goals$/ });
+  await expect(goalsChip).toBeVisible();
+  await goalsChip.click();
+  await expect(goalsChip).toHaveAttribute("aria-checked", "false");
+  await expect(page.getByText(/categories won/i).first()).not.toHaveText(
+    contestedBefore ?? "",
+  );
 
   // RU/EN toggle flips the UI copy.
   const toggle = page.getByRole("group", { name: /language|язык/i });

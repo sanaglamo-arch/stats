@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
-import { dataSource, type SeasonSelection } from "@/lib/data";
+import { dataSource, type MetricKey, type SeasonSelection } from "@/lib/data";
 import {
   buildCardViewModel,
   DEFAULT_SLICE,
@@ -13,6 +13,12 @@ import { useI18n } from "@/lib/i18n/provider";
 import { CardPreview } from "./card-preview";
 import { ShareActions } from "./share-actions";
 import { StudioControls } from "./studio-controls";
+import {
+  CompetitionTabs,
+  competitionsForContext,
+  contextFromCompetitions,
+  type CompetitionContext,
+} from "./competition-tabs";
 import { BottomSheet, FadeIn, TiltCard } from "./motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { commonAges, playerSliceOptions } from "./slice-options";
@@ -40,6 +46,24 @@ import { commonAges, playerSliceOptions } from "./slice-options";
  * screen readers and the e2e selectors. SSR/first paint assume desktop, then the
  * effect corrects on mount (no hydration text mismatch — only placement).
  */
+/**
+ * Apply (or clear) the global stacking competition set on one side. Passing
+ * `undefined` removes the optional `competitions` field entirely so the side
+ * round-trips through paramsFromSlice identically to a default slice (the "All"
+ * tab must not leave an empty array behind).
+ */
+function applyCompetitions(
+  side: SideOptions,
+  competitions: SideOptions["competitions"],
+): SideOptions {
+  if (competitions && competitions.length > 0) {
+    return { ...side, competitions };
+  }
+  const { competitions: _omit, ...rest } = side;
+  void _omit;
+  return rest;
+}
+
 function useIsDesktop(): boolean {
   const [isDesktop, setIsDesktop] = useState(true);
   useEffect(() => {
@@ -82,6 +106,22 @@ export function Studio() {
     }));
   };
 
+  // The global competition context (P6-10): one tab sets the same `competitions`
+  // set on BOTH sides. `undefined` (the "All" tab) drops the field so the slice
+  // round-trips through paramsFromSlice byte-identically to the default.
+  const setCompetitionContext = (ctx: CompetitionContext) => {
+    const competitions = competitionsForContext(ctx);
+    setSlice((s) => ({
+      ...s,
+      messi: applyCompetitions(s.messi, competitions),
+      ronaldo: applyCompetitions(s.ronaldo, competitions),
+    }));
+  };
+
+  const setMetrics = (metrics: MetricKey[]) => setSlice((s) => ({ ...s, metrics }));
+
+  const activeContext = contextFromCompetitions(slice.messi.competitions);
+
   const controls = (
     <StudioControls
       slice={slice}
@@ -92,11 +132,27 @@ export function Studio() {
       onMessiChange={setMessi}
       onRonaldoChange={setRonaldo}
       onSameAge={applySameAge}
+      onMetricsChange={setMetrics}
     />
+  );
+
+  const competitionTabs = (
+    <CompetitionTabs value={activeContext} t={t} onChange={setCompetitionContext} />
   );
 
   return (
     <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-10">
+      {/* ── Global competition context (P6-10): full-width tab bar at the top,
+          spanning both columns. One switch applies to BOTH players. ── */}
+      <FadeIn className="order-0 lg:col-span-2">
+        <div className="glass-panel flex flex-col gap-3 p-4">
+          <span className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[var(--color-text-muted)]">
+            {t.competitionContext}
+          </span>
+          {competitionTabs}
+        </div>
+      </FadeIn>
+
       {/* ── Hero stage: the card dominates. ── */}
       <FadeIn className="relative order-1 flex flex-col items-center gap-6 pb-24 lg:pb-0">
         <div className="card-halo" aria-hidden />

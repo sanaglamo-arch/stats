@@ -145,6 +145,27 @@ body {
   filter: blur(46px);
 }
 
+/*
+  Radix Select / dropdown open animation. The glass popover scales + fades up
+  from its trigger (modal-motion / spatial continuity). Transform + opacity only
+  so it never reflows. Reduced-motion (below) flattens it to an instant show.
+*/
+@keyframes neon-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.neon-popover[data-state="open"] {
+  animation: neon-pop-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: var(--radix-select-content-transform-origin);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -152,5 +173,9 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .neon-popover[data-state="open"] {
+    animation: none;
   }
 }

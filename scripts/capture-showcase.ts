@@ -72,14 +72,20 @@ async function main(): Promise<void> {
   await sleep(1400);
   await page.screenshot({ path: join(PREVIEW, "home-desktop-studio.png") });
 
-  // 3) Change a slice on each player → card morph/crossfade + re-count.
+  // 3) Drive the NEW controls → card morph/crossfade + re-count.
+  //    - global Champions League context tab (applies to both players);
+  //    - Messi → career period;
+  //    - Ronaldo → penalties toggle;
+  //    - drop a stat chip via the stat picker.
   const messiPanel = page.getByRole("region", { name: "Lionel Messi" });
   const ronaldoPanel = page.getByRole("region", { name: "Cristiano Ronaldo" });
+  await page.getByRole("tab", { name: /Champions League/i }).click();
+  await sleep(900);
   await messiPanel.getByRole("radio", { name: /^Career$/i }).click();
   await sleep(900);
-  await ronaldoPanel.locator("#ronaldo-comp").selectOption("champions_league");
-  await sleep(900);
   await ronaldoPanel.getByRole("switch").click();
+  await sleep(900);
+  await page.getByRole("switch", { name: /^Goals$/ }).click();
   await sleep(1300);
   await page.screenshot({ path: join(PREVIEW, "home-desktop-card-updated.png") });
 

@@ -1,36 +1,16 @@
 "use client";
 
-import type { CompetitionFilter, PlayerId, SeasonSelection } from "@/lib/data";
+import type { PlayerId, SeasonSelection } from "@/lib/data";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { SideOptions } from "@/components/card";
 import { PLAYER_META } from "@/components/card";
 import type { PlayerSliceOptions } from "./slice-options";
-import { Field, PenaltiesToggle, SegmentedControl, Select } from "./control-primitives";
+import { Field, NeonSelect, PenaltiesToggle, SegmentedControl } from "./control-primitives";
 
 /** Season-selection modes exposed in the UI (maps to SeasonSelection.kind). */
 type SeasonMode = "season" | "career" | "lastNSeasons" | "age";
 
 const LAST_N_CHOICES = [3, 5, 10] as const;
-
-const COMPETITIONS: readonly CompetitionFilter[] = [
-  "all",
-  "league",
-  "champions_league",
-  "domestic_cup",
-  "super_cup",
-  "club_world_cup",
-  "national_team",
-];
-
-const COMP_LABEL_KEYS: Record<CompetitionFilter, keyof Dictionary> = {
-  all: "compAll",
-  league: "compLeague",
-  champions_league: "compChampionsLeague",
-  domestic_cup: "compDomesticCup",
-  super_cup: "compSuperCup",
-  club_world_cup: "compClubWorldCup",
-  national_team: "compNationalTeam",
-};
 
 /**
  * Switch the active period mode while keeping a sensible value: e.g. flipping to
@@ -108,8 +88,9 @@ export function PlayerControls({
 
       {mode === "season" && (
         <Field label={t.selectSeason} htmlFor={`${player}-season`}>
-          <Select
+          <NeonSelect
             id={`${player}-season`}
+            ariaLabel={`${meta.name} — ${t.selectSeason}`}
             value={side.selection.kind === "season" ? side.selection.season : ""}
             onChange={(season) => setSelection({ kind: "season", season })}
             options={options.seasons.map((s) => ({ value: s, label: s }))}
@@ -119,8 +100,9 @@ export function PlayerControls({
 
       {mode === "lastNSeasons" && (
         <Field label={t.modeLastN} htmlFor={`${player}-lastn`}>
-          <Select
+          <NeonSelect
             id={`${player}-lastn`}
+            ariaLabel={`${meta.name} — ${t.modeLastN}`}
             value={side.selection.kind === "lastNSeasons" ? String(side.selection.n) : ""}
             onChange={(raw) => setSelection({ kind: "lastNSeasons", n: Number.parseInt(raw, 10) })}
             options={LAST_N_CHOICES.map((n) => ({
@@ -133,23 +115,15 @@ export function PlayerControls({
 
       {mode === "age" && (
         <Field label={t.modeAge} htmlFor={`${player}-age`}>
-          <Select
+          <NeonSelect
             id={`${player}-age`}
+            ariaLabel={`${meta.name} — ${t.modeAge}`}
             value={side.selection.kind === "age" ? String(side.selection.age) : ""}
             onChange={(raw) => setSelection({ kind: "age", age: Number.parseInt(raw, 10) })}
             options={options.ages.map((age) => ({ value: String(age), label: String(age) }))}
           />
         </Field>
       )}
-
-      <Field label={t.competition} htmlFor={`${player}-comp`}>
-        <Select
-          id={`${player}-comp`}
-          value={side.competition}
-          onChange={(raw) => onChange({ ...side, competition: raw as CompetitionFilter })}
-          options={COMPETITIONS.map((c) => ({ value: c, label: t[COMP_LABEL_KEYS[c]] }))}
-        />
-      </Field>
 
       <PenaltiesToggle
         id={`${player}-pen`}

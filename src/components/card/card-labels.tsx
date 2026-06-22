@@ -18,7 +18,13 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
-import { METRIC_CATALOG, type CardStatKey, type CompetitionFilter, type SeasonSelection } from "@/lib/data";
+import {
+  METRIC_CATALOG,
+  type CardStatKey,
+  type CompetitionFilter,
+  type CompetitionType,
+  type SeasonSelection,
+} from "@/lib/data";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { SideOptions } from "./card-model";
 
@@ -72,6 +78,23 @@ export function competitionLabel(t: Dictionary, comp: CompetitionFilter): string
   return t[COMP_LABEL_KEYS[comp]];
 }
 
+/** The cup competition types grouped under the single "Cups" context tab. */
+const CUP_TYPES: readonly CompetitionType[] = ["domestic_cup", "super_cup", "club_world_cup"];
+
+/**
+ * Human label for a stacking competition set (the global context tabs set
+ * `competitions`, keeping `competition:"all"`). The cup trio collapses to a
+ * single "Cups" chip; a single type reads as that competition's name; any other
+ * mix joins the individual labels.
+ */
+export function competitionsLabel(t: Dictionary, competitions: readonly CompetitionType[]): string {
+  const set = new Set(competitions);
+  if (set.size === CUP_TYPES.length && CUP_TYPES.every((c) => set.has(c))) {
+    return t.compCups;
+  }
+  return competitions.map((c) => competitionLabel(t, c)).join(" + ");
+}
+
 /** Human label for a season selection, e.g. "2011/12", "Career", "At age 25". */
 export function selectionLabel(t: Dictionary, selection: SeasonSelection): string {
   switch (selection.kind) {
@@ -89,7 +112,13 @@ export function selectionLabel(t: Dictionary, selection: SeasonSelection): strin
 /** Active-filter chips for one side, excluding the always-shown period itself. */
 export function contextChips(t: Dictionary, opts: SideOptions): string[] {
   const chips: string[] = [];
-  if (opts.competition !== "all") chips.push(competitionLabel(t, opts.competition));
+  // The stacking `competitions` set (set by the global context tabs) takes
+  // precedence over the single `competition` field, mirroring the data layer.
+  if (opts.competitions && opts.competitions.length > 0) {
+    chips.push(competitionsLabel(t, opts.competitions));
+  } else if (opts.competition !== "all") {
+    chips.push(competitionLabel(t, opts.competition));
+  }
   chips.push(opts.includePenalties ? t.penaltiesIncluded : t.penaltiesExcluded);
   return chips;
 }
