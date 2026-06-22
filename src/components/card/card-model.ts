@@ -120,11 +120,11 @@ export function buildCardViewModel(
   return {
     messi: {
       club: clubLabel(sliceRows(rows, { ...slice.messi, player: "messi" })),
-      trophies: result.messi.totals.trophies.length,
+      trophies: result.messi.totals.trophyCount,
     },
     ronaldo: {
       club: clubLabel(sliceRows(rows, { ...slice.ronaldo, player: "ronaldo" })),
-      trophies: result.ronaldo.totals.trophies.length,
+      trophies: result.ronaldo.totals.trophyCount,
     },
     rows: statRows,
     score: result.score,

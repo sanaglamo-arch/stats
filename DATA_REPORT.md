@@ -4,15 +4,75 @@
 > dataset is `verified: false`. Nothing here is launch-grade until a human
 > checks the numbers against an authoritative source.
 
+## Accuracy pass (2026-06-21)
+
+A pre-launch **data-accuracy calibration** was applied to the hand-built seed so
+the headline career aggregates match well-documented reality (as of ~2024/25).
+The per-(season × competition) granularity and all six competition types were
+**kept intact** — nothing was collapsed to a single career row, so the four UI
+slices (season pick / competition filter / same-age / penalties on-off) still
+work. All rows remain `verified: false`.
+
+**What was corrected:**
+
+- **Ballon d'Or placement** — Messi raised from 4 → **8** awards, each placed in
+  the season whose calendar contains the award year: 2008/09 (2009), 2009/10
+  (2010), 2010/11 (2011), 2011/12 (2012), 2014/15 (2015), 2018/19 (2019),
+  2021/22 (2021), 2022/23 (2023). Ronaldo kept at **5**: 2008/09 (2008), 2013/14
+  (2013), 2014/15 (2014), 2016/17 (2016), 2017/18 (2017).
+- **Career aggregates calibrated** to documented rounded reality by adjusting the
+  per-season rows so their SUM hits the targets — denser national-team coverage
+  (caps ≈ 191 Messi / ≈ 220 Ronaldo), fuller domestic-cup / super-cup / club
+  world cup rows, and Inter Miami / Al Nassr depth were the main additions.
+- **Internal consistency preserved at every row**: shots scaled with goals
+  (overall conversion Messi ~18.5%, Ronaldo ~15.8%; no row >36%), `penaltyGoals`
+  and `freekickGoals` ≤ `goals` per row, minutes/appearance in a plausible band
+  (debut/cameo rows excepted), xG/xA only on 2014+ rows (null before) and in the
+  same ballpark as goals/assists.
+- **Counting-logic fix (aggregation engine, not data):** the card's **Trophies**
+  and **Ballon d'Or** stats previously counted *distinct names* (so 10× La Liga =
+  1, and 8 identical "Ballon d'Or" strings = 1). Now **Trophies = trophies WON**
+  (distinct season+name → Messi 44 / Ronaldo 35) and **Ballon d'Or = distinct
+  seasons won** (Messi 8 / Ronaldo 5). This is why the career card shows Messi
+  leading both categories; the verdict stays strictly mechanical.
+
+**New audited career aggregates (all competitions, penalties incl.), computed
+from the regenerated `dataset.json`:**
+
+| Metric | Messi | Ronaldo |
+|---|---|---|
+| Ballon d'Or | **8** | **5** |
+| Career goals | 840 | 901 |
+| Penalty goals (subset) | 114 | 175 |
+| Assists | 380 | 245 |
+| Appearances | 1084 | 1271 |
+| Minutes | 88,009 | 100,002 |
+| Major team trophies (count) | 44 | 35 |
+| Rows | 93 | 94 |
+
+**Still needs owner manual verification (all rows remain `verified:false`):**
+
+- **Exact per-season / per-competition splits are approximate.** Career *totals*
+  are calibrated to documented reality, but the distribution across individual
+  rows (which season/competition each goal, penalty, assist and minute lands in)
+  is a plausible reconstruction, not a sourced split.
+- **Penalty, assist and minute distribution** per row — spot-check against an
+  authoritative source before launch.
+- **Trophy lists** — the *count* is calibrated (~44 / ~35), but verify the exact
+  competition+season list (e.g. which seasons carry Supercopa/UEFA Super Cup/CWC).
+- xG/xA values remain seed estimates (Understat unreachable this run).
+
 ## TL;DR
 
-- Dataset: `src/data/dataset.json` — **112 rows** (Messi 55, Ronaldo 57).
+- Dataset: `src/data/dataset.json` — **187 rows** (Messi 93, Ronaldo 94).
 - Coverage: Messi **2004/05 → 2024/25**, Ronaldo **2002/03 → 2024/25**, split by
   competition (`league` / `champions_league` / `domestic_cup` / `super_cup` /
   `club_world_cup` / `national_team`), with age-per-season and a penalty
   breakdown — so all four UI slices work.
 - **All numbers are currently SEED (hand-built, plausible) and need verification.**
   Live fetch was attempted for every source; all degraded gracefully this run.
+  Career *aggregates* were calibrated to documented reality on 2026-06-21 (see
+  the Accuracy pass section above); per-row splits remain approximate.
 
 ## Sources & what each provides
 

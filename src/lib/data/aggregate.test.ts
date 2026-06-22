@@ -117,7 +117,7 @@ describe("aggregate — penalties on/off (slice 4)", () => {
     expect(totals.penaltyGoals).toBe(8); // breakdown still reported
   });
 
-  it("dedupes trophies and awards across rows", () => {
+  it("dedupes trophy/award NAMES but counts trophies WON and Ballon d'Or wins", () => {
     const messi2011 = sliceRows(FIXTURE, {
       player: "messi",
       selection: { kind: "season", season: "2011/12" },
@@ -125,8 +125,26 @@ describe("aggregate — penalties on/off (slice 4)", () => {
       includePenalties: true,
     });
     const totals = aggregate(messi2011, true);
+    // Distinct names are still deduped for display...
     expect(totals.trophies).toEqual(["La Liga"]);
     expect(totals.individualAwards).toEqual(["Ballon d'Or"]);
+    // ...but the COUNTS reflect wins in this single season.
+    expect(totals.trophyCount).toBe(1);
+    expect(totals.ballonDor).toBe(1);
+  });
+
+  it("counts a repeated trophy across seasons as multiple wins (not one)", () => {
+    // Messi career fixture: La Liga appears in 2011/12 AND 2014/15.
+    const career = sliceRows(FIXTURE, {
+      player: "messi",
+      selection: { kind: "career" },
+      competition: "all",
+      includePenalties: true,
+    });
+    const totals = aggregate(career, true);
+    expect(totals.trophies).toEqual(["La Liga"]); // one distinct name
+    expect(totals.trophyCount).toBe(2); // but two wins (2011/12 + 2014/15)
+    expect(totals.ballonDor).toBe(1); // Ballon d'Or only on 2011/12 in the fixture
   });
 });
 

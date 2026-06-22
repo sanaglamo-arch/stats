@@ -105,15 +105,21 @@ export type AggregateTotals = {
   xa: number | null;
   yellowCards: number;
   redCards: number;
-  /** Distinct trophies across the selected rows. */
+  /** Distinct trophy names across the selected rows (for display/listing). */
   trophies: string[];
-  /** Distinct individual awards across the selected rows. */
+  /** Total trophies WON = distinct (season + trophy) entries (e.g. 10× La Liga = 10). */
+  trophyCount: number;
+  /** Distinct individual award names across the selected rows (for display/listing). */
   individualAwards: string[];
+  /** Ballon d'Or wins = number of distinct seasons carrying a Ballon d'Or in this slice. */
+  ballonDor: number;
 };
 
 function uniq(values: string[]): string[] {
   return [...new Set(values)];
 }
+
+const BALLON_DOR = /ballon\s*d['’]or/i;
 
 /**
  * Sum rows into totals. Slice 4 (penalties on/off): when `includePenalties` is
@@ -140,14 +146,20 @@ export function aggregate(
     yellowCards: 0,
     redCards: 0,
     trophies: [],
+    trophyCount: 0,
     individualAwards: [],
+    ballonDor: 0,
   };
   let xgSum = 0;
   let xaSum = 0;
   let xgCount = 0;
   let xaCount = 0;
-  const trophies: string[] = [];
-  const awards: string[] = [];
+  const trophyNames: string[] = [];
+  const awardNames: string[] = [];
+  // Count trophies as distinct (season + name) so repeat wins (e.g. La Liga
+  // across seasons) each count; count Ballon d'Or as distinct seasons won.
+  const trophyKeys = new Set<string>();
+  const ballonSeasons = new Set<string>();
 
   for (const r of rows) {
     totals.matches += r.matches;
@@ -169,14 +181,22 @@ export function aggregate(
       xaSum += r.xa;
       xaCount += 1;
     }
-    trophies.push(...r.trophies);
-    awards.push(...r.individualAwards);
+    for (const t of r.trophies) {
+      trophyNames.push(t);
+      trophyKeys.add(`${r.season}::${t}`);
+    }
+    for (const a of r.individualAwards) {
+      awardNames.push(a);
+      if (BALLON_DOR.test(a)) ballonSeasons.add(r.season);
+    }
   }
 
   totals.xg = xgCount > 0 ? round1(xgSum) : null;
   totals.xa = xaCount > 0 ? round1(xaSum) : null;
-  totals.trophies = uniq(trophies);
-  totals.individualAwards = uniq(awards);
+  totals.trophies = uniq(trophyNames);
+  totals.trophyCount = trophyKeys.size;
+  totals.individualAwards = uniq(awardNames);
+  totals.ballonDor = ballonSeasons.size;
   return totals;
 }
 
@@ -239,11 +259,6 @@ export type CardStatKey =
   | "yellowCards"
   | "redCards";
 
-/** Count Ballon d'Or wins inside the selected awards list. */
-function countBallonDor(awards: string[]): number {
-  return awards.filter((a) => /ballon\s*d['’]or/i.test(a)).length;
-}
-
 /**
  * Build the ~10-12 stat set for one player's slice. Order is the card display
  * order. xG/xA come through as null pre-2014 so the card hides them.
@@ -261,8 +276,8 @@ export function buildCardStats(
     { key: "shotConversion", value: derived.shotConversion, higherIsBetter: true, decimals: 2 },
     { key: "xg", value: totals.xg, higherIsBetter: true, decimals: 1 },
     { key: "xa", value: totals.xa, higherIsBetter: true, decimals: 1 },
-    { key: "trophies", value: totals.trophies.length, higherIsBetter: true, decimals: 0 },
-    { key: "ballonDor", value: countBallonDor(totals.individualAwards), higherIsBetter: true, decimals: 0 },
+    { key: "trophies", value: totals.trophyCount, higherIsBetter: true, decimals: 0 },
+    { key: "ballonDor", value: totals.ballonDor, higherIsBetter: true, decimals: 0 },
     { key: "yellowCards", value: totals.yellowCards, higherIsBetter: false, decimals: 0 },
     { key: "redCards", value: totals.redCards, higherIsBetter: false, decimals: 0 },
   ];
