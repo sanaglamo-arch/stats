@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Download, Loader2, Share2 } from "lucide-react";
 import { paramsFromSlice, type CardSlice } from "@/components/card";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
@@ -32,7 +33,11 @@ function triggerDownload(blob: Blob, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-type Status = { kind: "idle" } | { kind: "busy"; action: "download" | "share" } | { kind: "error"; message: string } | { kind: "info"; message: string };
+type Status =
+  | { kind: "idle" }
+  | { kind: "busy"; action: "download" | "share" }
+  | { kind: "error"; message: string }
+  | { kind: "info"; message: string };
 
 export function ShareActions({
   slice,
@@ -45,6 +50,18 @@ export function ShareActions({
 }) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const busy = status.kind === "busy";
+  const reduce = useReducedMotion();
+  const tap = reduce ? undefined : { scale: 0.97 };
+
+  // The polite live region announces every transient state to assistive tech,
+  // not just terminal info/errors — including the "Preparing…" busy state so a
+  // screen-reader user hears the async render start (Phase-3 reviewer nit).
+  const liveMessage =
+    status.kind === "busy"
+      ? t.downloading
+      : status.kind === "error" || status.kind === "info"
+        ? status.message
+        : "";
 
   async function handleDownload() {
     setStatus({ kind: "busy", action: "download" });
@@ -65,7 +82,11 @@ export function ShareActions({
       const file = new File([blob], FILENAME, { type: "image/png" });
 
       // Prefer sharing the PNG file via the Web Share API when supported.
-      if (typeof navigator !== "undefined" && navigator.canShare?.({ files: [file] }) && navigator.share) {
+      if (
+        typeof navigator !== "undefined" &&
+        navigator.canShare?.({ files: [file] }) &&
+        navigator.share
+      ) {
         await navigator.share({ title: t.appName, text: t.tagline, files: [file] });
         setStatus({ kind: "idle" });
         return;
@@ -99,10 +120,12 @@ export function ShareActions({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button
+        <motion.button
           type="button"
           onClick={handleDownload}
           disabled={busy}
+          whileTap={busy ? undefined : tap}
+          transition={{ type: "spring", stiffness: 420, damping: 30 }}
           className={`flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] px-5 text-sm font-bold uppercase tracking-wide text-[var(--color-bg-base)] transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${busy ? "" : "cursor-pointer"}`}
           style={{ background: "var(--color-gold)", boxShadow: "var(--shadow-glow-gold)" }}
         >
@@ -112,12 +135,14 @@ export function ShareActions({
             <Download size={18} aria-hidden />
           )}
           {status.kind === "busy" && status.action === "download" ? t.downloading : t.download}
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
           type="button"
           onClick={handleShare}
           disabled={busy}
+          whileTap={busy ? undefined : tap}
+          transition={{ type: "spring", stiffness: 420, damping: 30 }}
           className={`flex min-h-[48px] flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border-strong)] bg-[var(--color-surface-strong)] px-5 text-sm font-bold uppercase tracking-wide text-[var(--color-text)] transition-all duration-200 hover:bg-[var(--color-surface)] disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING} ${busy ? "" : "cursor-pointer"}`}
         >
           {status.kind === "busy" && status.action === "share" ? (
@@ -126,15 +151,18 @@ export function ShareActions({
             <Share2 size={18} aria-hidden />
           )}
           {t.share}
-        </button>
+        </motion.button>
       </div>
 
       <p
         aria-live="polite"
         className="min-h-[20px] text-center text-sm"
-        style={{ color: status.kind === "error" ? "var(--color-messi-bright)" : "var(--color-text-secondary)" }}
+        style={{
+          color:
+            status.kind === "error" ? "var(--color-messi-bright)" : "var(--color-text-secondary)",
+        }}
       >
-        {status.kind === "error" || status.kind === "info" ? status.message : ""}
+        {liveMessage}
       </p>
     </div>
   );

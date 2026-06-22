@@ -39,17 +39,21 @@ export function ComparisonCard({
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
         background:
-          "radial-gradient(900px 700px at 12% -8%, rgba(233,30,140,0.20), transparent 58%)," +
-          "radial-gradient(900px 700px at 88% 108%, rgba(46,168,255,0.20), transparent 58%)," +
+          "radial-gradient(820px 640px at 10% -10%, rgba(233,30,140,0.24), transparent 56%)," +
+          "radial-gradient(820px 640px at 90% 110%, rgba(46,168,255,0.24), transparent 56%)," +
+          "radial-gradient(1100px 1100px at 50% 42%, rgba(255,255,255,0.035), transparent 60%)," +
           "var(--color-bg-base)",
         padding: 56,
-        gap: 36,
+        gap: 34,
       }}
     >
-      <CardHeader
-        messiClub={model.messi.club}
-        ronaldoClub={model.ronaldo.club}
+      {/* hairline inner frame for a finished, premium edge */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-5 rounded-[var(--radius-xl)]"
+        style={{ border: "1px solid rgba(255,255,255,0.05)" }}
       />
+      <CardHeader messiClub={model.messi.club} ronaldoClub={model.ronaldo.club} />
       <PeriodPlaque slice={slice} t={t} />
       <StatList rows={model.rows} t={t} />
       <ResultFooter score={model.score} contested={model.contested} t={t} />
@@ -95,17 +99,20 @@ function PlayerHead({
         <PhotoSlot src={meta.photoSrc} alt={meta.name} accentVar={meta.accentVar} />
       </div>
       <div className={`flex w-full flex-col gap-1 ${alignClass}`}>
-        <span className="text-[26px] font-medium uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+        <span className="text-[24px] font-medium uppercase tracking-[0.32em] text-[var(--color-text-muted)]">
           {first}
         </span>
         <span
-          className="font-[family-name:var(--font-display)] text-[44px] font-black uppercase leading-none tracking-tight"
-          style={{ color: `var(${meta.accentVar})`, textShadow: `0 0 28px color-mix(in srgb, var(${meta.accentVar}) 60%, transparent)` }}
+          className="font-[family-name:var(--font-display)] text-[46px] font-black uppercase leading-[0.95] tracking-[-0.01em]"
+          style={{
+            color: `var(${meta.accentVar})`,
+            textShadow: `0 0 32px color-mix(in srgb, var(${meta.accentVar}) 65%, transparent)`,
+          }}
         >
           {last}
         </span>
         <div
-          className={`mt-2 flex items-center gap-3 ${align === "right" ? "flex-row-reverse" : ""}`}
+          className={`mt-3 flex items-center gap-3 ${align === "right" ? "flex-row-reverse" : ""}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- static flag asset, headless render */}
           <img
@@ -116,7 +123,9 @@ function PlayerHead({
             className="rounded-[4px]"
             style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
           />
-          <span className="text-[20px] font-semibold text-[var(--color-text)]">{meta.position}</span>
+          <span className="text-[20px] font-semibold text-[var(--color-text)]">
+            {meta.position}
+          </span>
         </div>
         <span className="text-[20px] font-medium text-[var(--color-text-secondary)]">{club}</span>
       </div>
@@ -157,10 +166,15 @@ function PeriodPlaque({ slice, t }: { slice: CardSlice; t: Dictionary }) {
 
   return (
     <div
-      className="glass flex flex-col gap-3 rounded-[var(--radius-lg)] px-7 py-5"
+      className="glass relative flex flex-col gap-3 overflow-hidden rounded-[var(--radius-lg)] px-7 py-5"
       style={{ borderColor: "var(--color-border-strong)" }}
     >
-      <div className="flex items-center gap-4">
+      <span
+        aria-hidden
+        className="absolute inset-y-4 left-0 w-1 rounded-full"
+        style={{ background: "linear-gradient(180deg, var(--color-messi), var(--color-ronaldo))" }}
+      />
+      <div className="flex items-center gap-4 pl-3">
         <span className="text-[18px] font-semibold uppercase tracking-[0.22em] text-[var(--color-text-muted)]">
           {t.period}
         </span>
@@ -176,12 +190,15 @@ function PeriodPlaque({ slice, t }: { slice: CardSlice; t: Dictionary }) {
           )}
         </span>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 pl-3">
         {chips.map((chip) => (
           <span
             key={chip}
             className="rounded-full px-4 py-1.5 text-[16px] font-medium text-[var(--color-text-secondary)]"
-            style={{ background: "var(--color-surface)", border: "1px solid var(--color-border-glass)" }}
+            style={{
+              background: "var(--color-surface)",
+              border: "1px solid var(--color-border-glass)",
+            }}
           >
             {chip}
           </span>
@@ -217,7 +234,9 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
           style={{
             textAlign: "left",
             color: messiWins ? "var(--color-messi-bright)" : "var(--color-text)",
-            textShadow: messiWins ? "0 0 18px color-mix(in srgb, var(--color-messi) 70%, transparent)" : "none",
+            textShadow: messiWins
+              ? "0 0 18px color-mix(in srgb, var(--color-messi) 70%, transparent)"
+              : "none",
             opacity: messiWins ? 1 : 0.82,
           }}
         >
@@ -234,7 +253,9 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
           style={{
             textAlign: "right",
             color: ronaldoWins ? "var(--color-ronaldo-bright)" : "var(--color-text)",
-            textShadow: ronaldoWins ? "0 0 18px color-mix(in srgb, var(--color-ronaldo) 70%, transparent)" : "none",
+            textShadow: ronaldoWins
+              ? "0 0 18px color-mix(in srgb, var(--color-ronaldo) 70%, transparent)"
+              : "none",
             opacity: ronaldoWins ? 1 : 0.82,
           }}
         >
@@ -243,7 +264,7 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
       </div>
 
       {/* double divergent bar meeting at center */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2.5">
         <Bar
           fraction={row.messiFraction}
           colorVar="--color-messi"
@@ -251,7 +272,11 @@ function StatRow({ row, t }: { row: CardStatRow; t: Dictionary }) {
           win={messiWins}
           direction="rtl"
         />
-        <span className="h-3 w-px shrink-0 bg-[var(--color-border-strong)]" aria-hidden />
+        <span
+          aria-hidden
+          className="h-2.5 w-1.5 shrink-0 rotate-45 rounded-[2px]"
+          style={{ background: "var(--color-border-strong)" }}
+        />
         <Bar
           fraction={row.ronaldoFraction}
           colorVar="--color-ronaldo"
@@ -284,16 +309,23 @@ function Bar({
       : `linear-gradient(90deg, var(${colorVar}), var(${brightVar}))`;
   return (
     <div
-      className="flex h-4 flex-1 items-center overflow-hidden rounded-full"
-      style={{ background: "var(--color-surface)", justifyContent: justify, border: "1px solid var(--color-border-glass)" }}
+      className="flex h-[18px] flex-1 items-center overflow-hidden rounded-full"
+      style={{
+        background: "var(--color-surface)",
+        justifyContent: justify,
+        border: "1px solid var(--color-border-glass)",
+        boxShadow: "inset 0 1px 2px rgba(0,0,0,0.35)",
+      }}
     >
       <div
         className="h-full rounded-full"
         style={{
           width: `${Math.max(fraction * 100, 5)}%`,
           background: gradient,
-          opacity: win ? 1 : 0.82,
-          boxShadow: win ? `0 0 16px color-mix(in srgb, var(${colorVar}) 75%, transparent)` : "none",
+          opacity: win ? 1 : 0.78,
+          boxShadow: win
+            ? `0 0 18px color-mix(in srgb, var(${colorVar}) 80%, transparent), inset 0 1px 0 rgba(255,255,255,0.35)`
+            : "inset 0 1px 0 rgba(255,255,255,0.12)",
         }}
       />
     </div>
@@ -315,27 +347,59 @@ function ResultFooter({
   const ronaldoLeads = score.ronaldo > score.messi;
   const wonBy = Math.max(score.messi, score.ronaldo);
 
+  const leadColorVar = messiLeads
+    ? "--color-messi"
+    : ronaldoLeads
+      ? "--color-ronaldo"
+      : "--color-gold";
+
   return (
     <div
-      className="flex flex-col items-center gap-3 rounded-[var(--radius-xl)] px-8 py-6"
+      className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[var(--radius-xl)] px-8 py-7"
       style={{
-        background: "linear-gradient(180deg, var(--color-surface-strong), var(--color-surface))",
+        background:
+          `radial-gradient(140% 120% at 50% 0%, color-mix(in srgb, var(${leadColorVar}) 12%, transparent), transparent 62%),` +
+          "linear-gradient(180deg, var(--color-surface-strong), var(--color-surface))",
         border: "1px solid var(--color-border-strong)",
         boxShadow: "var(--shadow-glass)",
       }}
     >
+      {/* gold accent hairline crowning the verdict */}
+      <span
+        aria-hidden
+        className="absolute inset-x-10 top-0 h-px"
+        style={{
+          background: "linear-gradient(90deg, transparent, var(--color-gold), transparent)",
+          opacity: 0.7,
+        }}
+      />
       <span className="text-[18px] font-semibold uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
         {t.overallResult}
       </span>
       <div className="flex items-baseline gap-5">
-        <ScoreSide name="MESSI" value={score.messi} colorVar="--color-messi" brightVar="--color-messi-bright" lead={messiLeads} align="right" />
+        <ScoreSide
+          name="MESSI"
+          value={score.messi}
+          colorVar="--color-messi"
+          brightVar="--color-messi-bright"
+          lead={messiLeads}
+          align="right"
+        />
         <span className="font-[family-name:var(--font-display)] text-[40px] font-bold text-[var(--color-text-muted)]">
           :
         </span>
-        <ScoreSide name="RONALDO" value={score.ronaldo} colorVar="--color-ronaldo" brightVar="--color-ronaldo-bright" lead={ronaldoLeads} align="left" />
+        <ScoreSide
+          name="RONALDO"
+          value={score.ronaldo}
+          colorVar="--color-ronaldo"
+          brightVar="--color-ronaldo-bright"
+          lead={ronaldoLeads}
+          align="left"
+        />
       </div>
       <span className="tabular text-[20px] font-medium text-[var(--color-text-secondary)]">
-        {wonBy} {t.categoriesWon} <span className="text-[var(--color-text-muted)]">/ {contested}</span>
+        {wonBy} {t.categoriesWon}{" "}
+        <span className="text-[var(--color-text-muted)]">/ {contested}</span>
       </span>
     </div>
   );
@@ -362,7 +426,9 @@ function ScoreSide({
         className="tabular font-[family-name:var(--font-display)] text-[68px] font-black leading-none"
         style={{
           color: lead ? `var(${brightVar})` : `var(${colorVar})`,
-          textShadow: lead ? `0 0 30px color-mix(in srgb, var(${colorVar}) 80%, transparent)` : "none",
+          textShadow: lead
+            ? `0 0 30px color-mix(in srgb, var(${colorVar}) 80%, transparent)`
+            : "none",
           opacity: lead ? 1 : 0.78,
         }}
       >
@@ -379,13 +445,23 @@ function ScoreSide({
 
 function Watermark() {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center gap-5">
       <span
-        className="font-[family-name:var(--font-display)] text-[20px] font-bold uppercase tracking-[0.4em]"
-        style={{ color: "var(--color-gold)", opacity: 0.9, textShadow: "var(--shadow-glow-gold)" }}
+        aria-hidden
+        className="h-px w-20"
+        style={{ background: "linear-gradient(90deg, transparent, var(--color-border-strong))" }}
+      />
+      <span
+        className="font-[family-name:var(--font-display)] text-[20px] font-bold uppercase tracking-[0.42em]"
+        style={{ color: "var(--color-gold)", opacity: 0.92, textShadow: "var(--shadow-glow-gold)" }}
       >
         FootyCompare
       </span>
+      <span
+        aria-hidden
+        className="h-px w-20"
+        style={{ background: "linear-gradient(90deg, var(--color-border-strong), transparent)" }}
+      />
     </div>
   );
 }

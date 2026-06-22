@@ -32,10 +32,6 @@ const COMP_LABEL_KEYS: Record<CompetitionFilter, keyof Dictionary> = {
   national_team: "compNationalTeam",
 };
 
-function modeOf(selection: SeasonSelection): SeasonMode {
-  return selection.kind;
-}
-
 /**
  * Switch the active period mode while keeping a sensible value: e.g. flipping to
  * "season" picks the player's newest season, "age" their first available age.
@@ -68,7 +64,7 @@ export function PlayerControls({
 }) {
   const meta = PLAYER_META[player];
   const accent = `var(${meta.accentVar})`;
-  const mode = modeOf(side.selection);
+  const mode = side.selection.kind;
 
   const setSelection = (selection: SeasonSelection) => onChange({ ...side, selection });
 

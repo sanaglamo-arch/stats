@@ -3,12 +3,18 @@
 import { useMemo, useState } from "react";
 import { Users } from "lucide-react";
 import { dataSource, type SeasonSelection } from "@/lib/data";
-import { buildCardViewModel, DEFAULT_SLICE, type CardSlice, type SideOptions } from "@/components/card";
+import {
+  buildCardViewModel,
+  DEFAULT_SLICE,
+  type CardSlice,
+  type SideOptions,
+} from "@/components/card";
 import { useI18n } from "@/lib/i18n/provider";
 import { CardPreview } from "./card-preview";
 import { PlayerControls } from "./player-controls";
 import { ShareActions } from "./share-actions";
 import { Select } from "./control-primitives";
+import { FadeIn, StaggerGroup, StaggerItem } from "./motion";
 import { commonAges, playerSliceOptions } from "./slice-options";
 
 /**
@@ -51,7 +57,7 @@ export function Studio() {
   return (
     <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
       {/* Preview — first in DOM source on mobile so the card (the product) leads. */}
-      <div className="order-1 flex flex-col gap-5 lg:sticky lg:top-6 lg:order-2 lg:self-start">
+      <FadeIn className="order-1 flex flex-col gap-5 lg:sticky lg:top-6 lg:order-2 lg:self-start">
         <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
           {t.preview}
         </h2>
@@ -59,51 +65,58 @@ export function Studio() {
           <CardPreview model={model} slice={slice} t={t} />
         </div>
         <ShareActions slice={slice} locale={locale} t={t} />
-      </div>
+      </FadeIn>
 
       {/* Controls */}
-      <div className="order-2 flex flex-col gap-5 lg:order-1">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
-          {t.controls}
-        </h2>
+      <StaggerGroup className="order-2 flex flex-col gap-5 lg:order-1">
+        <StaggerItem>
+          <h2 className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-text-muted)]">
+            {t.controls}
+          </h2>
+        </StaggerItem>
 
-        <PlayerControls
-          player="messi"
-          side={slice.messi}
-          options={messiOptions}
-          t={t}
-          onChange={setMessi}
-        />
-        <PlayerControls
-          player="ronaldo"
-          side={slice.ronaldo}
-          options={ronaldoOptions}
-          t={t}
-          onChange={setRonaldo}
-        />
-
-        <section className="glass flex flex-col gap-3 rounded-[var(--radius-lg)] p-5">
-          <div className="flex items-center gap-2">
-            <Users size={18} className="text-[var(--color-gold)]" aria-hidden />
-            <label
-              htmlFor="same-age"
-              className="text-sm font-semibold text-[var(--color-text)]"
-            >
-              {t.sameAge}
-            </label>
-          </div>
-          <Select
-            id="same-age"
-            value={sameAgeValue === null ? "" : String(sameAgeValue)}
-            onChange={(raw) => applySameAge(Number.parseInt(raw, 10))}
-            options={[
-              { value: "", label: "—" },
-              ...sharedAges.map((age) => ({ value: String(age), label: String(age) })),
-            ]}
+        <StaggerItem>
+          <PlayerControls
+            player="messi"
+            side={slice.messi}
+            options={messiOptions}
+            t={t}
+            onChange={setMessi}
           />
-          <p className="text-xs leading-relaxed text-[var(--color-text-muted)]">{t.sameAgeHint}</p>
-        </section>
-      </div>
+        </StaggerItem>
+        <StaggerItem>
+          <PlayerControls
+            player="ronaldo"
+            side={slice.ronaldo}
+            options={ronaldoOptions}
+            t={t}
+            onChange={setRonaldo}
+          />
+        </StaggerItem>
+
+        <StaggerItem>
+          <section className="glass flex flex-col gap-3 rounded-[var(--radius-lg)] p-5">
+            <div className="flex items-center gap-2">
+              <Users size={18} className="text-[var(--color-gold)]" aria-hidden />
+              <label htmlFor="same-age" className="text-sm font-semibold text-[var(--color-text)]">
+                {t.sameAge}
+              </label>
+            </div>
+            <Select
+              id="same-age"
+              value={sameAgeValue === null ? "" : String(sameAgeValue)}
+              onChange={(raw) => applySameAge(Number.parseInt(raw, 10))}
+              options={[
+                { value: "", label: "—" },
+                ...sharedAges.map((age) => ({ value: String(age), label: String(age) })),
+              ]}
+            />
+            <p className="text-xs leading-relaxed text-[var(--color-text-muted)]">
+              {t.sameAgeHint}
+            </p>
+          </section>
+        </StaggerItem>
+      </StaggerGroup>
     </div>
   );
 }

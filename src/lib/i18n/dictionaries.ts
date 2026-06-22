@@ -29,6 +29,8 @@ const en = {
   modeLastN: "Last N seasons",
   modeAge: "At age",
   selectSeason: "Select season",
+  // `seasonsCount` labels the dropdown options ("5 seasons"); `lastNSeasons`
+  // below is the full card-plaque phrasing ("Last 5 seasons").
   seasonsCount: "{n} seasons",
   sameAge: "Compare at same age",
   sameAgeHint: "Aligns both players to the same age (e.g. both at 25).",

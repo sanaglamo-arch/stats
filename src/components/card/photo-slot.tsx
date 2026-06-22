@@ -20,13 +20,30 @@ export function PhotoSlot({
     <div
       className="relative flex aspect-square w-full items-end justify-center overflow-hidden rounded-[var(--radius-lg)]"
       style={{
-        background: `radial-gradient(120% 90% at 50% 10%, color-mix(in srgb, var(${accentVar}) 28%, transparent), transparent 70%)`,
-        border: `1px solid color-mix(in srgb, var(${accentVar}) 45%, transparent)`,
-        boxShadow: `inset 0 0 40px color-mix(in srgb, var(${accentVar}) 22%, transparent)`,
+        background:
+          `radial-gradient(125% 95% at 50% 8%, color-mix(in srgb, var(${accentVar}) 32%, transparent), transparent 68%),` +
+          "linear-gradient(180deg, rgba(255,255,255,0.05), transparent 40%)",
+        border: `1px solid color-mix(in srgb, var(${accentVar}) 48%, transparent)`,
+        boxShadow:
+          `inset 0 0 44px color-mix(in srgb, var(${accentVar}) 24%, transparent),` +
+          `0 0 30px color-mix(in srgb, var(${accentVar}) 18%, transparent)`,
       }}
     >
+      {/* crisp top-edge light reflection — sells the glass surface */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent)",
+        }}
+      />
       {/* eslint-disable-next-line @next/next/no-img-element -- headless-rendered, see note above */}
-      <img src={src} alt={alt} className="h-full w-full object-contain" draggable={false} />
+      <img
+        src={src}
+        alt={alt}
+        className="relative h-full w-full object-contain"
+        draggable={false}
+      />
     </div>
   );
 }

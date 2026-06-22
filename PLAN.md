@@ -35,8 +35,8 @@
 - [x] P3-5 Playwright-smoke — реально прогнан на системном Chrome (1 passed) (P3 commit)
 
 ## Фаза 4 — Полировка (Design / Motion + `ui-ux-pro-max`)
-- [ ] P4-1 Анимации UI (Framer Motion), скелетоны, адаптив, prefers-reduced-motion
-- [ ] P4-2 Финальный визуал карточки до «вау» (ревью через `ui-ux-pro-max`)
+- [x] P4-1 Анимации UI (Framer Motion: stagger/fade/press), скелетон превью, адаптив, prefers-reduced-motion (всё под guard) (P4 commit)
+- [x] P4-2 Финальный визуал карточки до «вау» (ревью ui-ux-pro-max: фото-glass, бары, halo-футер, вотермарк) — карточка статична (P4 commit)
 
 ## Фаза 5 — Приёмка (Tester + Reviewer)
 - [ ] P5-1 Playwright E2E happy-path (выбрал срез → карточка → скачал)
@@ -50,3 +50,4 @@
 - 2026-06-21 Фаза 1 (P1-1..P1-8) — ingestion-pipeline за `DataSource`: схема PlayerSeasonComp, адаптеры Wikidata/Understat/FBref (реальный парс + фолбэк на seed), резалки 4 срезов + производные + compare(). Датасет 112 строк (Месси 55, Роналду 57, 6 типов турниров), все verified:false, DATA_REPORT.md. Делегировано Data Engineer; отдельные Tester (гейты PASS) и Reviewer (APPROVE-WITH-NITS); фиксы по ревью (Understat league-keying баг, удалён dead code, общий enrich-хелпер, compare по ключам). Гейты: typecheck ✓ lint ✓ test 41/41 ✓ build ✓.
 - 2026-06-21 Фаза 2 (P2-1..P2-4) — карточка по SPEC §4 (Orbitron+tabular, дивергентные бары, mechanical verdict, вотермарк), 2:3 1080×1620; PNG-рендер через Playwright (`/api/card`, fallback на системный Chrome); слот фото + 2 SVG-силуэта. Делегировано Card Engineer (ui-ux-pro-max); Tester PASS (54 теста, превью 1080×1620 реальные), Reviewer APPROVE-WITH-NITS; убрано мёртвое поле accentBrightVar. Дирижёр глазами одобрил превью (owner checkpoint). ⚠️ Данные seed: счёт перекошен (напр. Ballon d'Or Месси показывает 4 вместо 8) — на сверку владельцу (verified:false). Гейты: typecheck ✓ lint ✓ test 54/54 ✓ build ✓.
 - 2026-06-21 Фаза 3 (P3-1..P3-5) — Studio: per-player селекторы 4 срезов + same-age, реактивный scale-to-fit предпросмотр (in-memory), Download PNG (blob через /api/card) + Share (Web Share API с фолбэками), RU/EN. Делегировано UI Engineer (ui-ux-pro-max); Tester PASS (54 теста + e2e 1 passed на системном Chrome, скриншоты desktop/mobile), Reviewer APPROVE-WITH-NITS (нитки → в Фазу 4). Дирижёр одобрил UI глазами (desktop 2-кол, mobile ведёт карточкой). Гейты: typecheck ✓ lint ✓ test 54/54 ✓ build ✓ e2e ✓.
+- 2026-06-21 Фаза 4 (P4-1,P4-2) — UI-моушн (stagger/fade/press, всё под useReducedMotion), скелетон+кроссфейд превью, адаптив; карточка поднята до «вау» через ui-ux-pro-max (фото-glass, инсет-бары + diamond-нода, halo-футер) — статична, без моушна (PNG детерминирован). Phase-3 нитки внесены (aria-live busy, modeOf инлайн). Делегировано Design/Motion; Tester PASS (4 гейта+e2e, card/render motion-free подтверждён), Reviewer APPROVE-WITH-NITS → убран dead PressScale. Дирижёр одобрил финальный визуал. Гейты: typecheck ✓ lint ✓ test 54/54 ✓ build ✓ e2e ✓.
