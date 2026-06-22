@@ -114,6 +114,12 @@ const en = {
   statYellowCards: "Yellow cards",
   statRedCards: "Red cards",
 
+  // Insights section (P6-9) — wraps the Phase 6 visualizations
+  insightsKicker: "Deep dive",
+  insightsTitle: "The full picture",
+  insightsSubtitle:
+    "Beyond the card — profile radar, season-by-season trends and positional maps for the current comparison.",
+
   // Charts (Phase 6 visualizations)
   chartRadarTitle: "Profile radar",
   chartRadarHint: "Each axis is normalized 0–100% to the better of the two values.",
@@ -231,6 +237,11 @@ const ru: Dictionary = {
   statHatTricks: "Хет-трики",
   statYellowCards: "Жёлтые карточки",
   statRedCards: "Красные карточки",
+
+  insightsKicker: "Подробнее",
+  insightsTitle: "Полная картина",
+  insightsSubtitle:
+    "Больше, чем карточка — радар профиля, тренды по сезонам и позиционные карты для текущего сравнения.",
 
   chartRadarTitle: "Радар профиля",
   chartRadarHint: "Каждая ось нормализована 0–100% по лучшему из двух значений.",

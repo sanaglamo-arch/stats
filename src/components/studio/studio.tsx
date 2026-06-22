@@ -22,6 +22,7 @@ import {
 import { BottomSheet, FadeIn, TiltCard } from "./motion";
 import { Magnetic } from "@/components/motion/magnetic";
 import { commonAges, playerSliceOptions } from "./slice-options";
+import { Insights } from "./insights";
 
 /**
  * The card studio (SPEC §2/§3/§5) — recomposed as a CARD-HERO stage.
@@ -141,6 +142,7 @@ export function Studio() {
   );
 
   return (
+    <div className="flex w-full flex-col gap-16 lg:gap-24">
     <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-10">
       {/* ── Global competition context (P6-10): full-width tab bar at the top,
           spanning both columns. One switch applies to BOTH players. ── */}
@@ -217,6 +219,11 @@ export function Studio() {
           </BottomSheet>
         </>
       )}
+    </div>
+
+      {/* ── Insights (P6-9): read-only data-viz section, driven by the same
+          single-source-of-truth `slice` and the global competition context. ── */}
+      <Insights slice={slice} model={model} rows={rows} t={t} />
     </div>
   );
 }
