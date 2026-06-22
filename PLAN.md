@@ -12,14 +12,14 @@
 - [x] P0-5 CI-гейты локально зелёные на пустом каркасе — typecheck/lint/test(4)/build ✓ (P0 commit)
 
 ## Фаза 1 — Данные / ingestion-pipeline (Data Engineer)
-- [ ] P1-1 Схема `PlayerSeasonComp` (types.ts) + интерфейс `DataSource`
-- [ ] P1-2 Парсер-адаптер Wikidata/Wikipedia (сезоны/голы/ассисты/матчи/трофеи/награды/возраст) + нормализация
-- [ ] P1-3 Парсер-адаптер Understat (xG/xA, сезоны 2014+)
-- [ ] P1-4 Обогащение FBref/Transfermarkt (best-effort) + **деградация на правдоподобный seed** при бане/недоступности
-- [ ] P1-5 Разовый ingestion → нормализация → сохранение в локальную базу/JSON (фронт читает из неё, не из живой сети)
-- [ ] P1-6 Функции-резалки: 4 среза (сезон / турнир / один возраст / пенальти вкл-выкл) → агрегаты + производные (голы/90, конверсия)
-- [ ] P1-7 `verified:false` на всех записях + генерация `DATA_REPORT.md` (что откуда, что с фолбэка, что на сверку)
-- [ ] P1-8 Юнит-тесты нормализации и агрегации (на фикстурах, БЕЗ живой сети)
+- [x] P1-1 Схема `PlayerSeasonComp` (types.ts) + интерфейс `DataSource` — точно по SPEC §6 + verified/source (P1 commit)
+- [x] P1-2 Парсер-адаптер Wikidata/Wikipedia + нормализация — реальный SPARQL-адаптер с фолбэком на seed (P1 commit)
+- [x] P1-3 Парсер-адаптер Understat (xG/xA, 2014+) — embedded-JSON декодер, ключ по league-строке (P1 commit)
+- [x] P1-4 Обогащение FBref/Transfermarkt (best-effort) + деградация на seed — HTML-парсер, фолбэк при 403 (P1 commit)
+- [x] P1-5 Разовый ingestion → нормализация → JSON — `pnpm ingest` → src/data/dataset.json (112 строк) (P1 commit)
+- [x] P1-6 Функции-резалки: 4 среза + производные (голы/90, конверсия, xg/90) — aggregate.ts, compare() по ключам (P1 commit)
+- [x] P1-7 `verified:false` на всех записях + `DATA_REPORT.md` — все 112 строк, отчёт по источникам/сверке/фото (P1 commit)
+- [x] P1-8 Юнит-тесты нормализации и агрегации (фикстуры, без сети) — 41 тест зелёный (P1 commit)
 
 ## Фаза 2 — Генератор карточки (Card/Design Engineer + `ui-ux-pro-max`)
 - [ ] P2-1 Компонент карточки по эталону SPEC §4 (шапка, период, двойные бары, счёт по категориям, вотермарк), вертикаль 2:3
@@ -47,3 +47,4 @@
 <!-- 2026-XX-XX PX-Y done — заметка, commit -->
 - 2026-06-21 ШАГ 0 — тулчейн node20 + pnpm9.15 (corepack-wrapper вместо сломанного self-exec shim); надёжный git-push с токеном через trap-scrub; реконсайл с непустым remote; docs запушены.
 - 2026-06-21 Фаза 0 (P0-1..P0-5) — Next15/React19/TS-strict/Tailwind v4, dark-neon токены (Orbitron+Inter, glass), i18n RU/EN, ESLint/Prettier/Vitest/Playwright. Гейты: typecheck ✓ lint ✓ test 4/4 ✓ build ✓. ВАЖНО: билд гнать с отключённым sandbox (иначе SIGKILL/exit144). Каркас собран дирижёром из-за временного 529 на спавне субагентов; гейты прогнаны прозрачно.
+- 2026-06-21 Фаза 1 (P1-1..P1-8) — ingestion-pipeline за `DataSource`: схема PlayerSeasonComp, адаптеры Wikidata/Understat/FBref (реальный парс + фолбэк на seed), резалки 4 срезов + производные + compare(). Датасет 112 строк (Месси 55, Роналду 57, 6 типов турниров), все verified:false, DATA_REPORT.md. Делегировано Data Engineer; отдельные Tester (гейты PASS) и Reviewer (APPROVE-WITH-NITS); фиксы по ревью (Understat league-keying баг, удалён dead code, общий enrich-хелпер, compare по ключам). Гейты: typecheck ✓ lint ✓ test 41/41 ✓ build ✓.
