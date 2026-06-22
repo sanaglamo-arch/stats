@@ -39,9 +39,9 @@
 - [x] P4-2 Финальный визуал карточки до «вау» (ревью ui-ux-pro-max: фото-glass, бары, halo-футер, вотермарк) — карточка статична (P4 commit)
 
 ## Фаза 5 — Приёмка (Tester + Reviewer)
-- [ ] P5-1 Playwright E2E happy-path (выбрал срез → карточка → скачал)
-- [ ] P5-2 `/code-review` по диффу, фиксы
-- [ ] P5-3 `BUILD_REPORT.md` (что собрано, как запустить, **превью карточки**, before-launch TODO: сверка данных + лицензия фото) + СТОП
+- [x] P5-1 Playwright E2E happy-path (срез → превью обновилось → реальный PNG скачан, проверен по сигнатуре+размеру) (P5 commit)
+- [x] P5-2 Финальное acceptance-ревью всего репо (correctness+security+cleanup) — APPROVE-WITH-NITS, 0 блокеров (P5 commit)
+- [x] P5-3 `BUILD_REPORT.md` (что собрано, запуск, превью карточки, before-launch TODO: сверка данных + лицензия фото) + СТОП (P5 commit)
 
 ## Журнал прогресса (агенты дописывают снизу)
 <!-- 2026-XX-XX PX-Y done — заметка, commit -->
@@ -51,3 +51,4 @@
 - 2026-06-21 Фаза 2 (P2-1..P2-4) — карточка по SPEC §4 (Orbitron+tabular, дивергентные бары, mechanical verdict, вотермарк), 2:3 1080×1620; PNG-рендер через Playwright (`/api/card`, fallback на системный Chrome); слот фото + 2 SVG-силуэта. Делегировано Card Engineer (ui-ux-pro-max); Tester PASS (54 теста, превью 1080×1620 реальные), Reviewer APPROVE-WITH-NITS; убрано мёртвое поле accentBrightVar. Дирижёр глазами одобрил превью (owner checkpoint). ⚠️ Данные seed: счёт перекошен (напр. Ballon d'Or Месси показывает 4 вместо 8) — на сверку владельцу (verified:false). Гейты: typecheck ✓ lint ✓ test 54/54 ✓ build ✓.
 - 2026-06-21 Фаза 3 (P3-1..P3-5) — Studio: per-player селекторы 4 срезов + same-age, реактивный scale-to-fit предпросмотр (in-memory), Download PNG (blob через /api/card) + Share (Web Share API с фолбэками), RU/EN. Делегировано UI Engineer (ui-ux-pro-max); Tester PASS (54 теста + e2e 1 passed на системном Chrome, скриншоты desktop/mobile), Reviewer APPROVE-WITH-NITS (нитки → в Фазу 4). Дирижёр одобрил UI глазами (desktop 2-кол, mobile ведёт карточкой). Гейты: typecheck ✓ lint ✓ test 54/54 ✓ build ✓ e2e ✓.
 - 2026-06-21 Фаза 4 (P4-1,P4-2) — UI-моушн (stagger/fade/press, всё под useReducedMotion), скелетон+кроссфейд превью, адаптив; карточка поднята до «вау» через ui-ux-pro-max (фото-glass, инсет-бары + diamond-нода, halo-футер) — статична, без моушна (PNG детерминирован). Phase-3 нитки внесены (aria-live busy, modeOf инлайн). Делегировано Design/Motion; Tester PASS (4 гейта+e2e, card/render motion-free подтверждён), Reviewer APPROVE-WITH-NITS → убран dead PressScale. Дирижёр одобрил финальный визуал. Гейты: typecheck ✓ lint ✓ test 54/54 ✓ build ✓ e2e ✓.
+- 2026-06-21 Фаза 5 (P5-1..P5-3) — happy-path E2E (срез→превью→реальный PNG скачан, проверка PNG-сигнатуры+размера); финальное acceptance-ревью всего репо: 0 блокеров, подтверждены preview⇄PNG консистентность, mechanical verdict, безопасность /api/card (нет SSRF), data honesty, нет any; BUILD_REPORT.md написан. Гейты финал: typecheck ✓ lint ✓ test 54/54 ✓ build ✓ e2e 2/2 ✓. BUILD COMPLETE.
