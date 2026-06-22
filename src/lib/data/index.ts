@@ -8,6 +8,8 @@ export type {
   AdapterResult,
   AdapterId,
   RowProvenance,
+  IllustrativePositional,
+  IllustrativeShot,
 } from "./types";
 
 export { dataSource, datasetGeneratedAt, JsonDataSource } from "./source";
@@ -22,15 +24,31 @@ export type {
   CardStatKey,
   CategoryWinner,
   ComparisonResult,
+  MetricGroup,
+  MetricFormat,
+  MetricAvailability,
+  MetricKey,
+  MetricDef,
+  SeasonTrendPoint,
+  SeasonTrendOptions,
 } from "./aggregate";
 
 export {
   rowsForPlayer,
   filterByCompetition,
+  filterByCompetitions,
   selectSeasons,
   sliceRows,
   aggregate,
   deriveMetrics,
+  buildCardStat,
   buildCardStats,
+  metricValue,
   compare,
+  seasonTrend,
+  METRIC_CATALOG,
+  METRIC_KEYS,
+  DEFAULT_METRICS,
 } from "./aggregate";
+
+export { getIllustrativePositional, HEATMAP_ROWS, HEATMAP_COLS } from "./positional";

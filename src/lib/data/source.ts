@@ -1,4 +1,10 @@
-import type { DataSource, PlayerId, PlayerSeasonComp } from "./types";
+import type {
+  DataSource,
+  IllustrativePositional,
+  PlayerId,
+  PlayerSeasonComp,
+} from "./types";
+import { getIllustrativePositional } from "./positional";
 import dataset from "@/data/dataset.json";
 
 /**
@@ -22,6 +28,11 @@ export class JsonDataSource implements DataSource {
 
   getPlayerRows(player: PlayerId): readonly PlayerSeasonComp[] {
     return ROWS.filter((r) => r.player === player);
+  }
+
+  /** Deterministic illustrative positional data (swappable; flagged illustrative). */
+  getIllustrativePositional(player: PlayerId): IllustrativePositional {
+    return getIllustrativePositional(player);
   }
 }
 

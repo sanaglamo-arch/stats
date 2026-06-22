@@ -75,6 +75,14 @@ export type PlayerSeasonComp = {
   yellowCards: number;
   redCards: number;
 
+  /**
+   * Hat-tricks in this (season × competition). ILLUSTRATIVE: this is NOT in the
+   * canonical SPEC §6 schema and is NOT sourced from a real provider — it is a
+   * deterministic placeholder so the metric catalog can expose it (verified:false,
+   * documented in DATA_REPORT.md). Treated as `availability:"illustrative"`.
+   */
+  hatTricks: number;
+
   // season achievements
   trophies: string[];
   individualAwards: string[];
@@ -83,6 +91,33 @@ export type PlayerSeasonComp = {
   verified: boolean;
   /** Where this row came from this ingestion run. */
   source: RowProvenance;
+};
+
+/**
+ * A single shot on a normalized half-pitch (0..1 on both axes). ILLUSTRATIVE.
+ * `x` runs along the pitch toward goal, `y` across it. `xg` is an optional
+ * expected-goals weight (0..1).
+ */
+export type IllustrativeShot = {
+  x: number;
+  y: number;
+  xg?: number;
+  outcome: "goal" | "saved" | "missed";
+};
+
+/**
+ * Illustrative positional data for one player. NOT real tracking data — free
+ * positional feeds (heatmaps / shotmaps) are unavailable, so this is a
+ * DETERMINISTIC placeholder derived from the player id (no RNG, no clock). The
+ * `illustrative:true` flag is part of the contract so the UI can badge it.
+ */
+export type IllustrativePositional = {
+  /** Intensity grid, rows × cols, each cell in [0,1]. */
+  heatmap: number[][];
+  /** Plausible shot locations on a normalized 0..1 pitch half. */
+  shotmap: IllustrativeShot[];
+  /** Always true — this data is illustrative, not measured. */
+  illustrative: true;
 };
 
 /**
@@ -95,6 +130,12 @@ export interface DataSource {
   getAllRows(): readonly PlayerSeasonComp[];
   /** Returns rows for a single player. */
   getPlayerRows(player: PlayerId): readonly PlayerSeasonComp[];
+  /**
+   * Illustrative positional data for a player (heatmap + shotmap). Deterministic
+   * per player; flagged `illustrative:true`. Swappable: a real provider can
+   * implement this without touching the frontend (SPEC §6).
+   */
+  getIllustrativePositional(player: PlayerId): IllustrativePositional;
 }
 
 /**

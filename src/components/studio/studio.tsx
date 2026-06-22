@@ -76,6 +76,7 @@ export function Studio() {
   const applySameAge = (age: number) => {
     const selection: SeasonSelection = { kind: "age", age };
     setSlice((s) => ({
+      ...s,
       messi: { ...s.messi, selection },
       ronaldo: { ...s.ronaldo, selection },
     }));

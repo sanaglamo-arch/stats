@@ -3,6 +3,7 @@ import type {
   PlayerId,
   PlayerSeasonComp,
 } from "./types";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 /**
  * Pure aggregation / slicer functions (SPEC §5 & §7).
@@ -25,7 +26,19 @@ export type SeasonSelection =
 export type SliceOptions = {
   player: PlayerId;
   selection: SeasonSelection;
+  /**
+   * Single-competition filter (slice 2). "all" passes everything through.
+   * Kept for backward compatibility; `competitions` (below) takes precedence
+   * when present and non-empty.
+   */
   competition: CompetitionFilter;
+  /**
+   * OPTIONAL stacking competition filter (P6-3). When present and non-empty,
+   * rows are kept if their `competitionType` is in this set (combinations of
+   * league / CL / national / cups). When absent or empty, the single
+   * `competition` field is used instead. Additive — old callers are unaffected.
+   */
+  competitions?: CompetitionType[];
   /** When false, penalty goals are subtracted from goal totals. */
   includePenalties: boolean;
 };
@@ -56,6 +69,19 @@ export function filterByCompetition(
   return rows.filter((r) => r.competitionType === competition);
 }
 
+/**
+ * Slice 2 (stacking, P6-3): keep rows whose competitionType is in the given set.
+ * An empty set passes everything through (so it behaves like "all" / no filter).
+ */
+export function filterByCompetitions(
+  rows: readonly PlayerSeasonComp[],
+  competitions: readonly CompetitionType[],
+): PlayerSeasonComp[] {
+  if (competitions.length === 0) return [...rows];
+  const set = new Set(competitions);
+  return rows.filter((r) => set.has(r.competitionType));
+}
+
 /** Slices 1 & 3: select rows by season / career / last-N / age alignment. */
 export function selectSeasons(
   rows: readonly PlayerSeasonComp[],
@@ -84,7 +110,12 @@ export function sliceRows(
   opts: SliceOptions,
 ): PlayerSeasonComp[] {
   const byPlayer = rowsForPlayer(rows, opts.player);
-  const byComp = filterByCompetition(byPlayer, opts.competition);
+  // Stacking set takes precedence when provided & non-empty; otherwise fall back
+  // to the single-competition filter (backward compatible).
+  const byComp =
+    opts.competitions && opts.competitions.length > 0
+      ? filterByCompetitions(byPlayer, opts.competitions)
+      : filterByCompetition(byPlayer, opts.competition);
   return selectSeasons(byComp, opts.selection);
 }
 
@@ -105,6 +136,8 @@ export type AggregateTotals = {
   xa: number | null;
   yellowCards: number;
   redCards: number;
+  /** ILLUSTRATIVE total hat-tricks across the selected rows (not real data). */
+  hatTricks: number;
   /** Distinct trophy names across the selected rows (for display/listing). */
   trophies: string[];
   /** Total trophies WON = distinct (season + trophy) entries (e.g. 10× La Liga = 10). */
@@ -145,6 +178,7 @@ export function aggregate(
     xa: null,
     yellowCards: 0,
     redCards: 0,
+    hatTricks: 0,
     trophies: [],
     trophyCount: 0,
     individualAwards: [],
@@ -173,6 +207,7 @@ export function aggregate(
     totals.shotsOnTarget += r.shotsOnTarget;
     totals.yellowCards += r.yellowCards;
     totals.redCards += r.redCards;
+    totals.hatTricks += r.hatTricks;
     if (r.xg !== null) {
       xgSum += r.xg;
       xgCount += 1;
@@ -211,10 +246,19 @@ function round2(n: number): number {
 /** ---- Derived metrics (computed, never stored) ---- */
 
 export type DerivedMetrics = {
+  /** Goals + assists (direct goal contributions). */
+  goalContributions: number;
   goalsPer90: number;
   assistsPer90: number;
+  goalContributionsPer90: number;
   /** Goals / shots, as a fraction (0..1); 0 when no shots. */
   shotConversion: number;
+  /** Shots on target / shots, as a fraction (0..1); 0 when no shots. */
+  shotsOnTargetPct: number;
+  /** Shots per 90 minutes. */
+  shotsPer90: number;
+  /** Minutes per goal (lower is better); 0 when no goals. */
+  minutesPerGoal: number;
   /** Null when xG is unavailable for the selection (pre-2014). */
   xgPer90: number | null;
   xaPer90: number | null;
@@ -223,16 +267,149 @@ export type DerivedMetrics = {
 export function deriveMetrics(totals: AggregateTotals): DerivedMetrics {
   const per90 = (value: number): number =>
     totals.minutes > 0 ? round2((value * 90) / totals.minutes) : 0;
+  const goalContributions = totals.goals + totals.assists;
   return {
+    goalContributions,
     goalsPer90: per90(totals.goals),
     assistsPer90: per90(totals.assists),
+    goalContributionsPer90: per90(goalContributions),
     shotConversion: totals.shots > 0 ? round2(totals.goals / totals.shots) : 0,
+    shotsOnTargetPct: totals.shots > 0 ? round2(totals.shotsOnTarget / totals.shots) : 0,
+    shotsPer90: per90(totals.shots),
+    minutesPerGoal: totals.goals > 0 ? round1(totals.minutes / totals.goals) : 0,
     xgPer90: totals.xg !== null ? per90(totals.xg) : null,
     xaPer90: totals.xa !== null ? per90(totals.xa) : null,
   };
 }
 
+/** ---- Metric registry (P6-1) ---- */
+
+/** Grouping used by UI presets (attack / creation / efficiency / ...). */
+export type MetricGroup =
+  | "attack"
+  | "creation"
+  | "efficiency"
+  | "discipline"
+  | "trophies";
+
+/** How a metric value is rendered. */
+export type MetricFormat = "number" | "percent" | "count";
+
+/**
+ * Data-availability of a metric:
+ *  - "always"       — derivable for any slice from the canonical schema.
+ *  - "modern"       — xG/xA family: null for pre-2014 seasons (honesty line).
+ *  - "illustrative" — NOT real data (e.g. hat-tricks placeholder).
+ */
+export type MetricAvailability = "always" | "modern" | "illustrative";
+
+/**
+ * Every metric the card/charts can show. SUPERSET of the original 12 card stats.
+ * Each is genuinely derivable from `PlayerSeasonComp` (except `hatTricks`, which
+ * is an illustrative placeholder field).
+ */
+export type MetricKey =
+  | "goals"
+  | "assists"
+  | "goalContributions"
+  | "matches"
+  | "starts"
+  | "minutes"
+  | "goalsPer90"
+  | "assistsPer90"
+  | "goalContributionsPer90"
+  | "shotConversion"
+  | "shotsOnTargetPct"
+  | "shotsPer90"
+  | "minutesPerGoal"
+  | "freekickGoals"
+  | "penaltyGoals"
+  | "xg"
+  | "xa"
+  | "xgPer90"
+  | "xaPer90"
+  | "trophies"
+  | "ballonDor"
+  | "hatTricks"
+  | "yellowCards"
+  | "redCards";
+
+/**
+ * Definition of a single metric. `icon` is a STRING key resolved against the
+ * icon table in `card-labels` (the data layer stays React/lucide-free); by
+ * convention it equals the metric key. `labelKey` points at a dictionary entry.
+ */
+export type MetricDef = {
+  key: MetricKey;
+  group: MetricGroup;
+  labelKey: keyof Dictionary;
+  /** String key resolvable in card-labels' STAT_ICONS (defaults to `key`). */
+  icon: MetricKey;
+  decimals: number;
+  higherIsBetter: boolean;
+  format: MetricFormat;
+  /** One-line human definition (single canonical meaning, SPEC §7). */
+  definition: string;
+  availability: MetricAvailability;
+};
+
+/** The full registry. Every MetricKey has exactly one definition. */
+export const METRIC_CATALOG: Record<MetricKey, MetricDef> = {
+  goals: { key: "goals", group: "attack", labelKey: "statGoals", icon: "goals", decimals: 0, higherIsBetter: true, format: "number", definition: "Total goals scored in the slice (penalty-adjusted per the penalties toggle).", availability: "always" },
+  assists: { key: "assists", group: "creation", labelKey: "statAssists", icon: "assists", decimals: 0, higherIsBetter: true, format: "number", definition: "Total assists in the slice.", availability: "always" },
+  goalContributions: { key: "goalContributions", group: "attack", labelKey: "statGoalContributions", icon: "goalContributions", decimals: 0, higherIsBetter: true, format: "number", definition: "Goals plus assists (direct goal contributions).", availability: "always" },
+  matches: { key: "matches", group: "efficiency", labelKey: "statMatches", icon: "matches", decimals: 0, higherIsBetter: true, format: "number", definition: "Appearances in the slice.", availability: "always" },
+  starts: { key: "starts", group: "efficiency", labelKey: "statStarts", icon: "starts", decimals: 0, higherIsBetter: true, format: "number", definition: "Matches started in the slice.", availability: "always" },
+  minutes: { key: "minutes", group: "efficiency", labelKey: "statMinutes", icon: "minutes", decimals: 0, higherIsBetter: true, format: "number", definition: "Total minutes played in the slice.", availability: "always" },
+  goalsPer90: { key: "goalsPer90", group: "attack", labelKey: "statGoalsPer90", icon: "goalsPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Goals per 90 minutes played.", availability: "always" },
+  assistsPer90: { key: "assistsPer90", group: "creation", labelKey: "statAssistsPer90", icon: "assistsPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Assists per 90 minutes played.", availability: "always" },
+  goalContributionsPer90: { key: "goalContributionsPer90", group: "attack", labelKey: "statGoalContributionsPer90", icon: "goalContributionsPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Goals plus assists per 90 minutes played.", availability: "always" },
+  shotConversion: { key: "shotConversion", group: "efficiency", labelKey: "statShotConversion", icon: "shotConversion", decimals: 2, higherIsBetter: true, format: "percent", definition: "Goals divided by total shots.", availability: "always" },
+  shotsOnTargetPct: { key: "shotsOnTargetPct", group: "efficiency", labelKey: "statShotsOnTargetPct", icon: "shotsOnTargetPct", decimals: 2, higherIsBetter: true, format: "percent", definition: "Shots on target divided by total shots.", availability: "always" },
+  shotsPer90: { key: "shotsPer90", group: "attack", labelKey: "statShotsPer90", icon: "shotsPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Shots per 90 minutes played.", availability: "always" },
+  minutesPerGoal: { key: "minutesPerGoal", group: "efficiency", labelKey: "statMinutesPerGoal", icon: "minutesPerGoal", decimals: 0, higherIsBetter: false, format: "number", definition: "Minutes played per goal scored (lower is better).", availability: "always" },
+  freekickGoals: { key: "freekickGoals", group: "attack", labelKey: "statFreekickGoals", icon: "freekickGoals", decimals: 0, higherIsBetter: true, format: "number", definition: "Goals scored directly from free kicks.", availability: "always" },
+  penaltyGoals: { key: "penaltyGoals", group: "attack", labelKey: "statPenaltyGoals", icon: "penaltyGoals", decimals: 0, higherIsBetter: true, format: "number", definition: "Goals scored from penalties.", availability: "always" },
+  xg: { key: "xg", group: "attack", labelKey: "statXg", icon: "xg", decimals: 1, higherIsBetter: true, format: "number", definition: "Expected goals (xG); available for 2014+ seasons only.", availability: "modern" },
+  xa: { key: "xa", group: "creation", labelKey: "statXa", icon: "xa", decimals: 1, higherIsBetter: true, format: "number", definition: "Expected assists (xA); available for 2014+ seasons only.", availability: "modern" },
+  xgPer90: { key: "xgPer90", group: "attack", labelKey: "statXgPer90", icon: "xgPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Expected goals per 90 minutes; 2014+ seasons only.", availability: "modern" },
+  xaPer90: { key: "xaPer90", group: "creation", labelKey: "statXaPer90", icon: "xaPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Expected assists per 90 minutes; 2014+ seasons only.", availability: "modern" },
+  trophies: { key: "trophies", group: "trophies", labelKey: "statTrophies", icon: "trophies", decimals: 0, higherIsBetter: true, format: "count", definition: "Team trophies won in the slice (each season+trophy counts once).", availability: "always" },
+  ballonDor: { key: "ballonDor", group: "trophies", labelKey: "statBallonDor", icon: "ballonDor", decimals: 0, higherIsBetter: true, format: "count", definition: "Ballon d'Or wins in the slice (distinct seasons).", availability: "always" },
+  hatTricks: { key: "hatTricks", group: "attack", labelKey: "statHatTricks", icon: "hatTricks", decimals: 0, higherIsBetter: true, format: "count", definition: "Hat-tricks. ILLUSTRATIVE placeholder — not real data.", availability: "illustrative" },
+  yellowCards: { key: "yellowCards", group: "discipline", labelKey: "statYellowCards", icon: "yellowCards", decimals: 0, higherIsBetter: false, format: "number", definition: "Yellow cards received (lower is better).", availability: "always" },
+  redCards: { key: "redCards", group: "discipline", labelKey: "statRedCards", icon: "redCards", decimals: 0, higherIsBetter: false, format: "number", definition: "Red cards received (lower is better).", availability: "always" },
+};
+
+/** All metric keys in catalog order (stable). */
+export const METRIC_KEYS: MetricKey[] = Object.keys(METRIC_CATALOG) as MetricKey[];
+
+/**
+ * The DEFAULT card metric set, in the EXACT order the card has always rendered.
+ * Keeping this identical guarantees the default card stays byte-identical.
+ */
+export const DEFAULT_METRICS: MetricKey[] = [
+  "goals",
+  "assists",
+  "matches",
+  "minutes",
+  "goalsPer90",
+  "shotConversion",
+  "xg",
+  "xa",
+  "trophies",
+  "ballonDor",
+  "yellowCards",
+  "redCards",
+];
+
 /** ---- Card stat set (SPEC §7) ---- */
+
+/**
+ * `CardStatKey` is now an alias of `MetricKey` — the card can render ANY metric.
+ * (Kept as a named export so existing imports continue to work.)
+ */
+export type CardStatKey = MetricKey;
 
 /** A single comparable stat for the card. `value` null means "hide this stat". */
 export type CardStat = {
@@ -245,42 +422,94 @@ export type CardStat = {
   decimals: number;
 };
 
-export type CardStatKey =
-  | "goals"
-  | "assists"
-  | "matches"
-  | "minutes"
-  | "goalsPer90"
-  | "shotConversion"
-  | "xg"
-  | "xa"
-  | "trophies"
-  | "ballonDor"
-  | "yellowCards"
-  | "redCards";
+/**
+ * Extract the raw value for ANY metric from the computed totals + derived set.
+ * Returns null when the metric is unavailable for the slice (xG/xA family
+ * pre-2014). Pure lookup — no formatting.
+ */
+export function metricValue(
+  key: MetricKey,
+  totals: AggregateTotals,
+  derived: DerivedMetrics,
+): number | null {
+  switch (key) {
+    case "goals":
+      return totals.goals;
+    case "assists":
+      return totals.assists;
+    case "goalContributions":
+      return derived.goalContributions;
+    case "matches":
+      return totals.matches;
+    case "starts":
+      return totals.starts;
+    case "minutes":
+      return totals.minutes;
+    case "goalsPer90":
+      return derived.goalsPer90;
+    case "assistsPer90":
+      return derived.assistsPer90;
+    case "goalContributionsPer90":
+      return derived.goalContributionsPer90;
+    case "shotConversion":
+      return derived.shotConversion;
+    case "shotsOnTargetPct":
+      return derived.shotsOnTargetPct;
+    case "shotsPer90":
+      return derived.shotsPer90;
+    case "minutesPerGoal":
+      return derived.minutesPerGoal;
+    case "freekickGoals":
+      return totals.freekickGoals;
+    case "penaltyGoals":
+      return totals.penaltyGoals;
+    case "xg":
+      return totals.xg;
+    case "xa":
+      return totals.xa;
+    case "xgPer90":
+      return derived.xgPer90;
+    case "xaPer90":
+      return derived.xaPer90;
+    case "trophies":
+      return totals.trophyCount;
+    case "ballonDor":
+      return totals.ballonDor;
+    case "hatTricks":
+      return totals.hatTricks;
+    case "yellowCards":
+      return totals.yellowCards;
+    case "redCards":
+      return totals.redCards;
+  }
+}
+
+/** Build a single CardStat for a catalog metric (value may be null). */
+export function buildCardStat(
+  key: MetricKey,
+  totals: AggregateTotals,
+  derived: DerivedMetrics,
+): CardStat {
+  const def = METRIC_CATALOG[key];
+  return {
+    key,
+    value: metricValue(key, totals, derived),
+    higherIsBetter: def.higherIsBetter,
+    decimals: def.decimals,
+  };
+}
 
 /**
- * Build the ~10-12 stat set for one player's slice. Order is the card display
- * order. xG/xA come through as null pre-2014 so the card hides them.
+ * Build the stat set for one player's slice over the SELECTED metrics, in the
+ * selected order. Defaults to DEFAULT_METRICS → byte-identical to the original
+ * fixed 12-stat card. xG/xA come through as null pre-2014 so the card hides them.
  */
 export function buildCardStats(
   totals: AggregateTotals,
   derived: DerivedMetrics,
+  metrics: readonly MetricKey[] = DEFAULT_METRICS,
 ): CardStat[] {
-  return [
-    { key: "goals", value: totals.goals, higherIsBetter: true, decimals: 0 },
-    { key: "assists", value: totals.assists, higherIsBetter: true, decimals: 0 },
-    { key: "matches", value: totals.matches, higherIsBetter: true, decimals: 0 },
-    { key: "minutes", value: totals.minutes, higherIsBetter: true, decimals: 0 },
-    { key: "goalsPer90", value: derived.goalsPer90, higherIsBetter: true, decimals: 2 },
-    { key: "shotConversion", value: derived.shotConversion, higherIsBetter: true, decimals: 2 },
-    { key: "xg", value: totals.xg, higherIsBetter: true, decimals: 1 },
-    { key: "xa", value: totals.xa, higherIsBetter: true, decimals: 1 },
-    { key: "trophies", value: totals.trophyCount, higherIsBetter: true, decimals: 0 },
-    { key: "ballonDor", value: totals.ballonDor, higherIsBetter: true, decimals: 0 },
-    { key: "yellowCards", value: totals.yellowCards, higherIsBetter: false, decimals: 0 },
-    { key: "redCards", value: totals.redCards, higherIsBetter: false, decimals: 0 },
-  ];
+  return metrics.map((key) => buildCardStat(key, totals, derived));
 }
 
 /** ---- Head-to-head verdict (the viral hook: "MESSI 6 : 3 RONALDO") ---- */
@@ -297,16 +526,19 @@ export type ComparisonResult = {
 
 /**
  * Run the full comparison for two slice option sets (one per player). This is
- * the top-level function the UI/card layer calls. Stats where either side is
+ * the top-level function the UI/card layer calls. The "score by categories" and
+ * the displayed stat rows are computed ONLY over `metrics`, in that order
+ * (defaults to DEFAULT_METRICS → original behavior). Stats where either side is
  * null (e.g. xG pre-2014) are excluded from the category score.
  */
 export function compare(
   rows: readonly PlayerSeasonComp[],
   messiOpts: Omit<SliceOptions, "player">,
   ronaldoOpts: Omit<SliceOptions, "player">,
+  metrics: readonly MetricKey[] = DEFAULT_METRICS,
 ): ComparisonResult {
-  const messiSide = computeSide(rows, { ...messiOpts, player: "messi" });
-  const ronaldoSide = computeSide(rows, { ...ronaldoOpts, player: "ronaldo" });
+  const messiSide = computeSide(rows, { ...messiOpts, player: "messi" }, metrics);
+  const ronaldoSide = computeSide(rows, { ...ronaldoOpts, player: "ronaldo" }, metrics);
 
   const perCategory: ComparisonResult["perCategory"] = [];
   let messiScore = 0;
@@ -343,10 +575,58 @@ export function compare(
 function computeSide(
   rows: readonly PlayerSeasonComp[],
   opts: SliceOptions,
+  metrics: readonly MetricKey[],
 ): ComparisonResult["messi"] {
   const sliced = sliceRows(rows, opts);
   const totals = aggregate(sliced, opts.includePenalties);
   const derived = deriveMetrics(totals);
-  const stats = buildCardStats(totals, derived);
+  const stats = buildCardStats(totals, derived, metrics);
   return { totals, derived, stats };
+}
+
+/** ---- Visualization data providers (P6-4) ---- */
+
+/** One point on a season trend line. `value` null = unavailable that season. */
+export type SeasonTrendPoint = { season: string; value: number | null };
+
+/** Options for `seasonTrend` (all optional, additive). */
+export type SeasonTrendOptions = {
+  /** Restrict to a competition set (stacking). Empty/omitted = all. */
+  competitions?: CompetitionType[];
+  /** Single-competition filter (used only if `competitions` is empty/omitted). */
+  competition?: CompetitionFilter;
+  /** Penalties on/off for goal-derived metrics. Default true. */
+  includePenalties?: boolean;
+};
+
+/**
+ * REAL per-season trend of a metric for one player, oldest→newest. Each season's
+ * value is computed by aggregating that season's rows (respecting the optional
+ * competition filter + penalties) and reading the metric. `value` is null when
+ * the metric is unavailable that season (e.g. xG pre-2014). Pure & deterministic.
+ */
+export function seasonTrend(
+  rows: readonly PlayerSeasonComp[],
+  player: PlayerId,
+  metricKey: MetricKey,
+  opts: SeasonTrendOptions = {},
+): SeasonTrendPoint[] {
+  const includePenalties = opts.includePenalties ?? true;
+  const byPlayer = rowsForPlayer(rows, player);
+  const filtered =
+    opts.competitions && opts.competitions.length > 0
+      ? filterByCompetitions(byPlayer, opts.competitions)
+      : filterByCompetition(byPlayer, opts.competition ?? "all");
+
+  // Distinct seasons in chronological order.
+  const seasons = [...new Set(filtered.map((r) => r.season))].sort(
+    (a, b) => seasonStartYear(a) - seasonStartYear(b),
+  );
+
+  return seasons.map((season) => {
+    const seasonRows = filtered.filter((r) => r.season === season);
+    const totals = aggregate(seasonRows, includePenalties);
+    const derived = deriveMetrics(totals);
+    return { season, value: metricValue(metricKey, totals, derived) };
+  });
 }

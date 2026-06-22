@@ -2,12 +2,16 @@ import { describe, it, expect } from "vitest";
 import {
   rowsForPlayer,
   filterByCompetition,
+  filterByCompetitions,
   selectSeasons,
   sliceRows,
   aggregate,
   deriveMetrics,
   buildCardStats,
   compare,
+  seasonTrend,
+  DEFAULT_METRICS,
+  type MetricKey,
 } from "./aggregate";
 import type { PlayerSeasonComp } from "./types";
 
@@ -29,6 +33,7 @@ function row(p: Partial<PlayerSeasonComp> & Pick<PlayerSeasonComp, "player" | "s
     xa: null,
     yellowCards: 0,
     redCards: 0,
+    hatTricks: 0,
     trophies: [],
     individualAwards: [],
     verified: false,
@@ -243,5 +248,103 @@ describe("compare — head-to-head verdict", () => {
     );
     expect(on.messi.totals.goals).toBe(50);
     expect(on.ronaldo.totals.goals).toBe(34); // 46 - 12 penalties
+  });
+});
+
+describe("compare — selection-aware verdict (P6-2)", () => {
+  const both = {
+    selection: { kind: "season" as const, season: "2011/12" },
+    competition: "all" as const,
+    includePenalties: true,
+  };
+
+  it("defaults (no metrics arg) reproduce the full default metric set & order", () => {
+    const result = compare(FIXTURE, both, both);
+    expect(result.messi.stats.map((s) => s.key)).toEqual(DEFAULT_METRICS);
+  });
+
+  it("scores ONLY over the selected metrics, in the selected order", () => {
+    const metrics: MetricKey[] = ["assists", "goals"]; // note: reversed order
+    const result = compare(FIXTURE, both, both, metrics);
+    // Only the two chosen metrics are contested, in the chosen order.
+    expect(result.perCategory.map((c) => c.key)).toEqual(["assists", "goals"]);
+    // 2011/12: Messi 64 goals / 19 assists vs Ronaldo 46 goals (league only here)
+    // — both contested categories go to Messi.
+    expect(result.score.messi + result.score.ronaldo).toBeLessThanOrEqual(2);
+    expect(result.messi.stats.map((s) => s.key)).toEqual(["assists", "goals"]);
+  });
+
+  it("a single-metric selection yields at most a 1:0 / 0:1 score", () => {
+    const result = compare(FIXTURE, both, both, ["goals"]);
+    expect(result.perCategory).toHaveLength(1);
+    expect(result.score.messi + result.score.ronaldo).toBeLessThanOrEqual(1);
+  });
+});
+
+describe("filterByCompetitions — stacking sets (P6-3)", () => {
+  it("keeps rows whose type is in a multi-competition set, summing correctly", () => {
+    const messi = rowsForPlayer(FIXTURE, "messi");
+    // Messi 2011/12 fixture: league (50 g) + CL (14 g). A 2-comp set sums both.
+    const stacked = filterByCompetitions(
+      selectSeasons(messi, { kind: "season", season: "2011/12" }),
+      ["league", "champions_league"],
+    );
+    const totals = aggregate(stacked, true);
+    expect(totals.goals).toBe(64); // 50 + 14
+  });
+
+  it("an empty set passes everything through (acts like 'all')", () => {
+    const messi = rowsForPlayer(FIXTURE, "messi");
+    expect(filterByCompetitions(messi, [])).toHaveLength(messi.length);
+  });
+
+  it("sliceRows routes through the stacking set when present, else single comp", () => {
+    const onlyCl = sliceRows(FIXTURE, {
+      player: "messi",
+      selection: { kind: "season", season: "2011/12" },
+      competition: "all",
+      competitions: ["champions_league"],
+      includePenalties: true,
+    });
+    expect(onlyCl.every((r) => r.competitionType === "champions_league")).toBe(true);
+
+    // Without `competitions`, the single-competition field still works.
+    const single = sliceRows(FIXTURE, {
+      player: "messi",
+      selection: { kind: "season", season: "2011/12" },
+      competition: "league",
+      includePenalties: true,
+    });
+    expect(single.every((r) => r.competitionType === "league")).toBe(true);
+  });
+});
+
+describe("seasonTrend (P6-4)", () => {
+  it("returns ordered per-season values for a real metric", () => {
+    const trend = seasonTrend(FIXTURE, "messi", "goals");
+    expect(trend.map((p) => p.season)).toEqual(["2011/12", "2013/14", "2014/15"]);
+    // 2011/12 = league 50 + CL 14 = 64 (all competitions, penalties on)
+    expect(trend[0].value).toBe(64);
+    expect(trend[1].value).toBe(28); // 2013/14 league only
+  });
+
+  it("respects a competition filter", () => {
+    const trend = seasonTrend(FIXTURE, "messi", "goals", { competition: "league" });
+    const s2011 = trend.find((p) => p.season === "2011/12");
+    expect(s2011?.value).toBe(50); // league only
+  });
+
+  it("respects a stacking competition set", () => {
+    const trend = seasonTrend(FIXTURE, "messi", "goals", {
+      competitions: ["champions_league"],
+    });
+    expect(trend.map((p) => p.season)).toEqual(["2011/12"]); // only season with a CL row
+    expect(trend[0].value).toBe(14);
+  });
+
+  it("yields null for a metric unavailable in a season (xG pre-2014)", () => {
+    const trend = seasonTrend(FIXTURE, "messi", "xg");
+    expect(trend.find((p) => p.season === "2013/14")?.value).toBeNull();
+    expect(trend.find((p) => p.season === "2014/15")?.value).toBe(32.1);
   });
 });

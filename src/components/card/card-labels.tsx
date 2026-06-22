@@ -2,8 +2,12 @@ import {
   Award,
   CircleDot,
   Crosshair,
+  Flame,
   Gauge,
   Goal,
+  Hourglass,
+  PlusCircle,
+  Sparkles,
   Square,
   SquareStack,
   Target,
@@ -11,45 +15,47 @@ import {
   Trophy,
   Users,
   Wand2,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
-import type { CardStatKey, CompetitionFilter, SeasonSelection } from "@/lib/data";
+import { METRIC_CATALOG, type CardStatKey, type CompetitionFilter, type SeasonSelection } from "@/lib/data";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { SideOptions } from "./card-model";
 
-/** lucide icon per stat (SPEC §4 — per-stat icon, one consistent icon family). */
+/**
+ * lucide icon per metric (SPEC §4 — per-stat icon, one consistent icon family).
+ * Covers EVERY MetricKey so the card can render any catalog metric.
+ */
 export const STAT_ICONS: Record<CardStatKey, LucideIcon> = {
   goals: Goal,
   assists: Wand2,
+  goalContributions: PlusCircle,
   matches: Users,
+  starts: Users,
   minutes: Timer,
   goalsPer90: Gauge,
+  assistsPer90: Gauge,
+  goalContributionsPer90: Gauge,
   shotConversion: Target,
+  shotsOnTargetPct: Target,
+  shotsPer90: Zap,
+  minutesPerGoal: Hourglass,
+  freekickGoals: Sparkles,
+  penaltyGoals: CircleDot,
   xg: Crosshair,
   xa: CircleDot,
+  xgPer90: Crosshair,
+  xaPer90: CircleDot,
   trophies: Trophy,
   ballonDor: Award,
+  hatTricks: Flame,
   yellowCards: Square,
   redCards: SquareStack,
 };
 
-const STAT_LABEL_KEYS: Record<CardStatKey, keyof Dictionary> = {
-  goals: "statGoals",
-  assists: "statAssists",
-  matches: "statMatches",
-  minutes: "statMinutes",
-  goalsPer90: "statGoalsPer90",
-  shotConversion: "statShotConversion",
-  xg: "statXg",
-  xa: "statXa",
-  trophies: "statTrophies",
-  ballonDor: "statBallonDor",
-  yellowCards: "statYellowCards",
-  redCards: "statRedCards",
-};
-
+/** Label dictionary key per metric — sourced from the catalog (single source). */
 export function statLabel(t: Dictionary, key: CardStatKey): string {
-  return t[STAT_LABEL_KEYS[key]];
+  return t[METRIC_CATALOG[key].labelKey];
 }
 
 const COMP_LABEL_KEYS: Record<CompetitionFilter, keyof Dictionary> = {
@@ -89,14 +95,16 @@ export function contextChips(t: Dictionary, opts: SideOptions): string[] {
 }
 
 /**
- * Format a stat value with the right decimals. Shot conversion is a 0..1 ratio
- * → rendered as a percentage so the card reads naturally.
+ * Format a stat value with the right decimals. `percent` metrics (a 0..1 ratio)
+ * are rendered as a percentage; large counts (minutes) get thousands grouping.
+ * Driven by the metric catalog's `format` so every metric renders consistently.
  */
 export function formatStatValue(key: CardStatKey, value: number, decimals: number): string {
-  if (key === "shotConversion") {
+  const format = METRIC_CATALOG[key].format;
+  if (format === "percent") {
     return `${(value * 100).toFixed(0)}%`;
   }
-  if (key === "minutes") {
+  if (key === "minutes" || key === "minutesPerGoal") {
     return new Intl.NumberFormat("en-US").format(Math.round(value));
   }
   return value.toFixed(decimals);

@@ -145,6 +145,61 @@ licensed photo later is a one-line change per player in
 `src/components/card/player-meta.ts`. The before-launch decision (licence real
 photos **or** commission art) is unchanged.
 
+## Phase 6 — metric expansion, illustrative data (2026-06-22)
+
+Phase 6 expanded the data/contract layer (the card/charts/UI consume it). All
+rows remain `verified: false`.
+
+### New derived metrics (computed from rows, never stored)
+
+Added to `deriveMetrics` and exposed via the metric registry `METRIC_CATALOG`
+(`src/lib/data/aggregate.ts`). All are genuinely derivable from the canonical
+`PlayerSeasonComp` schema:
+
+- `goalContributions` (G+A), `goalContributionsPer90`
+- `assistsPer90`
+- `shotsOnTargetPct` (SoT / shots), `shotsPer90`
+- `minutesPerGoal` (lower-is-better)
+- `xgPer90`, `xaPer90` (availability `"modern"` — **null** for pre-2014 seasons,
+  same honesty line as xG/xA)
+
+Also surfaced as catalog metrics (already in the schema): `starts`,
+`freekickGoals`, `penaltyGoals`. The catalog groups every metric into
+attack / creation / efficiency / discipline / trophies and records, per metric,
+a single canonical `definition`, decimals, format, `higherIsBetter` and
+`availability`.
+
+The **default card is unchanged**: `DEFAULT_METRICS` is exactly the original 12
+keys in the original order, and `DEFAULT_SLICE` uses it, so the default
+`/render/card` PNG and view-model are byte-identical.
+
+### hatTricks — ILLUSTRATIVE (not real, `verified:false`)
+
+`hatTricks: number` was **added to the `PlayerSeasonComp` schema** even though it
+is **not** part of the SPEC §6 canonical model and is **not sourced from any real
+feed**. Seed values are a deterministic placeholder (`floor(goals / 14)` for open-
+play club competitions; 0 for national-team / super-cup / club-world-cup cameos),
+written by the seed path in `src/lib/data/seed.ts`. The live-source normalize path
+sets it to 0. Its catalog entry is `availability:"illustrative"`. **TODO before
+launch:** replace with real hat-trick counts or drop the metric.
+
+### Illustrative positional data — heatmap + shotmap (NOT real)
+
+Free positional feeds (heatmaps / shotmaps) are unavailable, so
+`getIllustrativePositional(player)` (`src/lib/data/positional.ts`, exposed on the
+`DataSource` interface so it is swappable) returns a **deterministic placeholder**:
+
+- a `16×10` heatmap intensity grid (each cell 0..1),
+- a shotmap of points on a normalized `0..1` pitch half (x, y, xg, outcome),
+- `illustrative: true` as part of the return.
+
+It is derived from a seeded PRNG (mulberry32) keyed by an FNV-1a hash of the
+player id — **no `Math.random` / `Date` / clock** — so the same player always
+yields byte-identical output (charts/PNG stay deterministic). This is **NOT real
+tracking/positional data**; the UI must badge it `illustrative`. **TODO before
+launch:** swap in a real positional provider behind `DataSource` (no frontend
+change required) or keep it explicitly labelled.
+
 ## How to regenerate
 
 ```bash

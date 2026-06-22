@@ -116,6 +116,9 @@ export function normalizeSeasonRecord(
     xa: null,
     yellowCards: toNumber(raw.yellowCards),
     redCards: toNumber(raw.redCards),
+    // Illustrative-only field; live sources do not provide it, so it starts at 0
+    // (the seed path fills a deterministic placeholder). See DATA_REPORT.md.
+    hatTricks: 0,
     trophies: raw.trophies ?? [],
     individualAwards: raw.individualAwards ?? [],
     verified: false,

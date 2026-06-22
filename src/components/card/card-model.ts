@@ -1,10 +1,12 @@
 import {
   compare,
   dataSource,
+  DEFAULT_METRICS,
   sliceRows,
   type CardStatKey,
   type CategoryWinner,
   type ComparisonResult,
+  type MetricKey,
   type PlayerSeasonComp,
   type SliceOptions,
 } from "@/lib/data";
@@ -23,12 +25,20 @@ export type SideOptions = Omit<SliceOptions, "player">;
 export type CardSlice = {
   messi: SideOptions;
   ronaldo: SideOptions;
+  /**
+   * Ordered, card-level metric set (P6-2). The "score by categories" and the
+   * displayed rows are computed ONLY over these metrics, in this order. Defaults
+   * to DEFAULT_METRICS — the original 12 stats in the original order — so the
+   * default card stays byte-identical.
+   */
+  metrics: MetricKey[];
 };
 
 /** Default matchup used by the render route when no params are given. */
 export const DEFAULT_SLICE: CardSlice = {
   messi: { selection: { kind: "season", season: "2011/12" }, competition: "all", includePenalties: true },
   ronaldo: { selection: { kind: "season", season: "2014/15" }, competition: "all", includePenalties: true },
+  metrics: DEFAULT_METRICS,
 };
 
 /** One rendered stat row: both values + normalized bar fractions (0..1). */
@@ -93,7 +103,12 @@ export function buildCardViewModel(
   rows: readonly PlayerSeasonComp[],
   slice: CardSlice,
 ): CardViewModel {
-  const result: ComparisonResult = compare(rows, slice.messi, slice.ronaldo);
+  const result: ComparisonResult = compare(
+    rows,
+    slice.messi,
+    slice.ronaldo,
+    slice.metrics,
+  );
 
   const ronaldoByKey = new Map(result.ronaldo.stats.map((s) => [s.key, s]));
   const winnerByKey = new Map(result.perCategory.map((c) => [c.key, c.winner]));

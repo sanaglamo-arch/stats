@@ -40,6 +40,20 @@ type SeedTuple = {
   awards?: string[];
 };
 
+/**
+ * ILLUSTRATIVE hat-tricks for a row. Hat-tricks are NOT in the SPEC §6 schema
+ * and not sourced from a real feed; this is a deterministic placeholder derived
+ * from the row's goal count (roughly one hat-trick per ~14 goals in open play
+ * competitions, none for national-team/super-cup cameos). Documented as
+ * illustrative / verified:false in DATA_REPORT.md.
+ */
+function illustrativeHatTricks(t: SeedTuple): number {
+  if (t.comp === "national_team" || t.comp === "super_cup" || t.comp === "club_world_cup") {
+    return 0;
+  }
+  return Math.floor(t.g / 14);
+}
+
 const FIRST_XG_SEASON = "2014/15";
 
 /** Seasons are labelled "YYYY/YY"; compare by leading year. */
@@ -267,6 +281,7 @@ function expand(player: "messi" | "ronaldo", t: SeedTuple): PlayerSeasonComp {
     xa: advanced && t.xa !== undefined ? t.xa : null,
     yellowCards: t.yc ?? 0,
     redCards: t.rc ?? 0,
+    hatTricks: illustrativeHatTricks(t),
     trophies: t.trophies ?? [],
     individualAwards: t.awards ?? [],
     verified: false,

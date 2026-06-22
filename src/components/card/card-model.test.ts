@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dataSource } from "@/lib/data";
+import { dataSource, DEFAULT_METRICS } from "@/lib/data";
 import { buildCardViewModel, DEFAULT_SLICE, type CardSlice } from "./card-model";
 
 const ROWS = dataSource.getAllRows();
@@ -59,6 +59,7 @@ describe("buildCardViewModel", () => {
     const career: CardSlice = {
       messi: { selection: { kind: "career" }, competition: "all", includePenalties: true },
       ronaldo: { selection: { kind: "career" }, competition: "all", includePenalties: true },
+      metrics: DEFAULT_METRICS,
     };
     const vm = build(career);
     expect(vm.rows.length).toBeGreaterThan(0);
@@ -73,6 +74,7 @@ describe("buildCardViewModel", () => {
     const sameAge: CardSlice = {
       messi: { selection: { kind: "age", age: 25 }, competition: "all", includePenalties: true },
       ronaldo: { selection: { kind: "age", age: 25 }, competition: "all", includePenalties: true },
+      metrics: DEFAULT_METRICS,
     };
     const vm = build(sameAge);
     expect(vm.rows.length).toBeGreaterThan(0);
@@ -83,10 +85,12 @@ describe("buildCardViewModel", () => {
     const sliceOn: CardSlice = {
       messi: { selection: { kind: "season", season: "2011/12" }, competition: "all", includePenalties: true },
       ronaldo: { selection: { kind: "season", season: "2011/12" }, competition: "all", includePenalties: true },
+      metrics: DEFAULT_METRICS,
     };
     const sliceOff: CardSlice = {
       messi: { selection: { kind: "season", season: "2011/12" }, competition: "all", includePenalties: false },
       ronaldo: { selection: { kind: "season", season: "2011/12" }, competition: "all", includePenalties: false },
+      metrics: DEFAULT_METRICS,
     };
     const goalsOn = build(sliceOn).rows.find((r) => r.key === "goals");
     const goalsOff = build(sliceOff).rows.find((r) => r.key === "goals");
@@ -99,6 +103,7 @@ describe("buildCardViewModel", () => {
     const pre2014: CardSlice = {
       messi: { selection: { kind: "season", season: "2011/12" }, competition: "all", includePenalties: true },
       ronaldo: { selection: { kind: "season", season: "2011/12" }, competition: "all", includePenalties: true },
+      metrics: DEFAULT_METRICS,
     };
     const vm = build(pre2014);
     expect(vm.rows.some((r) => r.key === "xg")).toBe(false);
@@ -111,6 +116,7 @@ describe("buildCardViewModel", () => {
     const impossible: CardSlice = {
       messi: { selection: { kind: "age", age: 999 }, competition: "all", includePenalties: true },
       ronaldo: { selection: { kind: "age", age: 999 }, competition: "all", includePenalties: true },
+      metrics: DEFAULT_METRICS,
     };
     const vm = build(impossible);
     // ties (0 vs 0) produce rows but no score; goals row would be 0-0 tie
