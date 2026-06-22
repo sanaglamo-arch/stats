@@ -92,6 +92,23 @@ const en = {
   statHatTricks: "Hat-tricks",
   statYellowCards: "Yellow cards",
   statRedCards: "Red cards",
+
+  // Charts (Phase 6 visualizations)
+  chartRadarTitle: "Profile radar",
+  chartRadarHint: "Each axis is normalized 0–100% to the better of the two values.",
+  chartTrendTitle: "Season trend",
+  chartTrendMetric: "Metric",
+  chartHeatmapTitle: "Touch heatmap",
+  chartShotmapTitle: "Shot map",
+  chartNoData: "No data for this selection.",
+  chartGap: "no data",
+  // Shot outcomes (legend + a11y)
+  shotGoal: "Goal",
+  shotSaved: "Saved",
+  shotMissed: "Missed",
+  // Honesty badge + captions (SPEC §6) — MUST be shown on illustrative charts
+  illustrative: "Illustrative",
+  illustrativeCaption: "Placeholder data — not real tracking, shown for layout only.",
 } as const;
 
 export type Dictionary = Record<keyof typeof en, string>;
@@ -174,6 +191,20 @@ const ru: Dictionary = {
   statHatTricks: "Хет-трики",
   statYellowCards: "Жёлтые карточки",
   statRedCards: "Красные карточки",
+
+  chartRadarTitle: "Радар профиля",
+  chartRadarHint: "Каждая ось нормализована 0–100% по лучшему из двух значений.",
+  chartTrendTitle: "Тренд по сезонам",
+  chartTrendMetric: "Метрика",
+  chartHeatmapTitle: "Тепловая карта касаний",
+  chartShotmapTitle: "Карта ударов",
+  chartNoData: "Нет данных для этого среза.",
+  chartGap: "нет данных",
+  shotGoal: "Гол",
+  shotSaved: "Сейв",
+  shotMissed: "Мимо",
+  illustrative: "Иллюстративно",
+  illustrativeCaption: "Placeholder-данные — не реальный трекинг, только для макета.",
 };
 
 export const dictionaries: Record<Locale, Dictionary> = { en, ru };
