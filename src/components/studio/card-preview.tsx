@@ -6,10 +6,11 @@ import {
   CARD_HEIGHT,
   CARD_WIDTH,
   ComparisonCard,
+  paramsFromSlice,
   type CardSlice,
   type CardViewModel,
 } from "@/components/card";
-import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { DEFAULT_LOCALE, type Dictionary } from "@/lib/i18n/dictionaries";
 import { DURATION, EASE } from "@/lib/motion/tokens";
 
 /**
@@ -48,9 +49,17 @@ export function CardPreview({
     return () => observer.disconnect();
   }, []);
 
-  // Crossfade key: changes when the rendered verdict changes (cheap proxy for
-  // "the card content is different"), so we don't crossfade on no-op renders.
-  const contentKey = `${model.score.messi}-${model.score.ronaldo}-${model.contested}-${slice.messi.selection.kind}-${slice.ronaldo.selection.kind}`;
+  // Crossfade key: a stable signature of everything that visibly changes the
+  // card, so ANY slice change (competition tab, season/age value, penalties,
+  // metric set, …) re-mounts the `animated` card → bars re-spring + numbers
+  // count-up. Built from the canonical slice serialization (`paramsFromSlice`,
+  // also used by /api/card) plus the rendered stat figures + score — so a
+  // comp-tab change that only alters numbers still re-animates, while a true
+  // no-op render keeps the same key (no spurious flicker). Locale is irrelevant
+  // here (it only swaps labels, which re-render via `t`), so we pin DEFAULT_LOCALE.
+  const contentKey = `${paramsFromSlice(slice, DEFAULT_LOCALE).toString()}|${model.rows
+    .map((r) => `${r.messiValue}/${r.ronaldoValue}`)
+    .join(",")}|${model.score.messi}:${model.score.ronaldo}`;
 
   return (
     <div

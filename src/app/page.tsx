@@ -36,8 +36,7 @@ export default function HomePage() {
         <motion.header
           className="mb-10 flex flex-col items-center gap-2 text-center"
           initial={reduce ? false : { opacity: 0, y: 24 }}
-          whileInView={reduce ? undefined : { opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.6 }}
+          animate={reduce ? undefined : { opacity: 1, y: 0 }}
           transition={{ duration: DURATION.base, ease: EASE.out }}
         >
           <span
@@ -52,9 +51,8 @@ export default function HomePage() {
         </motion.header>
 
         <motion.div
-          initial={reduce ? false : { opacity: 0, y: 48, scale: 0.96 }}
-          whileInView={reduce ? undefined : { opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, amount: 0.2 }}
+          initial={reduce ? false : { opacity: 0, y: 24 }}
+          animate={reduce ? undefined : { opacity: 1, y: 0 }}
           transition={SPRING.hero}
         >
           <Studio />

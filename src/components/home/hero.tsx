@@ -51,16 +51,22 @@ export function Hero() {
           {t.appName}
         </motion.span>
 
+        {/* Mobile: stack MESSI / vs / RONALDO so the wide Orbitron-black names
+            always fit (the page root clips horizontal overflow). sm+ goes back
+            to one dramatic inline line. Accessible name stays "MESSI vs RONALDO". */}
         <motion.h1
           variants={item}
-          className="font-[family-name:var(--font-display)] text-5xl font-black uppercase leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl"
+          className="flex flex-col items-center gap-1 font-[family-name:var(--font-display)] text-5xl font-black uppercase leading-[0.95] tracking-tight sm:flex-row sm:items-baseline sm:justify-center sm:gap-0 sm:text-7xl lg:text-8xl"
         >
           <span
             style={{ color: "var(--color-messi-bright)", textShadow: "var(--shadow-glow-messi)" }}
           >
             MESSI
           </span>
-          <span className="mx-4 align-middle text-3xl sm:text-5xl" style={{ color: "var(--color-text-muted)" }}>
+          <span
+            className="text-2xl sm:mx-4 sm:align-middle sm:text-5xl"
+            style={{ color: "var(--color-text-muted)" }}
+          >
             {t.vs}
           </span>
           <span

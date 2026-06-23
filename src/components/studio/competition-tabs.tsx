@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import type { CompetitionType } from "@/lib/data";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { SPRING } from "@/lib/motion/tokens";
+import { FOCUS_RING } from "./control-primitives";
 
 /**
  * The PRIMARY context switcher (P6-10). A single full-width tab bar at the top of
@@ -89,7 +90,7 @@ export function CompetitionTabs({
             <Tabs.Trigger
               key={item.value}
               value={item.value}
-              className={`relative flex-1 cursor-pointer rounded-[var(--radius-md)] px-3 py-2.5 text-center text-xs font-semibold uppercase tracking-[0.06em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)] ${
+              className={`relative flex min-h-[44px] flex-1 cursor-pointer items-center justify-center rounded-[var(--radius-md)] px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.06em] transition-colors duration-200 ${FOCUS_RING} ${
                 active
                   ? "text-[var(--color-bg-base)]"
                   : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"

@@ -10,6 +10,7 @@ import {
   type MetricKey,
 } from "@/lib/data";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { FOCUS_RING } from "./control-primitives";
 
 /**
  * The stat-selection block (P6-8). A tidy, hierarchical block — NOT a dropdown:
@@ -40,9 +41,6 @@ const GROUP_LABEL_KEYS: Record<MetricGroup, keyof Dictionary> = {
   discipline: "statGroupDiscipline",
   trophies: "statGroupTrophies",
 };
-
-const FOCUS_RING =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]";
 
 function metricsByGroup(): Record<MetricGroup, MetricKey[]> {
   const map: Record<MetricGroup, MetricKey[]> = {
@@ -141,7 +139,7 @@ export function StatPicker({
                     aria-disabled={lockedOff}
                     onClick={() => toggle(key)}
                     title={illustrative ? t.illustrativeCaption : def.definition}
-                    className={`flex min-h-[36px] cursor-pointer items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors duration-200 ${FOCUS_RING} ${
+                    className={`flex min-h-[40px] cursor-pointer items-center gap-1.5 rounded-full border px-3 text-xs font-medium transition-colors duration-200 ${FOCUS_RING} ${
                       on
                         ? "border-[var(--color-gold)] bg-[color-mix(in_srgb,var(--color-gold)_18%,transparent)] text-[var(--color-text)]"
                         : "border-[var(--color-border-glass)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-strong)] hover:text-[var(--color-text)]"
@@ -174,7 +172,7 @@ export function StatPicker({
           {metrics.map((key, i) => (
             <li
               key={key}
-              className="flex items-center justify-between gap-2 rounded-[var(--radius-sm)] bg-[var(--color-surface)] px-2.5 py-1.5"
+              className="flex items-center justify-between gap-2 rounded-[var(--radius-sm)] bg-[var(--color-surface)] py-0.5 pl-2.5 pr-1"
             >
               <span className="truncate text-xs font-medium text-[var(--color-text)]">
                 <span className="tabular mr-2 text-[var(--color-text-muted)]">{i + 1}</span>
@@ -186,7 +184,7 @@ export function StatPicker({
                   onClick={() => move(key, -1)}
                   disabled={i === 0}
                   aria-label={`${t.statMoveUp}: ${t[METRIC_CATALOG[key].labelKey]}`}
-                  className={`flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] disabled:cursor-not-allowed disabled:opacity-30 ${FOCUS_RING} ${
+                  className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] disabled:cursor-not-allowed disabled:opacity-30 ${FOCUS_RING} ${
                     i === 0 ? "" : "cursor-pointer"
                   }`}
                 >
@@ -197,7 +195,7 @@ export function StatPicker({
                   onClick={() => move(key, 1)}
                   disabled={i === metrics.length - 1}
                   aria-label={`${t.statMoveDown}: ${t[METRIC_CATALOG[key].labelKey]}`}
-                  className={`flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] disabled:cursor-not-allowed disabled:opacity-30 ${FOCUS_RING} ${
+                  className={`flex h-11 w-11 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] disabled:cursor-not-allowed disabled:opacity-30 ${FOCUS_RING} ${
                     i === metrics.length - 1 ? "" : "cursor-pointer"
                   }`}
                 >

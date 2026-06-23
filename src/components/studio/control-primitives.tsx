@@ -12,7 +12,8 @@ import { SPRING } from "@/lib/motion/tokens";
  * (--color-ring), cursor-pointer, smooth state transitions. No `any`.
  */
 
-const FOCUS_RING =
+/** Shared neon focus-visible ring — the single source for every studio control. */
+export const FOCUS_RING =
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]";
 
 export function Field({
@@ -132,7 +133,7 @@ export function SegmentedControl<T extends string>({
             role="radio"
             aria-checked={active}
             onClick={() => onChange(item.value)}
-            className={`relative min-h-[40px] cursor-pointer rounded-[var(--radius-sm)] px-2 text-xs font-semibold transition-colors duration-200 ${FOCUS_RING} ${
+            className={`relative min-h-[44px] cursor-pointer rounded-[var(--radius-sm)] px-2 text-xs font-semibold transition-colors duration-200 ${FOCUS_RING} ${
               active
                 ? "text-[var(--color-bg-base)]"
                 : "text-[var(--color-text-secondary)] hover:text-[var(--color-text)]"

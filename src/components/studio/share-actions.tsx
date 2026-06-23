@@ -7,9 +7,7 @@ import { paramsFromSlice, type CardSlice } from "@/components/card";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 import { Magnetic } from "@/components/motion/magnetic";
 import { SPRING } from "@/lib/motion/tokens";
-
-const FOCUS_RING =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]";
+import { FOCUS_RING } from "./control-primitives";
 
 const FILENAME = "messi-vs-ronaldo.png";
 

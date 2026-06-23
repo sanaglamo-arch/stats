@@ -142,7 +142,7 @@ export function Studio() {
   );
 
   return (
-    <div className="flex w-full flex-col gap-16 lg:gap-24">
+    <div className="flex w-full flex-col gap-16 pb-24 lg:gap-24 lg:pb-0">
     <div className="grid w-full grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-10">
       {/* ── Global competition context (P6-10): full-width tab bar at the top,
           spanning both columns. One switch applies to BOTH players. ── */}
@@ -155,8 +155,10 @@ export function Studio() {
         </div>
       </FadeIn>
 
-      {/* ── Hero stage: the card dominates. ── */}
-      <FadeIn className="relative order-1 flex flex-col items-center gap-6 pb-24 lg:pb-0">
+      {/* ── Hero stage: the card dominates. (Bottom clearance for the fixed
+          mobile "Customize" button lives on the outer wrapper, below the
+          Insights section — not here, or it double-pads on mobile.) ── */}
+      <FadeIn className="relative order-1 flex flex-col items-center gap-6">
         <div className="card-halo" aria-hidden />
         <div className="relative z-10 w-full max-w-[300px] sm:max-w-[360px] lg:max-w-[520px]">
           <TiltCard className="rounded-[var(--radius-xl)] shadow-[var(--shadow-hero)]">
