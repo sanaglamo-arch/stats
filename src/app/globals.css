@@ -200,6 +200,84 @@ body {
     radial-gradient(60% 50% at 50% 82%, rgba(245, 180, 60, 0.05), transparent 75%);
 }
 
+/*
+  DUOTONE PLAYER RENDER (Home Arena, P9-2). The base photo is desaturated and
+  contrast-boosted, then a per-side accent gradient is multiply-blended over it
+  via a ::after overlay so the figure reads as a single-hue "render" (Ronaldo
+  gold→red on the left, Messi blue on the right). A mask fades the lower/inner
+  edge into the stadium so the renders flank the VS without a hard photo box.
+  Static — filter/blend only, no motion, no repaint.
+*/
+.arena-render {
+  position: relative;
+  overflow: hidden;
+}
+.arena-render img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(1) contrast(1.18) brightness(0.92);
+  -webkit-mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
+}
+.arena-render::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color;
+}
+.arena-render::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.55;
+}
+/* Ronaldo (left) — warm gold→crimson duotone. */
+.arena-render-ronaldo::after {
+  background: linear-gradient(150deg, var(--color-gold) 0%, var(--color-ronaldo) 70%);
+}
+.arena-render-ronaldo::before {
+  background: radial-gradient(60% 55% at 60% 30%, rgba(245, 180, 60, 0.5), transparent 70%);
+}
+/* Messi (right) — electric azure duotone. */
+.arena-render-messi::after {
+  background: linear-gradient(210deg, var(--color-messi-bright) 0%, var(--color-messi) 75%);
+}
+.arena-render-messi::before {
+  background: radial-gradient(60% 55% at 40% 30%, rgba(58, 130, 255, 0.5), transparent 70%);
+}
+
+/* Energy-flash burst behind the VS medallion (static radial bloom). */
+.arena-vs-burst {
+  position: absolute;
+  inset: -120% -160%;
+  pointer-events: none;
+  background:
+    radial-gradient(38% 38% at 50% 50%, rgba(245, 180, 60, 0.55), transparent 62%),
+    conic-gradient(
+      from 0deg at 50% 50%,
+      rgba(245, 180, 60, 0.35) 0deg,
+      transparent 14deg,
+      rgba(226, 16, 59, 0.28) 30deg,
+      transparent 46deg,
+      rgba(58, 130, 255, 0.28) 62deg,
+      transparent 78deg,
+      rgba(245, 180, 60, 0.35) 96deg,
+      transparent 116deg,
+      rgba(226, 16, 59, 0.28) 150deg,
+      transparent 172deg,
+      rgba(58, 130, 255, 0.28) 210deg,
+      transparent 240deg,
+      rgba(245, 180, 60, 0.35) 300deg,
+      transparent 330deg
+    );
+  filter: blur(2px);
+}
+
 /* Centered halo directly behind the hero card for a focused neon lift. */
 .card-halo {
   position: absolute;
