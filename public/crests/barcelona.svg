@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Barcelona crest (stylized placeholder)">
+  <defs>
+    <clipPath id="bcn-shield">
+      <path d="M12 10h40v26c0 12-9 19-20 24-11-5-20-12-20-24V10Z"/>
+    </clipPath>
+  </defs>
+  <path d="M12 10h40v26c0 12-9 19-20 24-11-5-20-12-20-24V10Z" fill="#004d98"/>
+  <g clip-path="url(#bcn-shield)">
+    <rect x="32" y="10" width="20" height="50" fill="#a50044"/>
+    <rect x="12" y="22" width="40" height="5" fill="#edbb00"/>
+    <rect x="12" y="32" width="40" height="5" fill="#edbb00"/>
+  </g>
+  <path d="M12 10h40v26c0 12-9 19-20 24-11-5-20-12-20-24V10Z" fill="none" stroke="#edbb00" stroke-width="2.2"/>
+  <text x="32" y="32" font-family="Arial, sans-serif" font-size="13" font-weight="800" fill="#fff" text-anchor="middle" dominant-baseline="central" letter-spacing="-0.5">FCB</text>
+</svg>

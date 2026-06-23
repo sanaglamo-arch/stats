@@ -3,6 +3,7 @@ import { CARD_HEIGHT, CARD_WIDTH } from "./card-dimensions";
 import { PLAYER_META } from "./player-meta";
 import { PhotoSlot } from "./photo-slot";
 import { contextChips, selectionLabel, STAT_ICONS, statLabel } from "./card-labels";
+import { crestForClub } from "./club-crests";
 import type { CardSlice, CardStatRow, CardViewModel } from "./card-model";
 import { AnimatedBarFill, CountUpValue, CardPulse } from "./card-animations";
 
@@ -46,7 +47,7 @@ export function ComparisonCard({
 
   return (
     <div
-      className="font-[family-name:var(--font-sans)] relative grid overflow-hidden text-[var(--color-text)]"
+      className="font-[family-name:var(--font-sans)] relative grid overflow-hidden leading-normal text-[var(--color-text)]"
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
@@ -113,6 +114,7 @@ function PlayerHead({
   const [first, ...rest] = meta.name.split(" ");
   const last = rest.join(" ");
   const alignClass = align === "left" ? "items-start text-left" : "items-end text-right";
+  const crest = crestForClub(club);
 
   return (
     <div className={`flex min-w-0 flex-col gap-5 ${alignClass}`}>
@@ -150,10 +152,28 @@ function PlayerHead({
             {meta.position}
           </span>
         </div>
-        {/* club can be long ("Inter Miami CF") → truncate, never wrap/overflow */}
-        <span className="block w-full truncate text-[20px] font-medium text-[var(--color-text-secondary)]">
-          {club}
-        </span>
+        {/* club can be long ("Paris Saint-Germain") → crest is shrink-0, the
+            label truncates inside min-w-0; row mirrors header alignment so it
+            never collides in the grid-cols-[1fr_auto_1fr] header */}
+        <div
+          className={`mt-1 flex w-full min-w-0 items-center gap-2.5 ${align === "right" ? "flex-row-reverse" : ""}`}
+        >
+          {crest && (
+            // eslint-disable-next-line @next/next/no-img-element -- static crest asset, headless render
+            <img
+              src={crest}
+              alt=""
+              width={36}
+              height={36}
+              aria-hidden
+              className="shrink-0"
+              style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.45))" }}
+            />
+          )}
+          <span className="min-w-0 truncate text-[20px] font-medium text-[var(--color-text-secondary)]">
+            {club}
+          </span>
+        </div>
       </div>
     </div>
   );

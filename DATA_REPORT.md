@@ -145,6 +145,27 @@ licensed photo later is a one-line change per player in
 `src/components/card/player-meta.ts`. The before-launch decision (licence real
 photos **or** commission art) is unchanged.
 
+## Club crests — before-launch TODO (P7-3)
+
+⚠️ **Not a blocker, but a launch blocker (same spirit as the player-photo note
+above).** The card header now shows a small club-crest accent next to the club
+name (`public/crests/*.svg`, 8 files mapped in
+`src/components/card/club-crests.ts`). These are **ORIGINAL, stylized
+placeholder marks** — shield/roundel + monogram in each club's signature colors.
+They are **NOT** copied/traced official club crests, which are **registered
+trademarks**.
+
+Before any public/viral launch, the owner MUST either:
+
+- secure proper licence / trademark clearance to use the official club crests,
+  **or**
+- keep these original placeholder marks (or commission bespoke art) and confirm
+  they are sufficiently distinct from the trademarks.
+
+Swapping each crest is a one-file change in `public/crests/` (the mapping in
+`club-crests.ts` resolves by exact club name and returns `null` for unknown
+clubs / national-team rows, so the card omits the accent gracefully).
+
 ## Phase 6 — metric expansion, illustrative data (2026-06-22)
 
 Phase 6 expanded the data/contract layer (the card/charts/UI consume it). All
