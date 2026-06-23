@@ -123,27 +123,39 @@ Priority checks:
 When a number is confirmed, set its row's `verified: true` (and ideally switch
 `source.origin` to `fetched` with the real source).
 
-## Photo rights — before-launch TODO (SPEC §8)
+## Photo rights — attribution required before public launch (SPEC §8, P8-5)
 
-⚠️ **Not a Phase-1 blocker, but a launch blocker.** The MVP card uses two real
-player photos (Messi, Ronaldo) as swappable assets. Before any public/viral
-launch, the owner MUST either:
+**Phase 8 status (P8-5):** the card + player profile pages now ship **real,
+freely-licensed photos** of both players, sourced from Wikimedia Commons. Both
+are **CC BY 4.0** (Creative Commons Attribution 4.0 International), which permits
+commercial/online use *provided attribution is given*. The stylized neon
+silhouette placeholders (`public/players/messi.svg`, `public/players/ronaldo.svg`)
+are **kept in place as a fallback** and are no longer referenced by default.
 
-- secure a proper licence / image-rights clearance for both photos, **or**
-- replace them with commissioned stylized art / silhouettes.
+**Attribution is REQUIRED before public launch.** CC BY 4.0 obliges us to credit
+the author + license (and ideally link the source) wherever the images appear. A
+visible credit (e.g. a footer/about line) MUST be added before any public/viral
+launch. The two photos and their required attribution:
 
-Real photos at viral scale = copyright + personality-rights exposure. The photo
-component takes a `src`, so swapping assets is a one-line change.
+| Player | File (`public/players/`) | Author | License | Commons source |
+| --- | --- | --- | --- | --- |
+| Lionel Messi | `messi.jpg` (720×744) | Hossein Zohrevand / Tasnim News Agency | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Lionel_Messi_WC2022.jpg |
+| Cristiano Ronaldo | `ronaldo.jpg` (307×425) | Hossein Zohrevand / Tasnim News Agency | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Cristiano_Ronaldo_WC2022_-_01_(cropped).jpg |
 
-**Phase 2 status (Card/Design):** the MVP intentionally ships **stylized neon
-silhouette placeholders** (`public/players/messi.svg`, `public/players/ronaldo.svg`)
-instead of real photos — no copyrighted likeness is embedded, so the build is
-legal and works offline. National-team flags (`public/flags/ar.svg`,
-`public/flags/pt.svg`) are simple renderings of public-domain national symbols.
-The `<PhotoSlot src=…>` component takes a replaceable `src`; dropping in a
-licensed photo later is a one-line change per player in
-`src/components/card/player-meta.ts`. The before-launch decision (licence real
-photos **or** commission art) is unchanged.
+Suggested credit line (must appear in the live product before launch):
+
+> Player photos: Lionel Messi & Cristiano Ronaldo by Hossein Zohrevand / Tasnim
+> News Agency, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
+> via Wikimedia Commons.
+
+**Note on personality rights:** CC BY 4.0 covers the *photographer's copyright*,
+not the subject's personality/publicity rights. At viral scale, an
+image-rights/personality-rights review is still advisable. Swapping assets stays
+a one-line change per player in `src/components/card/player-meta.ts`
+(`photoSrc`), and the silhouette SVGs remain available as a drop-in fallback.
+
+National-team flags (`public/flags/ar.svg`, `public/flags/pt.svg`) are simple
+renderings of public-domain national symbols.
 
 ## Club crests — before-launch TODO (P7-3)
 

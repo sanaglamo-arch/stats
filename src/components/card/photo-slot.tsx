@@ -1,8 +1,14 @@
 /**
- * Player photo slot (SPEC §8). Accepts a replaceable `src` so a licensed photo
- * can drop in later without touching the card layout. MVP ships stylized neon
- * silhouette placeholders (see public/players/*.svg) — NOT real copyrighted
- * photos. Photo-rights are a documented before-launch TODO (DATA_REPORT.md §8).
+ * Player photo slot (SPEC §8). Accepts a replaceable `src` so the photo can swap
+ * without touching the card layout. Ships real licensed portraits (Wikimedia
+ * Commons, CC BY 4.0 — attribution in DATA_REPORT.md §8); silhouette SVGs remain
+ * in public/players/*.svg as a fallback.
+ *
+ * Framing: real photos are not pre-cropped to the square slot, so the <img> uses
+ * object-cover with a top-biased focal point (object-position) — faces sit in the
+ * upper portion of an upper-body shot, so this keeps the face in frame while the
+ * square crop trims the sides/bottom. Fully static (no RNG/clock) so the PNG
+ * route renders deterministically.
  *
  * Plain <img> on purpose: this component is also rendered headless by the PNG
  * route, where next/image's optimizer/runtime adds no value and only friction.
@@ -41,7 +47,8 @@ export function PhotoSlot({
       <img
         src={src}
         alt={alt}
-        className="relative h-full w-full object-contain"
+        className="relative h-full w-full object-cover"
+        style={{ objectPosition: "50% 18%" }}
         draggable={false}
       />
     </div>

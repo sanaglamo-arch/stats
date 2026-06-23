@@ -16,7 +16,11 @@ export type PlayerMeta = {
   nationality: string;
   /** ISO-ish two-letter code used to pick the flag asset. */
   countryCode: string;
-  /** Path to the stylized silhouette placeholder asset. */
+  /**
+   * Path to the player photo. Real licensed photos (Wikimedia Commons, CC BY 4.0
+   * — attribution recorded in DATA_REPORT.md §8). Silhouette SVGs are kept in
+   * public/players/*.svg as a fallback.
+   */
   photoSrc: string;
   /** Side accent color variable name (matches globals.css tokens). */
   accentVar: string;
@@ -29,7 +33,7 @@ export const PLAYER_META: Record<PlayerId, PlayerMeta> = {
     position: "Forward",
     nationality: "Argentina",
     countryCode: "ar",
-    photoSrc: "/players/messi.svg",
+    photoSrc: "/players/messi.jpg",
     accentVar: "--color-messi",
   },
   ronaldo: {
@@ -38,7 +42,7 @@ export const PLAYER_META: Record<PlayerId, PlayerMeta> = {
     position: "Forward",
     nationality: "Portugal",
     countryCode: "pt",
-    photoSrc: "/players/ronaldo.svg",
+    photoSrc: "/players/ronaldo.jpg",
     accentVar: "--color-ronaldo",
   },
 };
