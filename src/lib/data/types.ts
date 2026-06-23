@@ -1,5 +1,5 @@
 /**
- * Canonical data model for FootyCompare (SPEC §6 — load-bearing wall).
+ * Canonical data model for CompareGOATs (SPEC §6 — load-bearing wall).
  *
  * The atomic unit is ONE row per (player × season × competition).
  * Every slice (season pick / competition filter / same-age / penalties on-off)

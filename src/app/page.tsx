@@ -60,16 +60,6 @@ export default function HomePage() {
       </main>
 
       <VerdictBand />
-
-      <footer className="relative z-10 border-t border-[var(--color-border-glass)] px-4 py-12 text-center sm:px-6">
-        <span
-          className="font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-[0.36em]"
-          style={{ color: "var(--color-gold)", opacity: 0.9 }}
-        >
-          {t.appName}
-        </span>
-        <p className="mt-3 text-sm text-[var(--color-text-muted)]">{t.footerNote}</p>
-      </footer>
     </div>
   );
 }

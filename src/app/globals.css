@@ -1,23 +1,26 @@
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 /*
-  FootyCompare design tokens — dark glassmorphism + premium derby identity.
-  Single cohesive theme rooted in the rivalry, not a gender-reveal palette:
-    Messi   = BLUE family — Argentina celeste/azure (lead) + Barça garnet accent.
-    Ronaldo = RED family  — Portugal crimson/scarlet (lead) + green/gold accent.
-    Gold    = neutral brand / "win" highlight.
-  Token NAMES are stable so the whole site (hero / studio / insights) rebrands
-  coherently from here. Designed via the ui-ux-pro-max skill.
+  CompareGOATs design tokens — "GOAT Arena" stadium identity.
+  Dark glassmorphism + neon, rooted in the rivalry (palette from design-refs):
+    Ronaldo = RED family   — scarlet/crimson neon (lead).
+    Messi   = BLUE family  — electric azure neon (lead).
+    Gold    = brand / crown / "win" highlight (the CompareGOATs wordmark + verdict).
+    Base    = deep stadium navy under spotlight light-beams.
+  Token NAMES are stable so every Phase-8 surface rebrands coherently from here;
+  only the VALUES were retuned to the ref hexes. Designed via ui-ux-pro-max.
 */
 @theme {
-  /* Fonts */
-  --font-display: "Orbitron", system-ui, sans-serif;
+  /* Fonts — Bebas Neue display (headings/wordmark), Inter body (per ref3 style guide) */
+  --font-display: "Bebas Neue", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
 
-  /* Base surfaces */
-  --color-bg-base: #0a0e1a;
-  --color-bg-elevated: #0f172a;
+  /* Base surfaces — deep stadium navy */
+  --color-bg-base: #070b16;
+  --color-bg-elevated: #0c1322;
+  /* Stadium navy — a named brand surface for the arena backdrop / panel base */
+  --color-stadium-navy: #0a1020;
   --color-surface: rgba(255, 255, 255, 0.04);
   --color-surface-strong: rgba(255, 255, 255, 0.07);
   --color-border-glass: rgba(255, 255, 255, 0.1);
@@ -25,31 +28,29 @@
 
   /* Text */
   --color-text: #f8fafc;
-  --color-text-secondary: #94a3b8;
+  --color-text-secondary: #9aa7bd;
   --color-text-muted: #64748b;
 
-  /* Messi — BLUE family (Argentina celeste/azure lead, Barça garnet accent) */
-  --color-messi: #2f6bff;
-  --color-messi-bright: #6aa1ff;
-  --color-messi-soft: rgba(47, 107, 255, 0.18);
-  /* Barça garnet — Messi's deep secondary accent (NOT a flag, a rich tone).
-     Reserved for P7-3 (club crests) / P7-4 (derby accent). */
+  /* Messi — BLUE family (electric azure neon, ref arena) */
+  --color-messi: #2c63db;
+  --color-messi-bright: #3a82ff;
+  --color-messi-soft: rgba(44, 99, 219, 0.18);
+  /* Barça garnet — Messi's deep secondary accent (club crest / derby accent). */
   --color-messi-accent: #9e1b46;
 
-  /* Ronaldo — RED family (Portugal crimson/scarlet lead, green/gold accent) */
-  --color-ronaldo: #e11d3c;
-  --color-ronaldo-bright: #ff5a73;
-  --color-ronaldo-soft: rgba(225, 29, 60, 0.18);
-  /* Bottle / Portugal green — Ronaldo's deep secondary accent.
-     Reserved for P7-3 (club crests) / P7-4 (derby accent). */
+  /* Ronaldo — RED family (scarlet/crimson neon, ref arena) */
+  --color-ronaldo: #e2103b;
+  --color-ronaldo-bright: #ff1b2d;
+  --color-ronaldo-soft: rgba(226, 16, 59, 0.18);
+  /* Bottle / Portugal green — Ronaldo's deep secondary accent (club crest). */
   --color-ronaldo-accent: #0e6b4f;
 
-  /* Win / gold highlight */
-  --color-gold: #f5c451;
+  /* Win / gold highlight — warm crown gold → bright */
+  --color-gold: #f5b43c;
   --color-gold-bright: #ffd75e;
 
-  /* Focus ring — neutral azure (was purple; aligns to the new blue lead) */
-  --color-ring: #3b82f6;
+  /* Focus ring — neutral azure (aligns to the blue lead) */
+  --color-ring: #3a82ff;
 
   /* Radius scale */
   --radius-sm: 8px;
@@ -59,9 +60,9 @@
 
   /* Neon glow shadows */
   --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.45);
-  --shadow-glow-messi: 0 0 24px rgba(47, 107, 255, 0.45);
-  --shadow-glow-ronaldo: 0 0 24px rgba(225, 29, 60, 0.45);
-  --shadow-glow-gold: 0 0 24px rgba(245, 196, 81, 0.5);
+  --shadow-glow-messi: 0 0 24px rgba(44, 99, 219, 0.5);
+  --shadow-glow-ronaldo: 0 0 24px rgba(226, 16, 59, 0.5);
+  --shadow-glow-gold: 0 0 24px rgba(245, 180, 60, 0.5);
 
   /* Volumetric "hero" lift for the card stage — deep stacked shadow that floats
      the card off the backdrop, with a faint dual-accent halo. */
@@ -81,13 +82,24 @@ body {
 
 body {
   background:
-    radial-gradient(1200px 800px at 15% -10%, rgba(47, 107, 255, 0.12), transparent 60%),
-    radial-gradient(1200px 800px at 85% 110%, rgba(225, 29, 60, 0.12), transparent 60%),
+    radial-gradient(1100px 750px at 12% -8%, rgba(226, 16, 59, 0.1), transparent 60%),
+    radial-gradient(1100px 750px at 88% 108%, rgba(44, 99, 219, 0.1), transparent 60%),
     var(--color-bg-base);
   color: var(--color-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/*
+  Display headings (Bebas Neue) — a tall, condensed all-caps face. It ships at a
+  single weight, so hierarchy comes from size + tracking, not font-weight. This
+  helper normalises its tracking and keeps the cap-height feeling intentional.
+*/
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+  font-weight: 400;
 }
 
 /* Tabular numerals for all stat figures */
@@ -127,9 +139,53 @@ body {
 }
 
 /*
+  STADIUM ARENA backdrop (CompareGOATs). Deep navy base with overhead spotlight
+  light-beams (the floodlit-stadium look from design-refs): two cool white beams
+  raking down from the top corners, a warm gold crown-glow at centre-top, and a
+  dual-accent (red/blue) floor wash at the bottom. Pure CSS gradients, static —
+  no motion, no repaint. Use on a fixed/absolute layer behind page content.
+*/
+.stadium-bg {
+  background:
+    radial-gradient(60% 50% at 18% 0%, rgba(255, 255, 255, 0.1), transparent 60%),
+    radial-gradient(60% 50% at 82% 0%, rgba(255, 255, 255, 0.1), transparent 60%),
+    radial-gradient(45% 35% at 50% -5%, rgba(245, 180, 60, 0.14), transparent 65%),
+    radial-gradient(70% 45% at 20% 105%, rgba(226, 16, 59, 0.12), transparent 68%),
+    radial-gradient(70% 45% at 80% 105%, rgba(44, 99, 219, 0.12), transparent 68%),
+    var(--color-stadium-navy);
+}
+
+/*
+  Conical spotlight beams — sharper, lit "floodlight cones" angling in from the
+  top corners. Layer this as a ::before/aria-hidden element for extra drama on a
+  hero. Decorative only; safe to omit.
+*/
+.stadium-beams {
+  background:
+    conic-gradient(from 200deg at 15% -10%, transparent 0deg, rgba(255, 255, 255, 0.07) 22deg, transparent 44deg),
+    conic-gradient(from 140deg at 85% -10%, transparent 0deg, rgba(255, 255, 255, 0.07) 22deg, transparent 44deg);
+}
+
+/* Neon glow helpers — drop a colored halo behind any element (transform/filter
+   safe; no layout impact). Pair with the matching brand color. */
+.glow-ronaldo {
+  box-shadow: var(--shadow-glow-ronaldo);
+}
+.glow-messi {
+  box-shadow: var(--shadow-glow-messi);
+}
+.glow-gold {
+  box-shadow: var(--shadow-glow-gold);
+}
+/* Text neon — a soft self-glow for headings/wordmarks (gold by default). */
+.text-glow-gold {
+  text-shadow: 0 0 18px rgba(245, 180, 60, 0.45), 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/*
   Fixed ambient backdrop for the full-length cinematic page: a dual-accent
-  gradient mesh (Messi pink biased left, Ronaldo blue biased right) over a soft
-  purple glow, pinned to the viewport so it sits behind every scrolled section
+  gradient mesh (Ronaldo red biased left, Messi blue biased right) over a soft
+  gold glow, pinned to the viewport so it sits behind every scrolled section
   without repainting/stretching. Static — purely CSS, no motion.
 */
 .studio-aura-fixed {
@@ -138,9 +194,10 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(50% 40% at 18% 12%, rgba(47, 107, 255, 0.16), transparent 70%),
-    radial-gradient(50% 40% at 84% 22%, rgba(225, 29, 60, 0.16), transparent 70%),
-    radial-gradient(60% 50% at 50% 80%, rgba(158, 27, 70, 0.08), transparent 75%);
+    radial-gradient(50% 40% at 18% 12%, rgba(226, 16, 59, 0.14), transparent 70%),
+    radial-gradient(50% 40% at 84% 22%, rgba(44, 99, 219, 0.14), transparent 70%),
+    radial-gradient(60% 45% at 50% 6%, rgba(245, 180, 60, 0.07), transparent 72%),
+    radial-gradient(60% 50% at 50% 82%, rgba(245, 180, 60, 0.05), transparent 75%);
 }
 
 /* Centered halo directly behind the hero card for a focused neon lift. */
@@ -150,8 +207,8 @@ body {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(45% 42% at 32% 40%, rgba(47, 107, 255, 0.4), transparent 72%),
-    radial-gradient(45% 42% at 68% 40%, rgba(225, 29, 60, 0.4), transparent 72%);
+    radial-gradient(45% 42% at 32% 40%, rgba(226, 16, 59, 0.4), transparent 72%),
+    radial-gradient(45% 42% at 68% 40%, rgba(44, 99, 219, 0.4), transparent 72%);
   filter: blur(46px);
 }
 

@@ -26,4 +26,20 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Standalone Node tooling scripts (cron refresh, ingest, capture) — Node
+    // runtime globals, not part of the Next app bundle.
+    files: ["scripts/**/*.{mjs,js,ts}"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        setTimeout: "readonly",
+        Buffer: "readonly",
+        __dirname: "readonly",
+      },
+    },
+  },
 );

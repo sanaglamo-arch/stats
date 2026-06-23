@@ -75,7 +75,7 @@ export async function GET(request: NextRequest): Promise<Response> {
     await page.goto(renderUrl(request), { waitUntil: "networkidle", timeout: 30_000 });
     const card = page.locator("#card-root");
     await card.waitFor({ state: "visible", timeout: 10_000 });
-    // Let webfonts settle so Orbitron/Inter render in the shot.
+    // Let webfonts settle so Bebas Neue/Inter render in the shot.
     await page.evaluate(() => document.fonts.ready);
 
     const png = await card.screenshot({ type: "png" });

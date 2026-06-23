@@ -607,7 +607,7 @@ function Watermark() {
         className="font-[family-name:var(--font-display)] text-[20px] font-bold uppercase tracking-[0.42em]"
         style={{ color: "var(--color-gold)", opacity: 0.92, textShadow: "var(--shadow-glow-gold)" }}
       >
-        FootyCompare
+        CompareGOATs
       </span>
       <span
         aria-hidden

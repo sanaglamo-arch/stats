@@ -28,11 +28,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   if (!isPlayerId(id)) {
-    return { title: "FootyCompare" };
+    return { title: "CompareGOATs" };
   }
   const meta = PLAYER_META[id];
   return {
-    title: `${meta.name} — Career stats · FootyCompare`,
+    title: `${meta.name} — Career stats · CompareGOATs`,
     description: `${meta.name}'s career totals, season-by-season output, competition breakdown and honours.`,
   };
 }

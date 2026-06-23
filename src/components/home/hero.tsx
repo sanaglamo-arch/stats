@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { LanguageToggle } from "@/components/language-toggle";
 import { useI18n } from "@/lib/i18n/provider";
 import { DURATION, EASE, STAGGER } from "@/lib/motion/tokens";
 
@@ -34,10 +33,7 @@ export function Hero() {
 
   return (
     <section className="relative flex min-h-dvh flex-col">
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-end px-4 pt-6 sm:px-6">
-        <LanguageToggle />
-      </div>
-
+      {/* language toggle now lives in the shared app header (P9-1) */}
       <motion.div
         variants={container}
         initial="hidden"
@@ -52,7 +48,7 @@ export function Hero() {
           {t.appName}
         </motion.span>
 
-        {/* Mobile: stack MESSI / vs / RONALDO so the wide Orbitron-black names
+        {/* Mobile: stack MESSI / vs / RONALDO so the wide display-face names
             always fit (the page root clips horizontal overflow). sm+ goes back
             to one dramatic inline line. Accessible name stays "MESSI vs RONALDO". */}
         <motion.h1

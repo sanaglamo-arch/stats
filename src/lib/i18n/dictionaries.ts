@@ -7,9 +7,22 @@ export const DEFAULT_LOCALE: Locale = "en";
  * `ru` must mirror the exact key shape of `en` (enforced by the Dictionary type).
  */
 const en = {
-  appName: "FootyCompare",
+  appName: "CompareGOATs",
   tagline: "Messi vs Ronaldo — settle the debate with a card.",
   vs: "VS",
+
+  // App shell — nav + header (P9-1)
+  navCompare: "Compare",
+  navStats: "Stats",
+  navCareers: "Careers",
+  navAwards: "Awards",
+  navRecords: "Records",
+  navAbout: "About",
+  myArena: "myArena",
+  menu: "Menu",
+  closeMenu: "Close menu",
+  footerAccurate: "All stats accurate as of {date}",
+  footerScope: "club + country across all competitions",
   // Derby identity kicker (P7-4) — nation · club, one per side
   derbyMessi: "Argentina · Barça",
   derbyRonaldo: "Portugal · Madrid",
@@ -179,9 +192,21 @@ const en = {
 export type Dictionary = Record<keyof typeof en, string>;
 
 const ru: Dictionary = {
-  appName: "FootyCompare",
+  appName: "CompareGOATs",
   tagline: "Месси против Роналду — закрой спор одной карточкой.",
   vs: "VS",
+
+  navCompare: "Сравнение",
+  navStats: "Статистика",
+  navCareers: "Карьеры",
+  navAwards: "Награды",
+  navRecords: "Рекорды",
+  navAbout: "О проекте",
+  myArena: "Мой стадион",
+  menu: "Меню",
+  closeMenu: "Закрыть меню",
+  footerAccurate: "Все данные актуальны на {date}",
+  footerScope: "клуб + сборная по всем турнирам",
   derbyMessi: "Аргентина · Барса",
   derbyRonaldo: "Португалия · Мадрид",
   flagArgentina: "Флаг Аргентины",

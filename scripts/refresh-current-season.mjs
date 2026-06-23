@@ -62,12 +62,12 @@ const COMP_MAP = {
 };
 
 const num = (v) => {
-  const n = Number(String(v ?? "").replace(/[^0-9.\-]/g, ""));
+  const n = Number(String(v ?? "").replace(/[^0-9.-]/g, ""));
   return Number.isFinite(n) ? n : 0;
 };
 const numOrNull = (v) => {
   if (v === null || v === undefined || v === "") return null;
-  const n = Number(String(v).replace(/[^0-9.\-]/g, ""));
+  const n = Number(String(v).replace(/[^0-9.-]/g, ""));
   return Number.isFinite(n) ? n : null;
 };
 
