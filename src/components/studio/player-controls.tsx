@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import type { PlayerId, SeasonSelection } from "@/lib/data";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { SideOptions } from "@/components/card";
 import { PLAYER_META } from "@/components/card";
 import type { PlayerSliceOptions } from "./slice-options";
-import { Field, NeonSelect, PenaltiesToggle, SegmentedControl } from "./control-primitives";
+import { Field, FOCUS_RING, NeonSelect, PenaltiesToggle, SegmentedControl } from "./control-primitives";
 
 /** Season-selection modes exposed in the UI (maps to SeasonSelection.kind). */
 type SeasonMode = "season" | "career" | "lastNSeasons" | "age";
@@ -61,18 +63,28 @@ export function PlayerControls({
       className="glass-panel flex flex-col gap-4 p-4"
       style={{ borderColor: "color-mix(in srgb, " + accent + " 38%, var(--color-border-glass))" }}
     >
-      <header className="flex items-center gap-2.5">
-        <span
-          aria-hidden
-          className="h-2.5 w-2.5 rounded-full"
-          style={{ background: accent, boxShadow: `0 0 12px ${accent}` }}
-        />
-        <h3
-          className="font-[family-name:var(--font-display)] text-sm font-black uppercase tracking-[0.12em]"
-          style={{ color: accent }}
+      <header className="flex items-center justify-between gap-2.5">
+        <div className="flex items-center gap-2.5">
+          <span
+            aria-hidden
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ background: accent, boxShadow: `0 0 12px ${accent}` }}
+          />
+          <h3
+            className="font-[family-name:var(--font-display)] text-sm font-black uppercase tracking-[0.12em]"
+            style={{ color: accent }}
+          >
+            {meta.name}
+          </h3>
+        </div>
+        <Link
+          href={`/player/${player}`}
+          aria-label={`${meta.name} — ${t.profileViewFull}`}
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-muted)] transition-colors duration-200 hover:text-[var(--color-text)] ${FOCUS_RING}`}
         >
-          {meta.name}
-        </h3>
+          {t.profileViewFull}
+          <ArrowUpRight size={13} aria-hidden />
+        </Link>
       </header>
 
       <Field label={t.periodMode} htmlFor={`${player}-mode`}>

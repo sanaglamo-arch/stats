@@ -141,6 +141,41 @@ const en = {
   // Honesty badge + captions (SPEC §6) — MUST be shown on illustrative charts
   illustrative: "Illustrative",
   illustrativeCaption: "Placeholder data — not real tracking, shown for layout only.",
+
+  // Player profile pages (P7-5)
+  profileKicker: "Player profile",
+  profileBackToCompare: "Back to compare",
+  profileViewFull: "View full profile",
+  profileCareerSpan: "Career span",
+  profilePosition: "Position",
+  profileNationality: "Nationality",
+  profileClubs: "Clubs",
+  // Career totals
+  profileCareerTotals: "Career totals",
+  profileCareerTotalsHint: "Summed across every season, competition and club in the dataset.",
+  // By season
+  profileBySeason: "Season by season",
+  profileBySeasonHint: "Every season in the dataset, oldest to newest.",
+  profileColSeason: "Season",
+  profileColClub: "Club",
+  profileColComps: "Competitions",
+  profileColMatches: "MP",
+  profileColGoals: "G",
+  profileColAssists: "A",
+  profileColMinutes: "Min",
+  // By competition
+  profileByCompetition: "By competition",
+  profileByCompetitionHint: "Output split across the competition buckets.",
+  // Honours
+  profileHonours: "Honours",
+  profileTeamTrophies: "Team trophies",
+  profileBallonDor: "Ballon d'Or",
+  profileIndividualAwards: "Individual awards",
+  profileNoAwards: "No individual awards in the dataset.",
+  profileNoTrophies: "No team trophies in the dataset.",
+  // Honesty
+  profileModernOnly: "2014+ only",
+  profileUnverified: "Unverified dataset — figures await owner sign-off.",
 } as const;
 
 export type Dictionary = Record<keyof typeof en, string>;
@@ -265,6 +300,35 @@ const ru: Dictionary = {
   shotMissed: "Мимо",
   illustrative: "Иллюстративно",
   illustrativeCaption: "Placeholder-данные — не реальный трекинг, только для макета.",
+
+  profileKicker: "Профиль игрока",
+  profileBackToCompare: "К сравнению",
+  profileViewFull: "Полный профиль",
+  profileCareerSpan: "Карьера",
+  profilePosition: "Позиция",
+  profileNationality: "Сборная",
+  profileClubs: "Клубы",
+  profileCareerTotals: "Итоги карьеры",
+  profileCareerTotalsHint: "Суммировано по всем сезонам, турнирам и клубам в наборе данных.",
+  profileBySeason: "По сезонам",
+  profileBySeasonHint: "Все сезоны из набора данных, от ранних к поздним.",
+  profileColSeason: "Сезон",
+  profileColClub: "Клуб",
+  profileColComps: "Турниры",
+  profileColMatches: "И",
+  profileColGoals: "Г",
+  profileColAssists: "П",
+  profileColMinutes: "Мин",
+  profileByCompetition: "По турнирам",
+  profileByCompetitionHint: "Показатели в разбивке по группам турниров.",
+  profileHonours: "Награды",
+  profileTeamTrophies: "Командные трофеи",
+  profileBallonDor: "Золотой мяч",
+  profileIndividualAwards: "Личные награды",
+  profileNoAwards: "В наборе данных нет личных наград.",
+  profileNoTrophies: "В наборе данных нет командных трофеев.",
+  profileModernOnly: "Только 2014+",
+  profileUnverified: "Данные не выверены — цифры ждут подтверждения владельца.",
 };
 
 export const dictionaries: Record<Locale, Dictionary> = { en, ru };
