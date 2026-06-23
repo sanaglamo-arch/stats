@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { LanguageToggle } from "@/components/language-toggle";
@@ -78,6 +79,44 @@ export function Hero() {
             RONALDO
           </span>
         </motion.h1>
+
+        {/* Derby kicker — nation · club per side, tying each legend to a
+            footballing nation & dynasty. Mirrors the h1's mobile stacking
+            (column → row at sm+). Flags carry alt text; the "×" is decorative.
+            Garnet (Barça) / Portugal-green accent tokens tint the rule above
+            each label so the palette gains derby depth beyond blue/red. */}
+        <motion.div
+          variants={item}
+          className="-mt-2 flex flex-col items-center gap-2 text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-[var(--color-text-secondary)] sm:flex-row sm:gap-5 sm:text-xs"
+        >
+          <span className="flex items-center gap-2">
+            <Image
+              src="/flags/ar.svg"
+              alt={t.flagArgentina}
+              width={20}
+              height={14}
+              className="h-3.5 w-5 rounded-[2px] ring-1 ring-[var(--color-border-glass)]"
+            />
+            <span style={{ borderTop: "2px solid var(--color-messi-accent)" }} className="pt-1">
+              {t.derbyMessi}
+            </span>
+          </span>
+          <span aria-hidden className="text-[var(--color-text-muted)]">
+            ×
+          </span>
+          <span className="flex items-center gap-2">
+            <span style={{ borderTop: "2px solid var(--color-ronaldo-accent)" }} className="pt-1">
+              {t.derbyRonaldo}
+            </span>
+            <Image
+              src="/flags/pt.svg"
+              alt={t.flagPortugal}
+              width={20}
+              height={14}
+              className="h-3.5 w-5 rounded-[2px] ring-1 ring-[var(--color-border-glass)]"
+            />
+          </span>
+        </motion.div>
 
         <motion.p
           variants={item}

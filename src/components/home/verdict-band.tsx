@@ -72,7 +72,10 @@ export function VerdictBand() {
         aria-hidden
         className="pointer-events-none absolute left-[-10%] top-[-10%] h-[70%] w-[60%] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(47,107,255,0.32), transparent 70%)",
+          /* Azure lead (Argentina) over a deep Barça-garnet core (accent token
+             #9e1b46) so the aura gains club depth, not just a flat blue glow. */
+          background:
+            "radial-gradient(circle, rgba(47,107,255,0.32) 0%, rgba(158,27,70,0.20) 45%, transparent 72%)",
           filter: "blur(70px)",
         }}
       />
@@ -81,7 +84,10 @@ export function VerdictBand() {
         aria-hidden
         className="pointer-events-none absolute bottom-[-10%] right-[-10%] h-[70%] w-[60%] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(225,29,60,0.32), transparent 70%)",
+          /* Crimson lead (Portugal) over a deep Portugal-green core (accent
+             token #0e6b4f) for national depth beneath the red glow. */
+          background:
+            "radial-gradient(circle, rgba(225,29,60,0.32) 0%, rgba(14,107,79,0.18) 45%, transparent 72%)",
           filter: "blur(70px)",
         }}
       />

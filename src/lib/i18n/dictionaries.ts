@@ -10,6 +10,11 @@ const en = {
   appName: "FootyCompare",
   tagline: "Messi vs Ronaldo — settle the debate with a card.",
   vs: "VS",
+  // Derby identity kicker (P7-4) — nation · club, one per side
+  derbyMessi: "Argentina · Barça",
+  derbyRonaldo: "Portugal · Madrid",
+  flagArgentina: "Argentina flag",
+  flagPortugal: "Portugal flag",
   overallResult: "Overall Result",
   categoriesWon: "categories won",
 
@@ -144,6 +149,10 @@ const ru: Dictionary = {
   appName: "FootyCompare",
   tagline: "Месси против Роналду — закрой спор одной карточкой.",
   vs: "VS",
+  derbyMessi: "Аргентина · Барса",
+  derbyRonaldo: "Португалия · Мадрид",
+  flagArgentina: "Флаг Аргентины",
+  flagPortugal: "Флаг Португалии",
   overallResult: "Общий итог",
   categoriesWon: "категорий выиграно",
 
