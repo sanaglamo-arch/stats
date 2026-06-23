@@ -352,9 +352,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Supercopa de España"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -1175,9 +1173,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Supercopa de España"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -1521,9 +1517,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Supercopa de España"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -1711,9 +1705,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Supercopa de España"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -1807,9 +1799,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Copa del Rey"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -2524,9 +2514,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Leagues Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": false,
       "source": {
@@ -2586,7 +2574,9 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 1,
-      "trophies": [],
+      "trophies": [
+        "Supporters' Shield"
+      ],
       "individualAwards": [],
       "verified": false,
       "source": {
@@ -2888,9 +2878,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "FA Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -3100,9 +3088,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "EFL Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -3133,7 +3119,7 @@
       "redCards": 0,
       "hatTricks": 0,
       "trophies": [
-        "EFL Cup"
+        "Football League Cup"
       ],
       "individualAwards": [],
       "verified": true,
@@ -3382,7 +3368,9 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [],
+      "trophies": [
+        "FA Community Shield"
+      ],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -3476,9 +3464,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "EFL Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -3508,9 +3494,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "EFL Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -3940,9 +3924,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Supercopa de España"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -4161,9 +4143,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "UEFA Super Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -4544,7 +4524,7 @@
       "redCards": 0,
       "hatTricks": 0,
       "trophies": [
-        "Supercopa de España"
+        "UEFA Super Cup"
       ],
       "individualAwards": [],
       "verified": true,
@@ -4669,9 +4649,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 1,
-      "trophies": [
-        "Serie A"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -4795,9 +4773,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 2,
-      "trophies": [
-        "Serie A"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -4827,9 +4803,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Supercoppa Italiana"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -5195,9 +5169,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Arab Club Champions Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -5227,9 +5199,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Arab Club Champions Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {
@@ -5291,9 +5261,7 @@
       "yellowCards": 0,
       "redCards": 0,
       "hatTricks": 0,
-      "trophies": [
-        "Arab Club Champions Cup"
-      ],
+      "trophies": [],
       "individualAwards": [],
       "verified": true,
       "source": {

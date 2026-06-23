@@ -290,7 +290,10 @@ The sources named in the brief were tested before any collection:
 - **national caps / goals**: Wikipedia by-year intl tables + mvr, cross-verified to the career total; per-season split **distributed** (no Aug–Jul intl source exists).
 - **starts, shots, shotsOnTarget, freekickGoals, yellowCards, redCards, hatTricks**: ⚠️ **NOT yet from a real source** — carried over from the Phase-1 seed row for that (player × season × competition). `hatTricks` remains illustrative. These are the main remaining owner-verification items.
 - **Ballon d'Or**: ✅ re-verified — Messi 8 (2009–12, 2015, 2019, 2021, 2023), Ronaldo 5 (2008, 2013, 2014, 2016, 2017), placed on the correct award-season league rows.
-- **trophies / other individualAwards / ageDuringSeason**: trophies + other awards (e.g. Golden Shoe) still carried from seed (NOT yet re-verified — a P8-4 follow-up; counts look plausible: Messi ~45 / Ronaldo ~33 distinct); `ageDuringSeason` recomputed deterministically = `seasonStartYear − birthYear` (Messi b. 1987-06-24, Ronaldo b. 1985-02-05; both birthdays precede August, so this is age at season start). This corrected seed shifts (e.g. Ronaldo 2002/03: 18 → 17).
+- **trophies (team trophies)**: ✅ **cross-verified (P8-4 follow-up; was seed-carried)** — rebuilt every `trophies` array against Wikipedia *"List of career achievements by Lionel Messi / Cristiano Ronaldo"* + main player pages, cross-verified via WebSearch (CBS/UEFA/ESPN/MLSsoccer/SI). Each trophy now sits on the correct (player × season × competition) row using the real competition name; the prior seed had many misplacements (e.g. Ronaldo's single Al-Nassr Arab Club Champions Cup spread across 4 rows; "EFL Cup" mis-tagged on Man Utd 2008/09 cups; Inter Miami "Leagues Cup" duplicated onto the U.S. Open Cup row). **Verified distinct trophyCount (season+name) within dataset coverage: Messi 42, Ronaldo 32** (down from seed ~45 / ~33 — the seed over-counted via duplicates/misplacements). Out-of-dataset-coverage wins with no host row: Messi MLS Cup 2025 (2025/26, beyond coverage) and Ronaldo Sporting CP Supertaça 2002 (no super_cup row exists for 2002/03) — noted, not added (row structure left intact).
+  - **Messi per-competition breakdown (42):** La Liga 10, Copa del Rey 6, UEFA Champions League 4, Supercopa de España 6, UEFA Super Cup 3, FIFA Club World Cup 3, Ligue 1 2, Trophée des Champions 1, Leagues Cup 1, Supporters' Shield 1; Argentina — FIFA World Cup 1, Copa América 2 (2021, 2024), Finalissima 1, Olympic Gold 1.
+  - **Ronaldo per-competition breakdown (32):** Premier League 3, La Liga 2, Serie A 2, UEFA Champions League 5, FIFA Club World Cup 4, UEFA Super Cup 2, Supercopa de España 2, Supercoppa Italiana 2, Coppa Italia 1, Copa del Rey 2, FA Cup 1, Football League Cup 1, FA Community Shield 1, Arab Club Champions Cup 1; Portugal — UEFA European Championship 1 (2016), UEFA Nations League 2 (2019, 2025).
+- **other individualAwards / ageDuringSeason**: other awards (e.g. Golden Shoe) still carried from seed (NOT yet re-verified); Ballon d'Or untouched (still 8/5). `ageDuringSeason` recomputed deterministically = `seasonStartYear − birthYear` (Messi b. 1987-06-24, Ronaldo b. 1985-02-05; both birthdays precede August, so this is age at season start). This corrected seed shifts (e.g. Ronaldo 2002/03: 18 → 17).
 
 ### Career-total cross-verification (the headline numbers — 2+ sources)
 | Figure | Our data | Cross-source | Verdict |
@@ -300,6 +303,7 @@ The sources named in the brief were tested before any collection:
 | Messi Argentina | **196 caps / 115 goals** (thru 2024/25) | Wikipedia by-year + mvr (full-career 201/122 incl. in-progress 2026) | ✅ caps/goals exact; per-season distributed |
 | Ronaldo Portugal | **226 caps / 143 goals** (thru 2024/25) | Wikipedia + mvr + UEFA (all-time men's top scorer); full-career 229/143 | ✅ caps/goals exact; per-season distributed |
 | Ballon d'Or | **Messi 8 / Ronaldo 5** | Wikipedia (exact award years) | ✅ verified + normalized to the correct award seasons |
+| Team trophies (distinct, in-coverage) | **Messi 42 / Ronaldo 32** | Wikipedia "List of career achievements by…" + WebSearch (CBS/UEFA/ESPN/MLSsoccer/SI) | ✅ verified + placed on correct (season×competition) rows; out-of-coverage wins (Messi MLS Cup 2025, Ronaldo Supertaça 2002) noted, not host-able |
 
 ### Divergences → `verified:false` (recorded for owner sign-off)
 1. **Messi PSG 2022/23 (4 rows):** goals agree (21), but **appearances diverge** — mvr 41 vs WebSearch 54 (mvr counts only its 4 listed comps). Both values noted.
@@ -310,7 +314,7 @@ The sources named in the brief were tested before any collection:
 
 ### Still needs owner verification before launch
 - The carried-from-seed fields (starts/shots/SoT/freekicks/cards/hatTricks) — no real source yet.
-- trophies / individualAwards / Ballon d'Or counts (carried from seed; P8-4).
+- ~~trophies~~ ✅ now cross-verified (P8-4, see above; Messi 42 / Ronaldo 32 distinct). Remaining: other individualAwards (e.g. Golden Shoe) still seed-carried; Ballon d'Or already verified 8/5.
 - The PSG-apps, Inter-Miami-boundary, Ronaldo-combined-transfer, and Europa-League items above.
 
 ## How to regenerate
