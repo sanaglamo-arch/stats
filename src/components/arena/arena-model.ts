@@ -312,6 +312,66 @@ export function buildArenaModel(rows: readonly PlayerSeasonComp[]): ArenaModel {
   };
 }
 
+/** The canonical, ordered list of category keys (single source for the flow). */
+export const CATEGORY_KEYS: readonly CategoryKey[] = CATEGORIES.map((c) => c.key);
+
+/** Minimum number of categories a comparison must include. */
+export const MIN_CATEGORIES = 3;
+
+/** Type guard: is `value` a known category key? */
+export function isCategoryKey(value: string): value is CategoryKey {
+  return (CATEGORY_KEYS as readonly string[]).includes(value);
+}
+
+/**
+ * Parse a `?cats=` value (comma-separated keys) into a validated, de-duplicated,
+ * canonically-ordered list of category keys. Unknown keys are dropped. Falls back
+ * to ALL categories when the result would be empty or below {@link MIN_CATEGORIES}.
+ */
+export function parseCategoryParam(raw: string | null | undefined): CategoryKey[] {
+  if (!raw) return [...CATEGORY_KEYS];
+  const requested = new Set(
+    raw
+      .split(",")
+      .map((s) => s.trim())
+      .filter(isCategoryKey),
+  );
+  const selected = CATEGORY_KEYS.filter((k) => requested.has(k));
+  return selected.length >= MIN_CATEGORIES ? selected : [...CATEGORY_KEYS];
+}
+
+/** Serialise a selection back into a stable, round-trippable `?cats=` value. */
+export function serializeCategoryParam(keys: readonly CategoryKey[]): string {
+  return CATEGORY_KEYS.filter((k) => keys.includes(k)).join(",");
+}
+
+/**
+ * Recompute the overall verdict over a SUBSET of the model's categories (the
+ * keys the user kept in `/compare`). Reuses the already-resolved per-category
+ * winners — no new statistics. Returns the filtered categories plus a verdict
+ * tallied only over them, so the `/verdict` score reflects exactly the selection.
+ */
+export function selectVerdict(
+  model: ArenaModel,
+  keys: readonly CategoryKey[],
+): { categories: ArenaCategory[]; verdict: ArenaVerdict } {
+  const wanted = new Set(keys);
+  const categories = model.categories.filter((c) => wanted.has(c.key));
+
+  let ronaldo = 0;
+  let messi = 0;
+  let tied = 0;
+  for (const cat of categories) {
+    if (cat.winner === "ronaldo") ronaldo += 1;
+    else if (cat.winner === "messi") messi += 1;
+    else tied += 1;
+  }
+
+  const winner: RowWinner = ronaldo === messi ? "tie" : ronaldo > messi ? "ronaldo" : "messi";
+
+  return { categories, verdict: { winner, categoriesWon: { ronaldo, messi, tied } } };
+}
+
 /**
  * Format ONE side's value of a row for display. Percent metrics (a 0..1 ratio)
  * render as a percentage; large counts (minutes) get thousands grouping.

@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
 import { DURATION, EASE } from "@/lib/motion/tokens";
 import type { ArenaModel, CategoryKey } from "./arena-model";
@@ -66,6 +67,21 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
         <p className="mt-2 text-sm text-[var(--color-text-secondary)] sm:text-base">
           {t.arenaSubtitle}
         </p>
+
+        {/* Guided-flow entry point → /compare (P9-3) */}
+        <Link
+          href="/compare"
+          className="group mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wide transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]"
+          style={{
+            background: "linear-gradient(135deg, var(--color-gold-bright), var(--color-gold))",
+            color: "var(--color-bg-base)",
+            boxShadow: "0 8px 28px color-mix(in srgb, var(--color-gold) 38%, transparent)",
+          }}
+        >
+          {t.arenaStartCompare}
+          <ArrowRight size={17} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5" />
+        </Link>
+        <span className="mt-2 text-xs text-[var(--color-text-muted)]">{t.arenaStartCompareHint}</span>
       </motion.header>
 
       {/* Renders + VS */}
