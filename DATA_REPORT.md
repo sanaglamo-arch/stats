@@ -317,6 +317,9 @@ The sources named in the brief were tested before any collection:
 - ~~trophies~~ ✅ now cross-verified (P8-4, see above; Messi 42 / Ronaldo 32 distinct). Remaining: other individualAwards (e.g. Golden Shoe) still seed-carried; Ballon d'Or already verified 8/5.
 - The PSG-apps, Inter-Miami-boundary, Ronaldo-combined-transfer, and Europa-League items above.
 
+### P8-7 — current-season auto-refresh (daily)
+History is **frozen**; only the active season for the two current clubs (Messi @ Inter Miami, Ronaldo @ Al Nassr) is auto-updated. `scripts/refresh-current-season.mjs` fetches messivsronaldo.app's **Gatsby static JSON** (`/page-data/club-stats/<YYYY-YYYY>/page-data.json`) — a clean per-competition feed (apps/goals/assists/minsPlayed/pens/freeKicks/shots/SoT/xg/xa/hatTricks) that needs no browser. It upserts ONLY the active-season current-club rows (everything else untouched), and **only rebuilds + `pm2 restart footy` when a value actually changed**; any fetch/parse/validation failure logs and exits without modifying the dataset. Rows are `verified:false` (in-progress season; `starts`/cards unsourced). Scheduled by a **systemd timer** `footy-refresh.timer` (daily 04:00; units in `/etc/systemd/system/`, log `/root/.footy-refresh.log`). First run seeded **2025/26** (Messi 32 club goals so far, Ronaldo 29). NOTE: this is the only place the dataset changes without a code commit — the JSON drifts as the season progresses.
+
 ## How to regenerate
 
 ```bash
