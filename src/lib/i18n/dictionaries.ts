@@ -14,6 +14,7 @@ const en = {
   // App shell — nav + header (P9-1)
   navCompare: "Compare",
   navStats: "Stats",
+  navCards: "Cards",
   navCareers: "Careers",
   navAwards: "Awards",
   navRecords: "Records",
@@ -97,6 +98,27 @@ const en = {
   // Footer accuracy line
   arenaAccuracy: "All stats accurate as of {date}",
   arenaScope: "Includes club and country performances across all competitions",
+  // Arena → FUT cards entry (P9-5)
+  arenaViewCards: "View FUT cards",
+
+  // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
+  cardsTitle: "The Greatest Of All Time?",
+  cardsSubtitle: "Two legends, two cards — then the real numbers settle it",
+  cardsBattleLabel: "FUT collectible cards: Ronaldo versus Messi",
+  // FUT face stats (cosmetic)
+  futStatPac: "PAC",
+  futStatSho: "SHO",
+  futStatPas: "PAS",
+  futStatDri: "DRI",
+  futStatDef: "DEF",
+  futStatPhy: "PHY",
+  futStatClutch: "Clutch",
+  // Cosmetic disclaimer (the FUT ratings are the only non-real numbers)
+  cardsCosmeticBadge: "FIFA-style ratings · cosmetic",
+  cardsCosmeticNote:
+    "Card ratings are well-known FIFA-style values for flair only. The real numbers are in the comparison below and the full verdict.",
+  cardsViewVerdict: "Full verdict",
+  cardsBackToArena: "Back to Arena",
 
   // ── COMPARISON FLOW (P9-3 / P9-4) ─────────────────────────────────
   arenaStartCompare: "Choose categories",
@@ -302,6 +324,7 @@ const ru: Dictionary = {
 
   navCompare: "Сравнение",
   navStats: "Статистика",
+  navCards: "Карточки",
   navCareers: "Карьеры",
   navAwards: "Награды",
   navRecords: "Рекорды",
@@ -377,6 +400,24 @@ const ru: Dictionary = {
   arenaShowWinnerHint: "Скрой вердикт, чтобы читать цифры нейтрально.",
   arenaAccuracy: "Все данные актуальны на {date}",
   arenaScope: "Включает выступления за клуб и сборную во всех турнирах",
+  arenaViewCards: "Смотреть FUT-карточки",
+
+  // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
+  cardsTitle: "Величайший всех времён?",
+  cardsSubtitle: "Две легенды, две карточки — а решают всё реальные цифры",
+  cardsBattleLabel: "Коллекционные FUT-карточки: Роналду против Месси",
+  futStatPac: "PAC",
+  futStatSho: "SHO",
+  futStatPas: "PAS",
+  futStatDri: "DRI",
+  futStatDef: "DEF",
+  futStatPhy: "PHY",
+  futStatClutch: "Clutch",
+  cardsCosmeticBadge: "Рейтинги в стиле FIFA · косметика",
+  cardsCosmeticNote:
+    "Рейтинги карточек — известные значения в стиле FIFA, добавлены лишь для антуража. Реальные цифры — в сравнении ниже и в полном вердикте.",
+  cardsViewVerdict: "Полный вердикт",
+  cardsBackToArena: "Назад на Арену",
 
   // ── COMPARISON FLOW (P9-3 / P9-4) ─────────────────────────────────
   arenaStartCompare: "Выбрать категории",

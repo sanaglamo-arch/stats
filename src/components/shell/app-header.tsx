@@ -25,9 +25,9 @@ type NavItem = { key: keyof Dictionary; href: string };
 const NAV: readonly NavItem[] = [
   { key: "navCompare", href: "/#studio" },
   { key: "navStats", href: "/#insights" },
+  { key: "navCards", href: "/cards" },
   { key: "navCareers", href: "/player/messi" },
   { key: "navAwards", href: "/#verdict" },
-  { key: "navRecords", href: "/#insights" },
   { key: "navAbout", href: "/#about" },
 ];
 

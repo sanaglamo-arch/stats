@@ -251,6 +251,53 @@ body {
   background: radial-gradient(60% 55% at 40% 30%, rgba(58, 130, 255, 0.5), transparent 70%);
 }
 
+/*
+  FUT COLLECTIBLE CARD (P9-5, /cards). The angular FIFA-card silhouette is a
+  CSS clip-path octagon with a flat top and a pointed lower body — the gold trim
+  is a second, identical clip sitting 3px outside the tinted surface (see
+  fut-card.tsx). Static — the only motion is the framer entrance. The duotone
+  render reuses the home-arena treatment, scoped per side for the card tint.
+*/
+.fut-card-shape {
+  clip-path: polygon(
+    8% 0%,
+    92% 0%,
+    100% 6%,
+    100% 70%,
+    50% 100%,
+    0% 70%,
+    0% 6%
+  );
+  border-radius: 6px;
+}
+
+/* Duotone player render inside the FUT card — desaturated photo, side-tinted. */
+.fut-render {
+  overflow: hidden;
+}
+.fut-render img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(1) contrast(1.16) brightness(0.95);
+  -webkit-mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 72%, transparent 100%);
+}
+.fut-render::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color;
+}
+.fut-render-ronaldo::after {
+  background: linear-gradient(150deg, var(--color-gold) 0%, var(--color-ronaldo) 72%);
+}
+.fut-render-messi::after {
+  background: linear-gradient(210deg, var(--color-messi-bright) 0%, var(--color-messi) 76%);
+}
+
 /* Energy-flash burst behind the VS medallion (static radial bloom). */
 .arena-vs-burst {
   position: absolute;

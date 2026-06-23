@@ -82,6 +82,15 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
           <ArrowRight size={17} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5" />
         </Link>
         <span className="mt-2 text-xs text-[var(--color-text-muted)]">{t.arenaStartCompareHint}</span>
+
+        {/* Secondary entry → FUT collectible-card battle screen (P9-5) */}
+        <Link
+          href="/cards"
+          className="group mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-gold)] bg-[rgba(245,180,60,0.08)] px-4 py-2 text-sm font-semibold text-[var(--color-gold-bright)] transition-colors duration-200 hover:bg-[rgba(245,180,60,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]"
+        >
+          {t.arenaViewCards}
+          <ArrowRight size={15} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5" />
+        </Link>
       </motion.header>
 
       {/* Renders + VS */}
