@@ -205,15 +205,15 @@ export function ProfileView({ profile }: { profile: PlayerProfile }) {
                       className="inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface)] py-1 pl-1 pr-3 text-xs font-semibold text-[var(--color-text-secondary)]"
                     >
                       {crest ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={crest}
-                          alt=""
+                        // light chip so dark/monochrome crests (e.g. Juventus) read
+                        <span
                           aria-hidden
-                          width={20}
-                          height={20}
-                          className="h-5 w-5"
-                        />
+                          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                          style={{ background: "rgba(255,255,255,0.94)" }}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={crest} alt="" width={16} height={16} className="object-contain" />
+                        </span>
                       ) : (
                         <span aria-hidden className="h-5 w-5" />
                       )}

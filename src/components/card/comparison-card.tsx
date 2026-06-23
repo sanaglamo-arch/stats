@@ -159,16 +159,21 @@ function PlayerHead({
           className={`mt-1 flex w-full min-w-0 items-center gap-2.5 ${align === "right" ? "flex-row-reverse" : ""}`}
         >
           {crest && (
-            // eslint-disable-next-line @next/next/no-img-element -- static crest asset, headless render
-            <img
-              src={crest}
-              alt=""
-              width={36}
-              height={36}
+            // light chip so any crest — incl. dark/monochrome marks (e.g. Juventus'
+            // black "J") — reads on the dark card. Static, deterministic (PNG-safe).
+            <span
               aria-hidden
-              className="shrink-0"
-              style={{ filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.45))" }}
-            />
+              className="flex shrink-0 items-center justify-center rounded-full"
+              style={{
+                width: 40,
+                height: 40,
+                background: "rgba(255,255,255,0.94)",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.45)",
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- static crest asset, headless render */}
+              <img src={crest} alt="" width={30} height={30} className="object-contain" />
+            </span>
           )}
           <span className="min-w-0 truncate text-[20px] font-medium text-[var(--color-text-secondary)]">
             {club}

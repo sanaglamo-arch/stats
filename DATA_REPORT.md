@@ -157,26 +157,59 @@ a one-line change per player in `src/components/card/player-meta.ts`
 National-team flags (`public/flags/ar.svg`, `public/flags/pt.svg`) are simple
 renderings of public-domain national symbols.
 
-## Club crests — before-launch TODO (P7-3)
+## Club crests — REAL official trademarks (P8-6, 2026-06-23)
 
-⚠️ **Not a blocker, but a launch blocker (same spirit as the player-photo note
-above).** The card header now shows a small club-crest accent next to the club
-name (`public/crests/*.svg`, 8 files mapped in
-`src/components/card/club-crests.ts`). These are **ORIGINAL, stylized
-placeholder marks** — shield/roundel + monogram in each club's signature colors.
-They are **NOT** copied/traced official club crests, which are **registered
-trademarks**.
+⚠️ **TRADEMARK / LICENSING CLEARANCE IS REQUIRED BEFORE PUBLIC LAUNCH.** As of
+P8-6 the 8 stylized placeholder marks have been **REPLACED with the real,
+official club crests** sourced from Wikimedia (`upload.wikimedia.org`). These are
+**registered trademarks** of their respective clubs. The originals were
+**overwritten** — the previous P7-3 stylized placeholders (shield/roundel +
+monogram in each club's colors) **no longer exist in the tree**; they can be
+recovered from git history (commit `c830b46` and earlier) if a rollback is needed
+for licensing reasons.
 
-Before any public/viral launch, the owner MUST either:
+The card header + the player-profile crest row now render these official crests
+(`public/crests/*.svg`, all 8 still SVG, same slugs, mapped in
+`src/components/card/club-crests.ts` — the `crestForClub` API and the `.svg`
+paths are unchanged, so no code/test change was needed).
 
-- secure proper licence / trademark clearance to use the official club crests,
-  **or**
-- keep these original placeholder marks (or commission bespoke art) and confirm
-  they are sufficiently distinct from the trademarks.
+| Club (dataset string) | File | Format | License tag | Wikimedia file page |
+| --- | --- | --- | --- | --- |
+| Barcelona (`Barcelona`) | `barcelona.svg` | SVG | **PD-textlogo** + trademark | https://en.wikipedia.org/wiki/File:FC_Barcelona_(crest).svg |
+| Paris Saint-Germain | `psg.svg` | SVG | **PD-textlogo** + trademark | https://en.wikipedia.org/wiki/File:Paris_Saint-Germain_F.C..svg |
+| Inter Miami | `inter-miami.svg` | SVG | **PD-textlogo** + trademark | https://commons.wikimedia.org/wiki/File:MLS_crest_logo_RGB_-_Inter_Miami_CF.svg |
+| Sporting CP | `sporting.svg` | SVG | **Non-free logo** (fair use) | https://en.wikipedia.org/wiki/File:Sporting_CP_crest.svg |
+| Manchester United | `man-united.svg` | SVG | **Non-free logo** (fair use) | https://en.wikipedia.org/wiki/File:Manchester_United_FC_crest.svg |
+| Real Madrid | `real-madrid.svg` | SVG | **Non-free logo** (fair use) | https://en.wikipedia.org/wiki/File:Real_Madrid_CF.svg |
+| Juventus | `juventus.svg` | SVG | **PD-textlogo** + trademark | https://commons.wikimedia.org/wiki/File:Juventus_FC_2017_logo.svg |
+| Al Nassr | `al-nassr.svg` | SVG | **Trademarked** / non-free (`Marque déposée`) | https://fr.wikipedia.org/wiki/Fichier:Logo_Al-Nassr_FC_2025.svg |
 
-Swapping each crest is a one-file change in `public/crests/` (the mapping in
-`club-crests.ts` resolves by exact club name and returns `null` for unknown
-clubs / national-team rows, so the card omits the accent gracefully).
+License notes:
+- **Barcelona / PSG / Inter Miami / Juventus** are tagged **PD-textlogo** (below
+  the US threshold of originality) but **still carry the clubs' trademark
+  rights** — public-domain copyright status does NOT grant trademark permission.
+- **Sporting CP / Manchester United / Real Madrid** are **non-free logos** hosted
+  under fair-use rationales on Wikipedia; using them in a product is **not**
+  covered by that rationale and needs explicit clearance.
+- **Al Nassr** is the current 2025 (70th-anniversary) crest, tagged a registered
+  trademark on fr.wikipedia.
+- **Juventus** is the modern 2017 "J" logo (the club's current official mark; the
+  classic striped oval is no longer the current crest on Wikimedia).
+
+Before any public/viral launch, the owner MUST **secure proper licence /
+trademark clearance** for all 8 crests, or revert to bespoke/original marks
+(recoverable from git history). Swapping any crest back is a one-file change in
+`public/crests/` (the mapping in `club-crests.ts` resolves by exact club name and
+returns `null` for unknown clubs / national-team rows, so the card omits the
+accent gracefully).
+
+**Legibility note (for the conductor):** the **Juventus** crest is a solid-black
+"J" with no light fill, rendered at ~36px on the dark card base (`#0a0e1a`). It
+will read very faintly / nearly vanish against the dark background (the existing
+`drop-shadow` does not help a solid-black mark). A subtle light backing chip
+behind the crest (or only for Juventus) would fix it — flagged, not
+over-engineered here. The other 7 crests use light/saturated colors (white,
+yellow, red, blue) and read fine on dark.
 
 ## Phase 6 — metric expansion, illustrative data (2026-06-22)
 
