@@ -90,8 +90,8 @@ export function CardPulse() {
       className="pointer-events-none absolute inset-0 -z-0"
       style={{
         background:
-          "radial-gradient(50% 40% at 22% 30%, rgba(233,30,140,0.18), transparent 70%)," +
-          "radial-gradient(50% 40% at 78% 30%, rgba(46,168,255,0.18), transparent 70%)",
+          "radial-gradient(50% 40% at 22% 30%, rgba(47,107,255,0.18), transparent 70%)," +
+          "radial-gradient(50% 40% at 78% 30%, rgba(225,29,60,0.18), transparent 70%)",
         mixBlendMode: "screen",
       }}
       initial={{ opacity: 0.45 }}

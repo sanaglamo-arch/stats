@@ -14,10 +14,10 @@ import { METRIC_CATALOG, type MetricKey } from "@/lib/data";
  * source of truth. Keep in lockstep with the tokens.
  */
 export const CHART_COLORS = {
-  messi: "#e91e8c",
-  messiBright: "#ff5fb0",
-  ronaldo: "#2ea8ff",
-  ronaldoBright: "#6fc8ff",
+  messi: "#2f6bff",
+  messiBright: "#6aa1ff",
+  ronaldo: "#e11d3c",
+  ronaldoBright: "#ff5a73",
   gold: "#f5c451",
   grid: "rgba(255, 255, 255, 0.10)",
   gridStrong: "rgba(255, 255, 255, 0.18)",

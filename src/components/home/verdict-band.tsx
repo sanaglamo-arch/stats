@@ -72,7 +72,7 @@ export function VerdictBand() {
         aria-hidden
         className="pointer-events-none absolute left-[-10%] top-[-10%] h-[70%] w-[60%] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(233,30,140,0.32), transparent 70%)",
+          background: "radial-gradient(circle, rgba(47,107,255,0.32), transparent 70%)",
           filter: "blur(70px)",
         }}
       />
@@ -81,7 +81,7 @@ export function VerdictBand() {
         aria-hidden
         className="pointer-events-none absolute bottom-[-10%] right-[-10%] h-[70%] w-[60%] rounded-full"
         style={{
-          background: "radial-gradient(circle, rgba(46,168,255,0.32), transparent 70%)",
+          background: "radial-gradient(circle, rgba(225,29,60,0.32), transparent 70%)",
           filter: "blur(70px)",
         }}
       />

@@ -52,21 +52,22 @@ test("happy path: tweak slices on both players, preview updates, download a real
   // present "Career" segmented-control radio, which lives in the controls and
   // never proves the preview updated.
   //
-  // Default Messi side is a single season, so the plaque value is a "YYYY/YY"
-  // season token and does NOT yet read "Career/...".
-  await expect(page.getByText(/\d{4}\/\d{2}/).first()).toBeVisible();
-  await expect(page.getByText(/Career\s*\//)).toHaveCount(0);
+  // Default Messi side is a single season, so the preview plaque shows a
+  // "YYYY/YY" season token and NO "Career" period pill yet. Scope to the live
+  // preview (data-testid) so the controls' own "Career" radio never matches.
+  const preview = page.getByTestId("card-preview");
+  await expect(preview.getByText(/\d{4}\/\d{2}/).first()).toBeVisible();
+  await expect(preview.getByText("Career", { exact: true })).toHaveCount(0);
 
   await messiPanel.getByRole("radio", { name: /^Career$/i }).click();
   await expect(messiPanel.getByRole("radio", { name: /^Career$/i })).toHaveAttribute(
     "aria-checked",
     "true",
   );
-  // Live preview's period plaque value now reads "Career/<Ronaldo season>" — the
-  // in-memory card re-rendered from the new slice. Matching "Career/" (career on
-  // the Messi side, a season still on Ronaldo's) cannot be satisfied by the
-  // control radio, whose accessible text is just "Career".
-  await expect(page.getByText(/Career\s*\//).first()).toBeVisible();
+  // The in-memory card re-rendered from the new slice: Messi=career, Ronaldo=season
+  // → the period plaque now stacks two color-coded pills, so a "Career" pill appears
+  // INSIDE the preview (distinct from the control radio, which lives outside it).
+  await expect(preview.getByText("Career", { exact: true }).first()).toBeVisible();
 
   // --- Ronaldo: change the season via the new Radix value picker (combobox). ---
   // The season picker is now a @radix-ui/react-select — a `role="combobox"`

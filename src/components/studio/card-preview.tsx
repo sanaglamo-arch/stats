@@ -64,6 +64,7 @@ export function CardPreview({
   return (
     <div
       ref={boxRef}
+      data-testid="card-preview"
       className="relative w-full overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border-glass)] shadow-[var(--shadow-glass)]"
       style={{ aspectRatio: `${CARD_WIDTH} / ${CARD_HEIGHT}` }}
     >

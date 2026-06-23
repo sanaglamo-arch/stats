@@ -50,7 +50,7 @@ export function PitchHalf({ children }: { children?: ReactNode }) {
         width={RIGHT - LEFT}
         height={BOTTOM - TOP}
         rx="6"
-        fill="rgba(46,168,255,0.04)"
+        fill="rgba(255,255,255,0.03)"
         stroke={LINE}
         strokeWidth="1"
       />

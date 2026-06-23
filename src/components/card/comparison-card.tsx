@@ -14,13 +14,21 @@ import { AnimatedBarFill, CountUpValue, CardPulse } from "./card-animations";
  *
  * The card carries its own fixed 1080×1620 box; the render route screenshots it
  * at that size, the UI scales it down with CSS transform.
+ *
+ * LAYOUT (P7-1): the body is a single CSS grid with five explicit bands —
+ * header / period plaque / stat list / verdict / watermark. The stat band is
+ * the only flexible row (`minmax(0, 1fr)`); every other band is `auto`. This
+ * makes collisions structurally impossible: bands cannot bleed into one another
+ * regardless of stat count (3→12), club-name length, or two distinct periods.
+ * The stat list adapts its own internal density to the row count so 3 stats
+ * read airy and 12 stats stay tight-but-legible — always inside its band.
  */
 /**
  * `animated` is OFF by default — the static branch renders EXACTLY the original
  * deterministic output that the headless /render/card route screenshots into a
  * PNG. No hooks-driven animation runs when `animated` is false (the animated
  * subcomponents fall back to the plain static markup). Only the live preview
- * (CardPreview) opts in via `animated`.
+ * (CardPreview) opts in via `animated`. Nothing here reads time/random.
  */
 export function ComparisonCard({
   model,
@@ -38,24 +46,27 @@ export function ComparisonCard({
 
   return (
     <div
-      className="font-[family-name:var(--font-sans)] relative flex flex-col overflow-hidden text-[var(--color-text)]"
+      className="font-[family-name:var(--font-sans)] relative grid overflow-hidden text-[var(--color-text)]"
       style={{
         width: CARD_WIDTH,
         height: CARD_HEIGHT,
+        // Five-band poster grid. Only the stat band flexes; the rest are auto,
+        // so no band can ever overlap another (P7-1 no-collision invariant).
+        gridTemplateRows: "auto auto minmax(0, 1fr) auto auto",
+        rowGap: 44,
+        padding: 72,
         background:
-          "radial-gradient(820px 640px at 10% -10%, rgba(233,30,140,0.24), transparent 56%)," +
-          "radial-gradient(820px 640px at 90% 110%, rgba(46,168,255,0.24), transparent 56%)," +
-          "radial-gradient(1100px 1100px at 50% 42%, rgba(255,255,255,0.035), transparent 60%)," +
+          "radial-gradient(900px 680px at 8% -8%, color-mix(in srgb, var(--color-messi) 24%, transparent), transparent 56%)," +
+          "radial-gradient(900px 680px at 92% 108%, color-mix(in srgb, var(--color-ronaldo) 24%, transparent), transparent 56%)," +
+          "radial-gradient(1100px 1100px at 50% 42%, rgba(255,255,255,0.04), transparent 60%)," +
           "var(--color-bg-base)",
-        padding: 56,
-        gap: 34,
       }}
     >
       {/* hairline inner frame for a finished, premium edge */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-5 rounded-[var(--radius-xl)]"
-        style={{ border: "1px solid rgba(255,255,255,0.05)" }}
+        className="pointer-events-none absolute inset-6 rounded-[var(--radius-xl)]"
+        style={{ border: "1px solid rgba(255,255,255,0.06)" }}
       />
       {animated && <CardPulse />}
       <CardHeader messiClub={model.messi.club} ronaldoClub={model.ronaldo.club} />
@@ -81,7 +92,7 @@ export function ComparisonCard({
 
 function CardHeader({ messiClub, ronaldoClub }: { messiClub: string; ronaldoClub: string }) {
   return (
-    <header className="grid grid-cols-[1fr_auto_1fr] items-start gap-6">
+    <header className="relative grid grid-cols-[1fr_auto_1fr] items-start gap-7">
       <PlayerHead side="messi" club={messiClub} align="left" />
       <VsBadge />
       <PlayerHead side="ronaldo" club={ronaldoClub} align="right" />
@@ -104,25 +115,27 @@ function PlayerHead({
   const alignClass = align === "left" ? "items-start text-left" : "items-end text-right";
 
   return (
-    <div className={`flex min-w-0 flex-col gap-4 ${alignClass}`}>
-      <div className="w-full max-w-[300px]">
+    <div className={`flex min-w-0 flex-col gap-5 ${alignClass}`}>
+      <div className="w-full max-w-[296px]">
         <PhotoSlot src={meta.photoSrc} alt={meta.name} accentVar={meta.accentVar} />
       </div>
-      <div className={`flex w-full flex-col gap-1 ${alignClass}`}>
-        <span className="text-[24px] font-medium uppercase tracking-[0.32em] text-[var(--color-text-muted)]">
+      {/* fixed-height identity block → header height is stable across slices,
+          so a long club name can never push into the plaque below */}
+      <div className={`flex w-full min-w-0 flex-col gap-1.5 ${alignClass}`}>
+        <span className="text-[22px] font-medium uppercase tracking-[0.34em] text-[var(--color-text-muted)]">
           {first}
         </span>
         <span
-          className="font-[family-name:var(--font-display)] text-[46px] font-black uppercase leading-[0.95] tracking-[-0.01em]"
+          className="block w-full truncate font-[family-name:var(--font-display)] text-[48px] font-black uppercase leading-[0.95] tracking-[-0.01em]"
           style={{
             color: `var(${meta.accentVar})`,
-            textShadow: `0 0 32px color-mix(in srgb, var(${meta.accentVar}) 65%, transparent)`,
+            textShadow: `0 0 34px color-mix(in srgb, var(${meta.accentVar}) 60%, transparent)`,
           }}
         >
           {last}
         </span>
         <div
-          className={`mt-3 flex items-center gap-3 ${align === "right" ? "flex-row-reverse" : ""}`}
+          className={`mt-2.5 flex min-w-0 items-center gap-3 ${align === "right" ? "flex-row-reverse" : ""}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element -- static flag asset, headless render */}
           <img
@@ -130,14 +143,17 @@ function PlayerHead({
             alt={meta.nationality}
             width={40}
             height={27}
-            className="rounded-[4px]"
+            className="shrink-0 rounded-[4px]"
             style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.5)" }}
           />
-          <span className="text-[20px] font-semibold text-[var(--color-text)]">
+          <span className="truncate text-[20px] font-semibold text-[var(--color-text)]">
             {meta.position}
           </span>
         </div>
-        <span className="text-[20px] font-medium text-[var(--color-text-secondary)]">{club}</span>
+        {/* club can be long ("Inter Miami CF") → truncate, never wrap/overflow */}
+        <span className="block w-full truncate text-[20px] font-medium text-[var(--color-text-secondary)]">
+          {club}
+        </span>
       </div>
     </div>
   );
@@ -145,9 +161,9 @@ function PlayerHead({
 
 function VsBadge() {
   return (
-    <div className="flex h-full items-center pt-6">
+    <div className="flex h-full items-center pt-7">
       <div
-        className="flex h-[88px] w-[88px] items-center justify-center rounded-full"
+        className="flex h-[92px] w-[92px] items-center justify-center rounded-full"
         style={{
           background: "var(--color-surface-strong)",
           border: "1px solid var(--color-border-strong)",
@@ -156,7 +172,7 @@ function VsBadge() {
         }}
       >
         <span
-          className="font-[family-name:var(--font-display)] text-[34px] font-black tracking-tight"
+          className="font-[family-name:var(--font-display)] text-[36px] font-black tracking-tight"
           style={{ color: "var(--color-gold)" }}
         >
           VS
@@ -176,29 +192,30 @@ function PeriodPlaque({ slice, t }: { slice: CardSlice; t: Dictionary }) {
 
   return (
     <div
-      className="glass relative flex flex-col gap-3 overflow-hidden rounded-[var(--radius-lg)] px-7 py-5"
+      className="glass relative flex flex-col gap-3.5 overflow-hidden rounded-[var(--radius-lg)] px-8 py-6"
       style={{ borderColor: "var(--color-border-strong)" }}
     >
       <span
         aria-hidden
-        className="absolute inset-y-4 left-0 w-1 rounded-full"
+        className="absolute inset-y-5 left-0 w-1 rounded-full"
         style={{ background: "linear-gradient(180deg, var(--color-messi), var(--color-ronaldo))" }}
       />
-      <div className="flex items-center gap-4 pl-3">
-        <span className="text-[18px] font-semibold uppercase tracking-[0.22em] text-[var(--color-text-muted)]">
+      <div className="flex min-w-0 items-center gap-4 pl-3">
+        <span className="shrink-0 text-[18px] font-semibold uppercase tracking-[0.22em] text-[var(--color-text-muted)]">
           {t.period}
         </span>
-        <span className="tabular font-[family-name:var(--font-display)] text-[26px] font-bold text-[var(--color-text)]">
-          {samePeriod ? (
-            messiPeriod
-          ) : (
-            <>
-              <span style={{ color: "var(--color-messi)" }}>{messiPeriod}</span>
-              <span className="mx-3 text-[var(--color-text-muted)]">/</span>
-              <span style={{ color: "var(--color-ronaldo)" }}>{ronaldoPeriod}</span>
-            </>
-          )}
-        </span>
+        {samePeriod ? (
+          <span className="tabular truncate font-[family-name:var(--font-display)] text-[28px] font-bold text-[var(--color-text)]">
+            {messiPeriod}
+          </span>
+        ) : (
+          // Two distinct periods: stack into two color-coded plaques so long
+          // labels ("LAST 5 YEARS" / "AT AGE 25") never collide on one line.
+          <div className="flex min-w-0 flex-1 items-stretch gap-3">
+            <PeriodPill label={messiPeriod} colorVar="--color-messi" align="left" />
+            <PeriodPill label={ronaldoPeriod} colorVar="--color-ronaldo" align="right" />
+          </div>
+        )}
       </div>
       <div className="flex flex-wrap gap-2 pl-3">
         {chips.map((chip) => (
@@ -218,7 +235,47 @@ function PeriodPlaque({ slice, t }: { slice: CardSlice; t: Dictionary }) {
   );
 }
 
+function PeriodPill({
+  label,
+  colorVar,
+  align,
+}: {
+  label: string;
+  colorVar: string;
+  align: "left" | "right";
+}) {
+  return (
+    <span
+      className={`tabular min-w-0 flex-1 truncate font-[family-name:var(--font-display)] text-[26px] font-bold ${align === "right" ? "text-right" : "text-left"}`}
+      style={{ color: `var(${colorVar})` }}
+    >
+      {label}
+    </span>
+  );
+}
+
 /* ----------------------------- Stat list ----------------------------- */
+
+/**
+ * Density tiers keep the whole stat list inside its grid band for any row count
+ * (3→12). Fewer rows → larger figures, fatter bars, more breathing room; more
+ * rows → tighter rhythm but still legible. The band itself is `min-h-0` +
+ * `overflow-hidden`, so even an unexpected count can never spill into the
+ * verdict footer. All values are static (no time/random) → PNG-deterministic.
+ */
+function densityFor(count: number): {
+  valuePx: number;
+  labelPx: number;
+  iconPx: number;
+  barPx: number;
+  rowGapPx: number;
+} {
+  if (count <= 4) return { valuePx: 34, labelPx: 19, iconPx: 23, barPx: 20, rowGapPx: 22 };
+  if (count <= 6) return { valuePx: 31, labelPx: 18, iconPx: 22, barPx: 18, rowGapPx: 16 };
+  if (count <= 8) return { valuePx: 29, labelPx: 17, iconPx: 21, barPx: 16, rowGapPx: 12 };
+  if (count <= 10) return { valuePx: 27, labelPx: 16, iconPx: 20, barPx: 14, rowGapPx: 9 };
+  return { valuePx: 25, labelPx: 15, iconPx: 19, barPx: 13, rowGapPx: 7 };
+}
 
 function StatList({
   rows,
@@ -229,16 +286,30 @@ function StatList({
   t: Dictionary;
   animated: boolean;
 }) {
+  const density = densityFor(rows.length);
   return (
-    <div className="flex flex-1 flex-col justify-center gap-3.5">
+    <div
+      className="flex min-h-0 flex-col justify-center overflow-hidden"
+      style={{ gap: density.rowGapPx }}
+    >
       {rows.map((row) => (
-        <StatRow key={row.key} row={row} t={t} animated={animated} />
+        <StatRow key={row.key} row={row} t={t} animated={animated} density={density} />
       ))}
     </div>
   );
 }
 
-function StatRow({ row, t, animated }: { row: CardStatRow; t: Dictionary; animated: boolean }) {
+function StatRow({
+  row,
+  t,
+  animated,
+  density,
+}: {
+  row: CardStatRow;
+  t: Dictionary;
+  animated: boolean;
+  density: ReturnType<typeof densityFor>;
+}) {
   const Icon = STAT_ICONS[row.key];
   const messiWins = row.winner === "messi";
   const ronaldoWins = row.winner === "ronaldo";
@@ -246,10 +317,11 @@ function StatRow({ row, t, animated }: { row: CardStatRow; t: Dictionary; animat
   return (
     <div className="flex flex-col gap-1.5">
       {/* values + centered label/icon */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
         <span
-          className={`tabular font-[family-name:var(--font-display)] text-[30px] leading-none ${messiWins ? "font-black" : "font-semibold"}`}
+          className={`tabular font-[family-name:var(--font-display)] leading-none ${messiWins ? "font-black" : "font-semibold"}`}
           style={{
+            fontSize: density.valuePx,
             textAlign: "left",
             color: messiWins ? "var(--color-messi-bright)" : "var(--color-text)",
             textShadow: messiWins
@@ -266,14 +338,23 @@ function StatRow({ row, t, animated }: { row: CardStatRow; t: Dictionary; animat
           />
         </span>
 
-        <span className="flex items-center gap-2 whitespace-nowrap text-[18px] font-semibold uppercase tracking-[0.08em] text-[var(--color-text-secondary)]">
-          <Icon size={22} strokeWidth={2} className="text-[var(--color-text-muted)]" aria-hidden />
+        <span
+          className="flex items-center justify-center gap-2 whitespace-nowrap font-semibold uppercase tracking-[0.08em] text-[var(--color-text-secondary)]"
+          style={{ fontSize: density.labelPx }}
+        >
+          <Icon
+            size={density.iconPx}
+            strokeWidth={2}
+            className="shrink-0 text-[var(--color-text-muted)]"
+            aria-hidden
+          />
           {statLabel(t, row.key)}
         </span>
 
         <span
-          className={`tabular font-[family-name:var(--font-display)] text-[30px] leading-none ${ronaldoWins ? "font-black" : "font-semibold"}`}
+          className={`tabular font-[family-name:var(--font-display)] leading-none ${ronaldoWins ? "font-black" : "font-semibold"}`}
           style={{
+            fontSize: density.valuePx,
             textAlign: "right",
             color: ronaldoWins ? "var(--color-ronaldo-bright)" : "var(--color-text)",
             textShadow: ronaldoWins
@@ -299,12 +380,13 @@ function StatRow({ row, t, animated }: { row: CardStatRow; t: Dictionary; animat
           brightVar="--color-messi-bright"
           win={messiWins}
           direction="rtl"
+          heightPx={density.barPx}
           animated={animated}
         />
         <span
           aria-hidden
-          className="h-2.5 w-1.5 shrink-0 rotate-45 rounded-[2px]"
-          style={{ background: "var(--color-border-strong)" }}
+          className="w-1.5 shrink-0 rotate-45 rounded-[2px]"
+          style={{ height: density.barPx * 0.6, background: "var(--color-border-strong)" }}
         />
         <Bar
           fraction={row.ronaldoFraction}
@@ -312,6 +394,7 @@ function StatRow({ row, t, animated }: { row: CardStatRow; t: Dictionary; animat
           brightVar="--color-ronaldo-bright"
           win={ronaldoWins}
           direction="ltr"
+          heightPx={density.barPx}
           animated={animated}
         />
       </div>
@@ -325,6 +408,7 @@ function Bar({
   brightVar,
   win,
   direction,
+  heightPx,
   animated,
 }: {
   fraction: number;
@@ -332,6 +416,7 @@ function Bar({
   brightVar: string;
   win: boolean;
   direction: "ltr" | "rtl";
+  heightPx: number;
   animated: boolean;
 }) {
   const justify = direction === "rtl" ? "flex-end" : "flex-start";
@@ -349,8 +434,9 @@ function Bar({
   } as const;
   return (
     <div
-      className="flex h-[18px] flex-1 items-center overflow-hidden rounded-full"
+      className="flex flex-1 items-center overflow-hidden rounded-full"
       style={{
+        height: heightPx,
         background: "var(--color-surface)",
         justifyContent: justify,
         border: "1px solid var(--color-border-glass)",
@@ -392,7 +478,7 @@ function ResultFooter({
 
   return (
     <div
-      className="relative flex flex-col items-center gap-3 overflow-hidden rounded-[var(--radius-xl)] px-8 py-7"
+      className="relative flex flex-col items-center gap-5 overflow-hidden rounded-[var(--radius-xl)] px-8 py-8"
       style={{
         background:
           `radial-gradient(140% 120% at 50% 0%, color-mix(in srgb, var(${leadColorVar}) 12%, transparent), transparent 62%),` +
@@ -413,7 +499,7 @@ function ResultFooter({
       <span className="text-[18px] font-semibold uppercase tracking-[0.3em] text-[var(--color-text-muted)]">
         {t.overallResult}
       </span>
-      <div className="flex items-baseline gap-5">
+      <div className="flex items-baseline justify-center gap-5">
         <ScoreSide
           name="MESSI"
           value={score.messi}
