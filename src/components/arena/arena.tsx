@@ -1,17 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { ArrowRight, Share2, ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
 import { DURATION, EASE } from "@/lib/motion/tokens";
-import type { ArenaModel, CategoryKey } from "./arena-model";
+import { ShareModal } from "@/components/share/share-modal";
+import { CATEGORY_KEYS, serializeCategoryParam, type ArenaModel, type CategoryKey } from "./arena-model";
 import { PlayerRender } from "./player-render";
 import { VsMedallion } from "./vs-medallion";
 import { CategoryTabs } from "./category-tabs";
 import { ComparisonPanel } from "./comparison-panel";
 import { VerdictPanel } from "./verdict-panel";
+
+const FOCUS_RING =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]";
 
 /**
  * The flagship HOME ARENA (P9-2). Replaces the old hero+studio home content.
@@ -37,6 +41,18 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
 
   const [activeKey, setActiveKey] = useState<CategoryKey>(model.categories[0].key);
   const [showWinner, setShowWinner] = useState(true);
+  const [shareOpen, setShareOpen] = useState(false);
+  // The arena compares the full category set; a deep-linked ?cats= refines it.
+  const [catsParam, setCatsParam] = useState(serializeCategoryParam(CATEGORY_KEYS));
+
+  // Deep link: /?share=1[&cats=...] auto-opens the share modal (the verdict /
+  // cards "Share" links route here). Reads the URL once on mount.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const cats = params.get("cats");
+    if (cats) setCatsParam(cats);
+    if (params.get("share") === "1") setShareOpen(true);
+  }, []);
 
   const activeCategory = useMemo(
     () => model.categories.find((c) => c.key === activeKey) ?? model.categories[0],
@@ -120,6 +136,18 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
         <VerdictPanel verdict={model.verdict} showWinner={showWinner} onToggle={setShowWinner} />
       </motion.div>
 
+      {/* Generate share card */}
+      <motion.div className="mt-6 flex justify-center" {...reveal(0.2)}>
+        <button
+          type="button"
+          onClick={() => setShareOpen(true)}
+          className={`inline-flex items-center gap-2 rounded-full border border-[var(--color-border-strong)] px-6 py-3 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wide text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-surface)] ${FOCUS_RING}`}
+        >
+          <Share2 size={16} aria-hidden />
+          {t.arenaGenerateShareCard}
+        </button>
+      </motion.div>
+
       {/* Accuracy line */}
       <div className="mt-8 flex flex-col items-center gap-2 text-center text-xs text-[var(--color-text-muted)] sm:flex-row sm:justify-center sm:gap-4">
         <span className="inline-flex items-center gap-1.5">
@@ -131,6 +159,13 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
         </span>
         <span>{t.arenaScope}</span>
       </div>
+
+      <ShareModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        cats={catsParam}
+        showWinner={showWinner}
+      />
     </main>
   );
 }

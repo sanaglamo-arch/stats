@@ -100,6 +100,8 @@ const en = {
   arenaScope: "Includes club and country performances across all competitions",
   // Arena → FUT cards entry (P9-5)
   arenaViewCards: "View FUT cards",
+  // Arena → share card (P9-6)
+  arenaGenerateShareCard: "Generate Share Card",
 
   // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
   cardsTitle: "The Greatest Of All Time?",
@@ -156,6 +158,33 @@ const en = {
   verdictBackToArena: "Back to Arena",
   verdictNeutralHint: "Winner hidden — showing the raw numbers only.",
   verdictCategoriesLabel: "Categories",
+
+  // ── SHARE CARD + MODAL (P9-6) ─────────────────────────────────────
+  shareModalTitle: "Ready to share your verdict?",
+  shareModalSubtitle: "Download the card or share it straight to your feed.",
+  shareClose: "Close",
+  sharePreviewLabel: "Share card preview",
+  shareCaptionLabel: "Caption",
+  shareCopyCaption: "Copy Caption",
+  shareCopied: "Copied!",
+  shareDownload: "Download Card",
+  shareDownloading: "Preparing…",
+  shareOpenTiktok: "Open TikTok",
+  shareOpenX: "Share on X",
+  shareCopyLink: "Copy Link",
+  shareLinkCopied: "Link copied!",
+  shareDownloadError: "Couldn't generate the card — try again.",
+  // Strings baked onto the card itself
+  shareWinnerLabel: "Winner",
+  shareCategoriesWon: "Categories won",
+  shareNeutralTitle: "The Matchup",
+  shareNeutralSubtitle: "By the numbers — you decide",
+  shareFooterTag: "Settle the debate at CompareGOATs",
+  // Caption template ({winner} / {score} substituted; {winner} dropped when neutral)
+  shareCaptionWinner:
+    "Messi vs Ronaldo — who's the real GOAT? My verdict: {winner} wins {score}. #CompareGOATs #MessiVsRonaldo #GOATdebate #Football",
+  shareCaptionNeutral:
+    "Messi vs Ronaldo — who's the real GOAT? The numbers are in — you decide. #CompareGOATs #MessiVsRonaldo #GOATdebate #Football",
 
   // Cinematic homepage
   scrollCue: "Scroll to build your card",
@@ -401,6 +430,7 @@ const ru: Dictionary = {
   arenaAccuracy: "Все данные актуальны на {date}",
   arenaScope: "Включает выступления за клуб и сборную во всех турнирах",
   arenaViewCards: "Смотреть FUT-карточки",
+  arenaGenerateShareCard: "Создать карточку",
 
   // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
   cardsTitle: "Величайший всех времён?",
@@ -455,6 +485,31 @@ const ru: Dictionary = {
   verdictBackToArena: "Назад в Арену",
   verdictNeutralHint: "Победитель скрыт — показаны только цифры.",
   verdictCategoriesLabel: "Категории",
+
+  // ── SHARE CARD + MODAL (P9-6) ─────────────────────────────────────
+  shareModalTitle: "Готовы поделиться вердиктом?",
+  shareModalSubtitle: "Скачайте карточку или поделитесь ей прямо в ленте.",
+  shareClose: "Закрыть",
+  sharePreviewLabel: "Превью карточки",
+  shareCaptionLabel: "Подпись",
+  shareCopyCaption: "Копировать подпись",
+  shareCopied: "Скопировано!",
+  shareDownload: "Скачать карточку",
+  shareDownloading: "Готовим…",
+  shareOpenTiktok: "Открыть TikTok",
+  shareOpenX: "Поделиться в X",
+  shareCopyLink: "Копировать ссылку",
+  shareLinkCopied: "Ссылка скопирована!",
+  shareDownloadError: "Не удалось создать карточку — попробуйте ещё раз.",
+  shareWinnerLabel: "Победитель",
+  shareCategoriesWon: "Категорий выиграно",
+  shareNeutralTitle: "Противостояние",
+  shareNeutralSubtitle: "По цифрам — решать вам",
+  shareFooterTag: "Закрой спор на CompareGOATs",
+  shareCaptionWinner:
+    "Месси против Роналду — кто настоящий GOAT? Мой вердикт: {winner} побеждает {score}. #CompareGOATs #MessiVsRonaldo #GOATdebate #Football",
+  shareCaptionNeutral:
+    "Месси против Роналду — кто настоящий GOAT? Цифры на столе — решать вам. #CompareGOATs #MessiVsRonaldo #GOATdebate #Football",
 
   scrollCue: "Листай — собери карточку",
   studioKicker: "Студия",

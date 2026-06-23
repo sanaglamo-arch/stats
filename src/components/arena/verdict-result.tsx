@@ -7,6 +7,7 @@ import { ArrowLeft, Crown, Download, Share2, SlidersHorizontal } from "lucide-re
 import { PLAYER_META } from "@/components/card/player-meta";
 import { useI18n } from "@/lib/i18n/provider";
 import { DURATION, EASE, STAGGER } from "@/lib/motion/tokens";
+import { ShareModal } from "@/components/share/share-modal";
 import { CATEGORY_ICONS } from "./arena-icons";
 import { VerdictToggle } from "./verdict-toggle";
 import {
@@ -46,6 +47,8 @@ export function VerdictResult({
   const { t } = useI18n();
   const reduce = useReducedMotion();
   const [showWinner, setShowWinner] = useState(true);
+  const [shareOpen, setShareOpen] = useState(false);
+  const catsParam = serializeCategoryParam(selectedKeys);
 
   const winnerId = verdict.winner === "tie" ? null : verdict.winner;
   const accent =
@@ -64,12 +67,6 @@ export function VerdictResult({
       : t.verdictLeads.replace("{name}", PLAYER_META[verdict.winner].name);
 
   const editHref = `/compare`;
-  const shareHref = `/?share=1&cats=${serializeCategoryParam(selectedKeys)}`;
-
-  function onDownload() {
-    // P9-6 share/summary-card modal lands here; ready hook for now.
-    window.location.assign(shareHref);
-  }
 
   const reveal = (delay: number) =>
     reduce
@@ -188,7 +185,7 @@ export function VerdictResult({
       >
         <button
           type="button"
-          onClick={onDownload}
+          onClick={() => setShareOpen(true)}
           className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wide transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 sm:w-auto ${FOCUS_RING}`}
           style={{
             background: "linear-gradient(135deg, var(--color-gold-bright), var(--color-gold))",
@@ -199,13 +196,14 @@ export function VerdictResult({
           <Download size={17} aria-hidden />
           {t.verdictDownloadCard}
         </button>
-        <Link
-          href={shareHref}
+        <button
+          type="button"
+          onClick={() => setShareOpen(true)}
           className={`inline-flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] px-6 py-3.5 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wide text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-surface)] sm:w-auto ${FOCUS_RING}`}
         >
           <Share2 size={17} aria-hidden />
           {t.verdictShare}
-        </Link>
+        </button>
         <Link
           href={editHref}
           className={`inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] sm:w-auto ${FOCUS_RING}`}
@@ -214,6 +212,13 @@ export function VerdictResult({
           {t.verdictEditCategories}
         </Link>
       </motion.div>
+
+      <ShareModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        cats={catsParam}
+        showWinner={showWinner}
+      />
     </main>
   );
 }

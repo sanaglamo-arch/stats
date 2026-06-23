@@ -1,10 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Trophy } from "lucide-react";
+import { ArrowRight, Share2, Trophy } from "lucide-react";
 import { PLAYER_META } from "@/components/card/player-meta";
 import { useI18n } from "@/lib/i18n/provider";
-import type { ArenaVerdict } from "@/components/arena/arena-model";
+import { CATEGORY_KEYS, serializeCategoryParam, type ArenaVerdict } from "@/components/arena/arena-model";
+import { ShareModal } from "@/components/share/share-modal";
 import { FOCUS_RING } from "@/components/studio/control-primitives";
 
 /**
@@ -16,6 +18,9 @@ import { FOCUS_RING } from "@/components/studio/control-primitives";
 export function FinalScoreStrip({ verdict }: { verdict: ArenaVerdict }) {
   const { t } = useI18n();
   const { ronaldo, messi } = verdict.categoriesWon;
+  const [shareOpen, setShareOpen] = useState(false);
+  // The cards screen compares the full category set.
+  const catsParam = serializeCategoryParam(CATEGORY_KEYS);
 
   const leaderId = verdict.winner === "tie" ? null : verdict.winner;
   const leaderName = leaderId ? PLAYER_META[leaderId].name : null;
@@ -62,18 +67,35 @@ export function FinalScoreStrip({ verdict }: { verdict: ArenaVerdict }) {
         </div>
       </div>
 
-      <Link
-        href="/verdict"
-        className={`group inline-flex items-center gap-2 rounded-full px-5 py-3 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wide transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 ${FOCUS_RING}`}
-        style={{
-          background: "linear-gradient(135deg, var(--color-gold-bright), var(--color-gold))",
-          color: "var(--color-bg-base)",
-          boxShadow: "0 8px 28px color-mix(in srgb, var(--color-gold) 38%, transparent)",
-        }}
-      >
-        {t.cardsViewVerdict}
-        <ArrowRight size={17} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5" />
-      </Link>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <button
+          type="button"
+          onClick={() => setShareOpen(true)}
+          className={`inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-border-strong)] px-5 py-3 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wide text-[var(--color-text)] transition-colors duration-200 hover:bg-[var(--color-surface)] ${FOCUS_RING}`}
+        >
+          <Share2 size={16} aria-hidden />
+          {t.verdictShare}
+        </button>
+        <Link
+          href="/verdict"
+          className={`group inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-wide transition-[transform,box-shadow] duration-200 hover:-translate-y-0.5 ${FOCUS_RING}`}
+          style={{
+            background: "linear-gradient(135deg, var(--color-gold-bright), var(--color-gold))",
+            color: "var(--color-bg-base)",
+            boxShadow: "0 8px 28px color-mix(in srgb, var(--color-gold) 38%, transparent)",
+          }}
+        >
+          {t.cardsViewVerdict}
+          <ArrowRight size={17} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5" />
+        </Link>
+      </div>
+
+      <ShareModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        cats={catsParam}
+        showWinner
+      />
     </section>
   );
 }
