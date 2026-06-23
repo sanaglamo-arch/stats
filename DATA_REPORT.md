@@ -221,9 +221,60 @@ tracking/positional data**; the UI must badge it `illustrative`. **TODO before
 launch:** swap in a real positional provider behind `DataSource` (no frontend
 change required) or keep it explicitly labelled.
 
+## Phase 8 — REAL cross-verified data (2026-06-23)
+
+Phase 8 replaced the hand-built seed numbers with **real, cross-verified** club + national-team data. `dataset.json` now has **215 rows** (Messi 105, Ronaldo 110); 155 rows `verified:true`, 60 `verified:false` (see divergences below).
+
+### Source availability (calibrated 2026-06-23) — IMPORTANT
+The sources named in the brief were tested before any collection:
+
+| Source | Status | Used for |
+|---|---|---|
+| **FBref (Opta)** — intended canon | ❌ HTTP **403** anti-bot | unreachable; documented only |
+| **Transfermarkt** | ❌ blocked (cannot fetch) | unreachable |
+| **Understat** (xG/xA) | ❌ blocked (JS-gated, no table in fetch) | unreachable |
+| **messivsronaldo.app** `/club-stats/<season>/` | ✅ fetchable, structured | **PRIMARY club canon** — per-competition apps/goals/assists/minutes for both players, maps 1:1 to the schema |
+| **Wikipedia** (article + by-year intl tables) | ✅ fetchable | national-team totals, awards, corroboration |
+| **WebSearch** | ✅ | per-season headline cross-verification |
+
+→ **Adopted canon: messivsronaldo.app (mvr) for club structure, Wikipedia + WebSearch for cross-verification.** Fabricating "real" numbers from blocked sources was explicitly avoided. `source.adapter:"mvr"` (new `AdapterId`) marks mvr-sourced club rows; `"wikidata"` marks national rows (Wikipedia + mvr).
+
+### Per-metric canon + definition
+- **matches / minutes / goals / assists / penaltyGoals** (club): mvr per (season × competition), club + all comps. Definition e.g. *"goals = club, that competition, mvr (corroborated vs Wikipedia/WebSearch)"*.
+- **xg / xa**: mvr league-row only, ≈2014/15+; `null` otherwise (honesty line — pre-2014 advanced metrics don't exist publicly). Understat (the intended xG source) was blocked.
+- **national caps / goals**: Wikipedia by-year intl tables + mvr, cross-verified to the career total; per-season split **distributed** (no Aug–Jul intl source exists).
+- **starts, shots, shotsOnTarget, freekickGoals, yellowCards, redCards, hatTricks**: ⚠️ **NOT yet from a real source** — carried over from the Phase-1 seed row for that (player × season × competition). `hatTricks` remains illustrative. These are the main remaining owner-verification items.
+- **Ballon d'Or**: ✅ re-verified — Messi 8 (2009–12, 2015, 2019, 2021, 2023), Ronaldo 5 (2008, 2013, 2014, 2016, 2017), placed on the correct award-season league rows.
+- **trophies / other individualAwards / ageDuringSeason**: trophies + other awards (e.g. Golden Shoe) still carried from seed (NOT yet re-verified — a P8-4 follow-up; counts look plausible: Messi ~45 / Ronaldo ~33 distinct); `ageDuringSeason` recomputed deterministically = `seasonStartYear − birthYear` (Messi b. 1987-06-24, Ronaldo b. 1985-02-05; both birthdays precede August, so this is age at season start). This corrected seed shifts (e.g. Ronaldo 2002/03: 18 → 17).
+
+### Career-total cross-verification (the headline numbers — 2+ sources)
+| Figure | Our data | Cross-source | Verdict |
+|---|---|---|---|
+| Messi club goals | **762** | Barça 672 = Wikipedia exact; PSG 32, Inter Miami 58 (mvr + WebSearch) | ✅ verified |
+| Ronaldo club goals | **798** | Real Madrid 450 = canonical (RM site says 451); Man Utd 142, Juve 101, Sporting 5, Al Nassr 100 | ✅ verified (≈801 canonical incl. excluded Europa rows — see below) |
+| Messi Argentina | **196 caps / 115 goals** (thru 2024/25) | Wikipedia by-year + mvr (full-career 201/122 incl. in-progress 2026) | ✅ caps/goals exact; per-season distributed |
+| Ronaldo Portugal | **226 caps / 143 goals** (thru 2024/25) | Wikipedia + mvr + UEFA (all-time men's top scorer); full-career 229/143 | ✅ caps/goals exact; per-season distributed |
+| Ballon d'Or | **Messi 8 / Ronaldo 5** | Wikipedia (exact award years) | ✅ verified + normalized to the correct award seasons |
+
+### Divergences → `verified:false` (recorded for owner sign-off)
+1. **Messi PSG 2022/23 (4 rows):** goals agree (21), but **appearances diverge** — mvr 41 vs WebSearch 54 (mvr counts only its 4 listed comps). Both values noted.
+2. **Messi Inter Miami 2023/24 & 2024/25 (8 rows):** **MLS calendar-year vs European Aug–May boundary** mismatch — mvr splits on the Euro calendar (its "2024-2025" even includes the Jun-2025 Club World Cup), not comparable to calendar-year sources. Flagged pending a boundary decision (also relevant to the P8-7 current-season cron).
+3. **Ronaldo 2021/22 & 2022/23 (6 rows):** mid-season transfers (Juve→Man Utd; Man Utd→Al Nassr). mvr returns **combined** per-competition totals only — the two clubs cannot be cleanly split (mvr footnotes: "+1 Serie A app for Juventus", "+3 goals/2 assists/16 apps for Man Utd"). Rows assigned to the majority club; both values noted.
+4. **Ronaldo Europa League / UEFA Cup EXCLUDED:** 2002/03 Sporting UEFA Cup (2 app, 0 g) + 2022/23 Man Utd Europa League (6 app, **2 g**) are **not in the dataset** — the closed `CompetitionType` union has no Europa/UEFA-Cup bucket, and force-fitting into `champions_league` would corrupt CL totals. This is the ~2-goal gap between our 798 and the canonical ~800. **Owner decision needed:** add a `europa_league` competition type (touches UI tabs/aggregation) or accept the documented exclusion.
+5. **All 42 national rows `verified:false`:** career caps/goals are real + cross-verified, but per-season values were **distributed** from calendar-year data (no per-season Aug–Jul source). `assists` distributed proportionally.
+
+### Still needs owner verification before launch
+- The carried-from-seed fields (starts/shots/SoT/freekicks/cards/hatTricks) — no real source yet.
+- trophies / individualAwards / Ballon d'Or counts (carried from seed; P8-4).
+- The PSG-apps, Inter-Miami-boundary, Ronaldo-combined-transfer, and Europa-League items above.
+
 ## How to regenerate
 
 ```bash
-pnpm ingest      # runs adapters → normalize → writes src/data/dataset.json
-pnpm test        # unit tests on fixtures (no network)
+# Phase 8 club/national data was collected via web research (messivsronaldo.app +
+# Wikipedia + WebSearch) into data-staging/*.json, then merged into dataset.json.
+# The original adapter pipeline (FBref/TM/Understat) remains but those sources are
+# anti-bot/blocked, so it degrades to seed — see "Source availability" above.
+./node_modules/.bin/tsc --noEmit   # typecheck (corepack/pnpm is broken in this env)
+./node_modules/.bin/vitest run     # unit tests on fixtures (no network)
 ```

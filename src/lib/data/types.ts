@@ -32,7 +32,13 @@ export type RowProvenance = {
   enrichedBy: AdapterId[];
 };
 
-export type AdapterId = "wikidata" | "understat" | "fbref" | "transfermarkt";
+// `mvr` = messivsronaldo.app
+export type AdapterId =
+  | "wikidata"
+  | "understat"
+  | "fbref"
+  | "transfermarkt"
+  | "mvr";
 
 /**
  * One canonical comparison row. EXACTLY the shape mandated by SPEC §6, plus
