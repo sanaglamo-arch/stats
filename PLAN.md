@@ -71,8 +71,8 @@
 - [x] P8-2 (Data) РЕАЛЬНЫЕ КЛУБНЫЕ — Месси 85 строк (Барса 672✓), Роналду 88 (Реал 450✓), кросс-верифицировано, смерджено (d8a4173).
 - [x] P8-3 (Data) РЕАЛЬНАЯ СБОРНАЯ — 42 строки, Месси Аргентина 196/115, Роналду Португалия 226/143 career cross-verified; per-season distributed (verified:false) (d8a4173).
 - [~] P8-4 (Data) КРОСС-ВЕРИФИКАЦИЯ — career голы/ассисты/матчи/минуты ✓, Золотые мячи ✓ (Месси 8/Роналду 5 нормализованы), verified-флаги ✓, DATA_REPORT источник-за-источником+расхождения ✓. ОСТАЛОСЬ: трофеи/прочие individualAwards ещё seed-carried (counts правдоподобны, нужна сверка).
-- [ ] P8-5 (Data/Design) РЕАЛЬНЫЕ ФОТО игроков (Wikimedia Commons) вместо силуэтов — `PhotoSlot`/`player-meta` photoSrc; права-нота.
-- [ ] P8-6 (Data/Design) РЕАЛЬНЫЕ КРЕСТИ всех клубов карьеры (Wikimedia/официальные) вместо стилизованных плейсхолдеров /public/crests/.
+- [x] P8-5 (Data/Design) РЕАЛЬНЫЕ ФОТО — 2 CC BY 4.0 портрета (Wikimedia, WC2022) → /public/players/*.jpg, photo-slot object-cover+focal, attribution в DATA_REPORT (28615f1).
+- [x] P8-6 (Data/Design) РЕАЛЬНЫЕ КРЕСТИ — 8 официальных SVG (Wikimedia) в /public/crests/, те же слаги (API/тесты целы), light-chip за крестом (тёмный Юве «J» читается), DATA_REPORT trademark-ноты (f4ce18e).
 - [ ] P8-7 (Data) ТЕКУЩИЙ СЕЗОН + CRON — Месси(Интер Майами)/Роналду(Аль-Насср) обновить; cron раз в сутки (история ЗАМОРОЖЕНА, парс один раз). Cron только с явного разрешения босса.
 
 ## Журнал прогресса (агенты дописывают снизу)
