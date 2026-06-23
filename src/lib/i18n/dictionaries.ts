@@ -173,8 +173,6 @@ const en = {
   profileIndividualAwards: "Individual awards",
   profileNoAwards: "No individual awards in the dataset.",
   profileNoTrophies: "No team trophies in the dataset.",
-  // Honesty
-  profileModernOnly: "2014+ only",
   profileUnverified: "Unverified dataset — figures await owner sign-off.",
 } as const;
 
@@ -327,7 +325,6 @@ const ru: Dictionary = {
   profileIndividualAwards: "Личные награды",
   profileNoAwards: "В наборе данных нет личных наград.",
   profileNoTrophies: "В наборе данных нет командных трофеев.",
-  profileModernOnly: "Только 2014+",
   profileUnverified: "Данные не выверены — цифры ждут подтверждения владельца.",
 };
 

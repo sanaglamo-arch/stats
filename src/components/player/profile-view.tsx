@@ -234,27 +234,19 @@ export function ProfileView({ profile }: { profile: PlayerProfile }) {
           delay={0.1}
         >
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {HEADLINE_METRICS.map((key) => {
-              const modern = METRIC_CATALOG[key].availability === "modern";
-              return (
-                <div key={key} className="glass-panel flex flex-col gap-1 p-4">
-                  <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
-                    {statLabel(t, key)}
-                  </span>
-                  <span
-                    className="tabular font-[family-name:var(--font-display)] text-2xl font-black sm:text-3xl"
-                    style={{ color: accent }}
-                  >
-                    {formatMetric(key, profile.totals, profile.derived)}
-                  </span>
-                  {modern && (
-                    <span className="text-[0.6rem] font-medium uppercase tracking-wide text-[var(--color-text-muted)]">
-                      {t.profileModernOnly}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+            {HEADLINE_METRICS.map((key) => (
+              <div key={key} className="glass-panel flex flex-col gap-1 p-4">
+                <span className="text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
+                  {statLabel(t, key)}
+                </span>
+                <span
+                  className="tabular font-[family-name:var(--font-display)] text-2xl font-black sm:text-3xl"
+                  style={{ color: accent }}
+                >
+                  {formatMetric(key, profile.totals, profile.derived)}
+                </span>
+              </div>
+            ))}
           </div>
         </Section>
 
