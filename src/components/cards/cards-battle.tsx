@@ -108,7 +108,7 @@ export function CardsBattle({ model }: { model: ArenaModel }) {
       <div className="mt-6 flex justify-center">
         <Link
           href="/"
-          className={`inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] px-4 py-2 text-sm font-medium text-[var(--color-text-secondary)] transition-colors duration-200 hover:bg-[var(--color-surface)] hover:text-[var(--color-text)] ${FOCUS_RING}`}
+          className={`inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--color-border-glass)] px-4 py-2.5 text-sm font-medium text-[var(--color-text-secondary)] transition-colors duration-200 hover:bg-[var(--color-surface)] hover:text-[var(--color-text)] lg:min-h-0 lg:px-4 lg:py-2 ${FOCUS_RING}`}
         >
           {t.cardsBackToArena}
         </Link>

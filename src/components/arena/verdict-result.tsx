@@ -87,7 +87,7 @@ export function VerdictResult({
         <div className="flex flex-col gap-3">
           <Link
             href="/"
-            className={`inline-flex w-fit items-center gap-1.5 rounded-full border border-[var(--color-border-glass)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 w-fit items-center gap-1.5 rounded-full border border-[var(--color-border-glass)] px-4 py-2.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] lg:min-h-0 lg:px-3 lg:py-1.5 ${FOCUS_RING}`}
           >
             <ArrowLeft size={14} aria-hidden />
             {t.verdictBackToArena}

@@ -30,7 +30,7 @@ export function VerdictToggle({
         aria-checked={checked}
         aria-label={t.arenaShowWinner}
         onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 shrink-0 rounded-full border transition-colors duration-200 ${FOCUS_RING}`}
+        className={`relative h-6 w-11 shrink-0 rounded-full border transition-colors duration-200 before:absolute before:-inset-x-2 before:-inset-y-2.5 before:content-[''] ${FOCUS_RING}`}
         style={{
           background: checked
             ? "color-mix(in srgb, var(--color-gold) 70%, transparent)"

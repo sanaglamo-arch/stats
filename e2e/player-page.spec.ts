@@ -40,9 +40,9 @@ test("an invalid player id returns 404", async ({ page }) => {
   expect(response?.status()).toBe(404);
 });
 
-test("the studio links to each player's profile", async ({ page }) => {
-  await page.goto("/");
-  const messiPanel = page.getByRole("region", { name: "Lionel Messi" });
-  const profileLink = messiPanel.getByRole("link", { name: /Lionel Messi.*profile/i });
-  await expect(profileLink).toHaveAttribute("href", "/player/messi");
+test("a player profile is reachable as a real route", async ({ page }) => {
+  // The arena/header flow exposes player profiles at /player/<id>; the route
+  // renders the player's profile page directly (deep-linkable).
+  await page.goto("/player/messi");
+  await expect(page.getByRole("heading", { level: 1, name: "Lionel Messi" })).toBeVisible();
 });

@@ -102,7 +102,7 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
         {/* Secondary entry → FUT collectible-card battle screen (P9-5) */}
         <Link
           href="/cards"
-          className="group mt-3 inline-flex items-center gap-2 rounded-full border border-[var(--color-gold)] bg-[rgba(245,180,60,0.08)] px-4 py-2 text-sm font-semibold text-[var(--color-gold-bright)] transition-colors duration-200 hover:bg-[rgba(245,180,60,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]"
+          className="group mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border border-[var(--color-gold)] bg-[rgba(245,180,60,0.08)] px-4 py-2.5 text-sm font-semibold text-[var(--color-gold-bright)] transition-colors duration-200 hover:bg-[rgba(245,180,60,0.16)] lg:min-h-0 lg:py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-bg-base)]"
         >
           {t.arenaViewCards}
           <ArrowRight size={15} aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -116,7 +116,9 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
         aria-label={t.arenaSubtitle}
       >
         <PlayerRender id="ronaldo" identity={model.identity.ronaldo} align="left" />
-        <div className="hidden items-center justify-center self-center lg:flex">
+        {/* VS medallion — flows between the stacked players on mobile, sits
+            centred in the 3-col grid on desktop. */}
+        <div className="-my-2 flex items-center justify-center self-center lg:my-0">
           <VsMedallion />
         </div>
         <PlayerRender id="messi" identity={model.identity.messi} align="right" />

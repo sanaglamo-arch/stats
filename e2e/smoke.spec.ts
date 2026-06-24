@@ -1,59 +1,56 @@
 import { expect, test } from "@playwright/test";
 
-test("studio renders the matchup, controls, preview, actions and i18n toggle", async ({ page }) => {
+/**
+ * Smoke: the new HOME ARENA (P9-2) renders end-to-end. Asserts the CompareGOATs
+ * brand chrome, both players' identity cards, the category tablist + a live
+ * comparison/verdict, the share modal, and the RU/EN toggle — all via resilient
+ * role/text selectors (no brittle class/DOM coupling).
+ */
+test("home arena renders the brand, both players, category tabs, verdict and share", async ({
+  page,
+}) => {
   await page.goto("/");
 
-  // Matchup heading.
+  // Brand chrome: the CompareGOATs wordmark in the app header.
+  await expect(page.getByRole("link", { name: /CompareGOATs/i }).first()).toBeVisible();
+
+  // The arena H1 ("GOAT ARENA").
   const heading = page.getByRole("heading", { level: 1 });
-  await expect(heading).toContainText("MESSI");
-  await expect(heading).toContainText("RONALDO");
+  await expect(heading).toContainText(/ARENA/i);
 
-  // Global competition context tabs (P6-10) render as a tablist.
-  await expect(page.getByRole("tab", { name: /Champions League/i })).toBeVisible();
-  await expect(page.getByRole("tab", { name: /^All$/i })).toBeVisible();
+  // Both players' identity cards (their names render as headings).
+  await expect(page.getByRole("heading", { name: "Cristiano Ronaldo" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Lionel Messi" })).toBeVisible();
 
-  // Per-player control panels render with their period segmented control.
-  const messiPanel = page.getByRole("region", { name: "Lionel Messi" });
-  const ronaldoPanel = page.getByRole("region", { name: "Cristiano Ronaldo" });
-  await expect(messiPanel).toBeVisible();
-  await expect(ronaldoPanel).toBeVisible();
-  await expect(messiPanel.getByRole("radiogroup")).toBeVisible();
+  // Category tablist with selectable tabs (a real WAI-ARIA tablist).
+  const tablist = page.getByRole("tablist");
+  await expect(tablist).toBeVisible();
+  const goalsTab = page.getByRole("tab", { name: /Goals|Голы/i });
+  await expect(goalsTab).toBeVisible();
+  // Selecting a different category swaps the live comparison panel.
+  const assistsTab = page.getByRole("tab", { name: /Assists|Передачи/i });
+  await assistsTab.click();
+  await expect(assistsTab).toHaveAttribute("aria-selected", "true");
 
-  // Live preview is on screen (the card watermark proves the card rendered).
-  await expect(page.getByText("FootyCompare", { exact: true }).first()).toBeVisible();
+  // A final verdict panel is present on the page.
+  await expect(page.getByText(/final verdict|итоговый вердикт/i).first()).toBeVisible();
 
-  // Download button present and enabled.
-  const download = page.getByRole("button", { name: /Download PNG/i });
-  await expect(download).toBeVisible();
-  await expect(download).toBeEnabled();
+  // Share modal opens from the "Generate share card" button.
+  await page.getByRole("button", { name: /share card|карточк/i }).first().click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  // It carries a live preview + a caption field + a download action.
+  await expect(dialog.getByRole("img", { name: /preview|превью/i })).toBeVisible();
+  // Close it (Esc) and confirm it dismisses.
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
 
-  // Share button present.
-  await expect(page.getByRole("button", { name: /^Share$/i })).toBeVisible();
-
-  // Changing a selector updates the preview: Messi season → career changes the
-  // visible period plaque text inside the card.
-  await messiPanel.getByRole("radio", { name: /^Career$/i }).click();
-  await expect(messiPanel.getByRole("radio", { name: /^Career$/i })).toHaveAttribute(
-    "aria-checked",
-    "true",
-  );
-  // The card period plaque now reads "Career" (default Messi was a single season).
-  await expect(page.getByText("Career").first()).toBeVisible();
-
-  // Toggling a stat chip (P6-8) changes the card: dropping "Goals" lowers the
-  // contested-categories total shown in the card's result footer.
-  const contestedBefore = await page.getByText(/categories won/i).first().textContent();
-  const goalsChip = page.getByRole("switch", { name: /^Goals$/ });
-  await expect(goalsChip).toBeVisible();
-  await goalsChip.click();
-  await expect(goalsChip).toHaveAttribute("aria-checked", "false");
-  await expect(page.getByText(/categories won/i).first()).not.toHaveText(
-    contestedBefore ?? "",
-  );
-
-  // RU/EN toggle flips the UI copy.
-  const toggle = page.getByRole("group", { name: /language|язык/i });
-  await expect(toggle).toBeVisible();
-  await toggle.getByRole("button", { name: "RU" }).click();
-  await expect(page.getByRole("region", { name: "Lionel Messi" }).getByText("Период")).toBeVisible();
+  // RU/EN toggle flips the UI copy: switching to RU changes the arena subtitle.
+  const langGroup = page.getByRole("group", { name: /language|язык/i }).first();
+  await expect(langGroup).toBeVisible();
+  await langGroup.getByRole("button", { name: "RU" }).click();
+  // The H1 copy is now Russian: "GOAT Арена". Assert the RU-only Cyrillic word
+  // so the flip genuinely fails if the locale didn't change (the Latin "ARENA"
+  // would otherwise pass even with no switch).
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(/Арена/i);
 });

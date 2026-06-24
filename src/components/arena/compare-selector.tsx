@@ -87,7 +87,7 @@ export function CompareSelector({ categories }: { categories: ArenaCategory[] })
       <motion.header className="mb-8 flex flex-col items-center text-center" {...reveal(0)}>
         <Link
           href="/"
-          className={`mb-4 inline-flex items-center gap-1.5 self-start rounded-full border border-[var(--color-border-glass)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] ${FOCUS_RING}`}
+          className={`mb-4 inline-flex min-h-11 items-center gap-1.5 self-start rounded-full border border-[var(--color-border-glass)] px-4 py-2.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] lg:min-h-0 lg:px-3 lg:py-1.5 ${FOCUS_RING}`}
         >
           <ArrowLeft size={14} aria-hidden />
           {t.compareBackToArena}
@@ -120,14 +120,14 @@ export function CompareSelector({ categories }: { categories: ArenaCategory[] })
           <button
             type="button"
             onClick={selectAll}
-            className={`rounded-full border border-[var(--color-border-glass)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 items-center rounded-full border border-[var(--color-border-glass)] px-4 py-2.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] lg:min-h-0 lg:px-3 lg:py-1.5 ${FOCUS_RING}`}
           >
             {t.compareSelectAll}
           </button>
           <button
             type="button"
             onClick={clear}
-            className={`rounded-full border border-[var(--color-border-glass)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] ${FOCUS_RING}`}
+            className={`inline-flex min-h-11 items-center rounded-full border border-[var(--color-border-glass)] px-4 py-2.5 text-xs font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] lg:min-h-0 lg:px-3 lg:py-1.5 ${FOCUS_RING}`}
           >
             {t.compareClear}
           </button>

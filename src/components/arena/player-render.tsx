@@ -38,13 +38,11 @@ export function PlayerRender({
     { label: t.arenaCaps, value: String(identity.caps) },
   ];
 
-  const renderSide = align === "left" ? "order-1" : "order-2";
-
   return (
     <div className={`flex flex-col ${align === "right" ? "lg:items-end" : "lg:items-start"}`}>
       {/* Duotone render */}
       <div
-        className={`arena-render arena-render-${id} relative mx-auto h-44 w-44 rounded-[var(--radius-xl)] sm:h-56 sm:w-56 ${renderSide}`}
+        className={`arena-render arena-render-${id} relative mx-auto h-44 w-44 rounded-[var(--radius-xl)] sm:h-56 sm:w-56`}
         style={{ boxShadow: `0 0 60px color-mix(in srgb, ${accent} 38%, transparent)` }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
