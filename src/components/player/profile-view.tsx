@@ -325,7 +325,7 @@ export function ProfileView({ profile }: { profile: PlayerProfile }) {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 grid items-start gap-4 sm:grid-cols-2">
             <div className="glass-panel p-5">
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
                 {t.profileTeamTrophies}
@@ -349,8 +349,20 @@ export function ProfileView({ profile }: { profile: PlayerProfile }) {
               <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
                 {t.profileIndividualAwards}
               </h3>
-              {otherAwards.length > 0 ? (
+              {profile.totals.ballonDor > 0 || otherAwards.length > 0 ? (
                 <ul className="flex flex-wrap gap-2">
+                  {profile.totals.ballonDor > 0 ? (
+                    <li
+                      className="rounded-full border px-3 py-1 text-xs font-semibold"
+                      style={{
+                        borderColor: "color-mix(in srgb, var(--color-gold) 55%, transparent)",
+                        background: "color-mix(in srgb, var(--color-gold) 12%, transparent)",
+                        color: "var(--color-gold)",
+                      }}
+                    >
+                      {t.profileBallonDor} ×{profile.totals.ballonDor}
+                    </li>
+                  ) : null}
                   {otherAwards.map((award) => (
                     <li
                       key={award}
