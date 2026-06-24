@@ -37,6 +37,22 @@ if [ "$code2" = "200" ]; then
   exit 0
 fi
 
-echo "$(ts) UNHEALTHY (got '${code:-timeout}' then '${code2:-timeout}') — restarting $APP" >> "$LOG"
-PM2_HOME=/root/.pm2 "$PM2" restart "$APP" --update-env >> "$LOG" 2>&1
+echo "$(ts) UNHEALTHY (got '${code:-timeout}' then '${code2:-timeout}') — recovering $APP" >> "$LOG"
+export PM2_HOME=/root/.pm2
+
+# Tier 1: plain restart. Works for a hang where pm2 still tracks the process.
+"$PM2" restart "$APP" --update-env >> "$LOG" 2>&1
 echo "$(ts) restart issued (exit $?)" >> "$LOG"
+
+# Tier 2: pm2 may have LOST the process entirely (not in `pm2 list` anymore) —
+# then `restart` is a no-op/error and the site stays down. Re-probe; if still
+# unhealthy, start a fresh instance from scratch and persist it.
+sleep 4
+code3=$(probe)
+if [ "$code3" != "200" ]; then
+  echo "$(ts) still '${code3:-timeout}' after restart — starting fresh $APP" >> "$LOG"
+  cd /root/footycompare || exit 1
+  "$PM2" start ./node_modules/next/dist/bin/next --name "$APP" --interpreter node -- start -p 3000 -H 0.0.0.0 >> "$LOG" 2>&1
+  echo "$(ts) fresh start issued (exit $?)" >> "$LOG"
+  "$PM2" save >> "$LOG" 2>&1
+fi
