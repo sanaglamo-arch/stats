@@ -109,6 +109,10 @@ function DetailRow({ row }: { row: ArenaRow }) {
 
   const ronaldoWon = row.winner === "ronaldo";
   const messiWon = row.winner === "messi";
+  // Loser greyed hue-independently (matches the Arena ComparisonPanel); ties
+  // keep both bars coloured. Winner keeps full colour + glow.
+  const ronaldoLost = messiWon;
+  const messiLost = ronaldoWon;
 
   const barTransition = reduce ? { duration: 0 } : { duration: DURATION.base, ease: EASE.out };
 
@@ -128,9 +132,9 @@ function DetailRow({ row }: { row: ArenaRow }) {
             <motion.div
               className="absolute inset-y-0 right-0 rounded-full"
               style={{
-                background: "var(--color-ronaldo)",
+                background: ronaldoLost ? "var(--color-text-muted)" : "var(--color-ronaldo)",
                 boxShadow: ronaldoWon ? "0 0 12px color-mix(in srgb, var(--color-ronaldo) 70%, transparent)" : "none",
-                opacity: ronaldoWon ? 1 : 0.45,
+                opacity: ronaldoLost ? 0.55 : 1,
               }}
               initial={reduce ? false : { width: 0 }}
               animate={{ width: `${row.ronaldoFill * 100}%` }}
@@ -141,9 +145,9 @@ function DetailRow({ row }: { row: ArenaRow }) {
             <motion.div
               className="absolute inset-y-0 left-0 rounded-full"
               style={{
-                background: "var(--color-messi)",
+                background: messiLost ? "var(--color-text-muted)" : "var(--color-messi)",
                 boxShadow: messiWon ? "0 0 12px color-mix(in srgb, var(--color-messi) 70%, transparent)" : "none",
-                opacity: messiWon ? 1 : 0.45,
+                opacity: messiLost ? 0.55 : 1,
               }}
               initial={reduce ? false : { width: 0 }}
               animate={{ width: `${row.messiFill * 100}%` }}

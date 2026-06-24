@@ -64,6 +64,10 @@ function Row({ row, showWinner }: { row: ArenaRow; showWinner: boolean }) {
 
   const ronaldoWon = showWinner && row.winner === "ronaldo";
   const messiWon = showWinner && row.winner === "messi";
+  // A side reads as "lost" (greyed) only when the OTHER side won — ties keep
+  // both bars coloured. Drives the hue-independent winner/loser contrast.
+  const ronaldoLost = messiWon;
+  const messiLost = ronaldoWon;
 
   const ronaldoColor = "var(--color-ronaldo)";
   const messiColor = "var(--color-messi)";
@@ -97,14 +101,16 @@ function Row({ row, showWinner }: { row: ArenaRow; showWinner: boolean }) {
           </span>
         </span>
         <div className="flex w-full items-center gap-1">
-          {/* left track (Ronaldo) — fills from centre outward (right→left) */}
+          {/* left track (Ronaldo) — fills from centre outward (right→left). The
+              loser is desaturated to grey (hue-independent so the win/loss reads
+              identically on every row); the winner keeps full colour + glow. */}
           <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-surface)]">
             <motion.div
               className="absolute inset-y-0 right-0 rounded-full"
               style={{
-                background: ronaldoColor,
+                background: ronaldoLost ? "var(--color-text-muted)" : ronaldoColor,
                 boxShadow: ronaldoWon ? "0 0 12px color-mix(in srgb, var(--color-ronaldo) 70%, transparent)" : "none",
-                opacity: showWinner && !ronaldoWon ? 0.45 : 1,
+                opacity: ronaldoLost ? 0.55 : 1,
               }}
               initial={reduce ? false : { width: 0 }}
               animate={{ width: `${rFill * 100}%` }}
@@ -116,9 +122,9 @@ function Row({ row, showWinner }: { row: ArenaRow; showWinner: boolean }) {
             <motion.div
               className="absolute inset-y-0 left-0 rounded-full"
               style={{
-                background: messiColor,
+                background: messiLost ? "var(--color-text-muted)" : messiColor,
                 boxShadow: messiWon ? "0 0 12px color-mix(in srgb, var(--color-messi) 70%, transparent)" : "none",
-                opacity: showWinner && !messiWon ? 0.45 : 1,
+                opacity: messiLost ? 0.55 : 1,
               }}
               initial={reduce ? false : { width: 0 }}
               animate={{ width: `${mFill * 100}%` }}
