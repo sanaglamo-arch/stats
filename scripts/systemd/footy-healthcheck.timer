@@ -1,0 +1,12 @@
+[Unit]
+Description=Run the FootyCompare health watchdog every 2 minutes
+
+[Timer]
+# First run 2 min after boot, then every 2 min while up. The box has no cron
+# daemon, so this systemd timer is the scheduler (mirrors footy-refresh.timer).
+OnBootSec=2min
+OnUnitActiveSec=2min
+AccuracySec=15s
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=FootyCompare health watchdog (restart pm2 app on hang/non-200)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/footycompare
+ExecStart=/usr/bin/env bash scripts/healthcheck.sh
