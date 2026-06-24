@@ -6,9 +6,9 @@ import { DURATION, EASE } from "@/lib/motion/tokens";
 
 /**
  * The glowing VS medallion with an energy-flash burst (the arena centrepiece).
- * The burst is a static CSS bloom; under motion it does a single slow rotation
- * (transform-only, infinite but gentle) that collapses to nothing under
- * prefers-reduced-motion. The "VS" itself never moves.
+ * The burst is a STATIC neon bloom (no rotation — a spinning gradient read as a
+ * cringe rotating square). The only motion is the medallion's one-shot scale-in
+ * entrance, which collapses under prefers-reduced-motion. The "VS" never moves.
  */
 export function VsMedallion() {
   const { t } = useI18n();
@@ -16,12 +16,8 @@ export function VsMedallion() {
 
   return (
     <div className="relative flex items-center justify-center" aria-hidden>
-      {/* Energy-flash burst */}
-      <motion.div
-        className="arena-vs-burst"
-        animate={reduce ? undefined : { rotate: 360 }}
-        transition={reduce ? undefined : { duration: 40, ease: "linear", repeat: Infinity }}
-      />
+      {/* Energy-flash burst — static radial/conic bloom, no animation. */}
+      <div className="arena-vs-burst" />
 
       {/* Medallion */}
       <motion.div

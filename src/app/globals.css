@@ -301,28 +301,36 @@ body {
 /* Energy-flash burst behind the VS medallion (static radial bloom). */
 .arena-vs-burst {
   position: absolute;
-  inset: -120% -160%;
+  /* Centered square so the static bloom reads as a circular flash, never a
+     lopsided rectangle. A radial mask fades the edges to a clean circle. */
+  left: 50%;
+  top: 50%;
+  width: 320px;
+  height: 320px;
+  transform: translate(-50%, -50%);
   pointer-events: none;
   background:
-    radial-gradient(38% 38% at 50% 50%, rgba(245, 180, 60, 0.55), transparent 62%),
+    radial-gradient(34% 34% at 50% 50%, rgba(245, 180, 60, 0.5), transparent 60%),
     conic-gradient(
       from 0deg at 50% 50%,
-      rgba(245, 180, 60, 0.35) 0deg,
-      transparent 14deg,
-      rgba(226, 16, 59, 0.28) 30deg,
-      transparent 46deg,
-      rgba(58, 130, 255, 0.28) 62deg,
-      transparent 78deg,
-      rgba(245, 180, 60, 0.35) 96deg,
-      transparent 116deg,
-      rgba(226, 16, 59, 0.28) 150deg,
-      transparent 172deg,
-      rgba(58, 130, 255, 0.28) 210deg,
-      transparent 240deg,
-      rgba(245, 180, 60, 0.35) 300deg,
-      transparent 330deg
+      rgba(245, 180, 60, 0.32) 0deg,
+      transparent 16deg,
+      rgba(226, 16, 59, 0.24) 34deg,
+      transparent 52deg,
+      rgba(58, 130, 255, 0.3) 68deg,
+      transparent 88deg,
+      rgba(245, 180, 60, 0.32) 110deg,
+      transparent 132deg,
+      rgba(226, 16, 59, 0.24) 168deg,
+      transparent 192deg,
+      rgba(58, 130, 255, 0.3) 232deg,
+      transparent 256deg,
+      rgba(245, 180, 60, 0.32) 312deg,
+      transparent 340deg
     );
-  filter: blur(2px);
+  -webkit-mask-image: radial-gradient(closest-side, #000 38%, transparent 72%);
+  mask-image: radial-gradient(closest-side, #000 38%, transparent 72%);
+  filter: blur(3px);
 }
 
 /* Centered halo directly behind the hero card for a focused neon lift. */
