@@ -139,15 +139,13 @@ export function FutCard({
               />
             </div>
 
-            {/* 6 FUT face stats: two columns of 3 (PAC SHO PAS | DRI DEF PHY) */}
-            <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1.5 px-2">
-              {FUT_FACE_STATS.map((key, i) => (
-                <div
-                  key={key}
-                  className={`flex items-center justify-between gap-2 ${i % 2 === 0 ? "justify-self-start" : "justify-self-end"} w-full`}
-                >
+            {/* 6 FUT face stats: two columns of 3 (PAC SHO PAS | DRI DEF PHY).
+                Value + label are a TIGHT pair ("92 PAC"), columns centred. */}
+            <dl className="mx-auto mt-3 grid w-fit grid-cols-2 gap-x-8 gap-y-1.5">
+              {FUT_FACE_STATS.map((key) => (
+                <div key={key} className="flex items-baseline gap-1.5">
                   <dd
-                    className="tabular text-lg font-black tabular-nums text-white"
+                    className="tabular w-7 text-right text-lg font-black tabular-nums text-white"
                     aria-label={`${t[STAT_LABELS[key]]} ${rating.stats[key]}`}
                   >
                     {rating.stats[key]}
