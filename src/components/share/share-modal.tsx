@@ -204,10 +204,13 @@ export function ShareModal({
       aria-labelledby={titleId}
       aria-describedby={descId}
     >
-      {/* Scrim */}
+      {/* Scrim — decorative mouse-dismiss affordance. Hidden from the a11y tree
+          (aria-hidden + tabIndex -1) so it doesn't duplicate the header X's
+          "Close" accessible name; keyboard/SR users dismiss via the X or Esc. */}
       <motion.button
         type="button"
-        aria-label={t.shareClose}
+        aria-hidden
+        tabIndex={-1}
         className="absolute inset-0 cursor-default bg-black/65 backdrop-blur-sm"
         onClick={onClose}
         initial={reduce ? false : { opacity: 0 }}
