@@ -285,6 +285,10 @@ function BreakdownRow({
   const reduce = useReducedMotion();
   const Icon = CATEGORY_ICONS[category.icon];
   const headline = category.rows[0];
+  // Metrics-won tally for this category — shown in winner mode so the numbers
+  // agree with the pill (e.g. World Cup 2–2 → TIED, not a lone "143 vs 115").
+  const rWins = category.rows.filter((r) => r.winner === "ronaldo").length;
+  const mWins = category.rows.filter((r) => r.winner === "messi").length;
 
   const winnerPill = winnerLabel(category.winner, t);
   const pillColor =
@@ -312,22 +316,35 @@ function BreakdownRow({
         </span>
       </div>
 
-      {/* Two headline values */}
-      <div className="flex items-center justify-center gap-2 text-sm">
-        <span
-          className="tabular font-bold tabular-nums"
-          style={{ color: ronaldoWon ? "var(--color-ronaldo-bright)" : "var(--color-text-secondary)" }}
-        >
-          {formatArenaValue(headline, headline.ronaldo)}
-        </span>
-        <span className="text-xs text-[var(--color-text-muted)]">{t.vs}</span>
-        <span
-          className="tabular font-bold tabular-nums"
-          style={{ color: messiWon ? "var(--color-messi-bright)" : "var(--color-text-secondary)" }}
-        >
-          {formatArenaValue(headline, headline.messi)}
-        </span>
-      </div>
+      {/* Centre: in winner mode the metrics-won tally (consistent with the
+          pill); in neutral mode the headline metric's two values. */}
+      {showWinner ? (
+        <div className="flex items-center justify-center gap-2 text-sm" title={t.verdictMetricsWon}>
+          <span
+            className="tabular font-bold tabular-nums"
+            style={{ color: ronaldoWon ? "var(--color-ronaldo-bright)" : "var(--color-text-secondary)" }}
+          >
+            {rWins}
+          </span>
+          <span className="text-xs text-[var(--color-text-muted)]">{t.vs}</span>
+          <span
+            className="tabular font-bold tabular-nums"
+            style={{ color: messiWon ? "var(--color-messi-bright)" : "var(--color-text-secondary)" }}
+          >
+            {mWins}
+          </span>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center gap-2 text-sm">
+          <span className="tabular font-bold tabular-nums text-[var(--color-text-secondary)]">
+            {formatArenaValue(headline, headline.ronaldo)}
+          </span>
+          <span className="text-xs text-[var(--color-text-muted)]">{t.vs}</span>
+          <span className="tabular font-bold tabular-nums text-[var(--color-text-secondary)]">
+            {formatArenaValue(headline, headline.messi)}
+          </span>
+        </div>
+      )}
 
       {/* Winner pill / neutral metric label */}
       {showWinner ? (
