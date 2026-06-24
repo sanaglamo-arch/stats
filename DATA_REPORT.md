@@ -125,30 +125,33 @@ When a number is confirmed, set its row's `verified: true` (and ideally switch
 
 ## Photo rights — attribution required before public launch (SPEC §8, P8-5)
 
-**Phase 8 status (P8-5):** the card + player profile pages now ship **real,
-freely-licensed photos** of both players, sourced from Wikimedia Commons. Both
-are **CC BY 4.0** (Creative Commons Attribution 4.0 International), which permits
-commercial/online use *provided attribution is given*. The stylized neon
-silhouette placeholders (`public/players/messi.svg`, `public/players/ronaldo.svg`)
-are **kept in place as a fallback** and are no longer referenced by default.
+**Phase 8 status (P8-5), upgraded in the Phase 9 polish pass:** the card + player
+profile + arena/FUT renders now ship **real, freely-licensed photos** of both
+players, sourced from Wikimedia Commons. The original WC2022 crops were low-res
+(messi 720×744, ronaldo only 307×425) and read as grainy under the duotone, so
+they were **replaced with higher-res, cleanly-cropped portraits** (3:4, head &
+shoulders, clean backgrounds). The stylized neon silhouette placeholders
+(`public/players/messi.svg`, `public/players/ronaldo.svg`) are **kept as a
+fallback** and are not referenced by default.
 
-**Attribution is REQUIRED before public launch.** CC BY 4.0 obliges us to credit
-the author + license (and ideally link the source) wherever the images appear. A
-visible credit (e.g. a footer/about line) MUST be added before any public/viral
-launch. The two photos and their required attribution:
+**Attribution is REQUIRED before public launch.** Both new photos are
+ShareAlike-licensed (CC BY-SA), which obliges us to credit the author + license
+(and link the source) wherever the images appear, and to keep any derivative of
+the image itself under a compatible license. A visible credit (footer/about line)
+MUST be added before any public/viral launch. The two photos and their required
+attribution:
 
 | Player | File (`public/players/`) | Author | License | Commons source |
 | --- | --- | --- | --- | --- |
-| Lionel Messi | `messi.jpg` (720×744) | Hossein Zohrevand / Tasnim News Agency | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Lionel_Messi_WC2022.jpg |
-| Cristiano Ronaldo | `ronaldo.jpg` (307×425) | Hossein Zohrevand / Tasnim News Agency | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Cristiano_Ronaldo_WC2022_-_01_(cropped).jpg |
+| Lionel Messi | `messi.jpg` (750×1000, cropped from 1498×2069) | Bryan Berlin | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Lionel_Messi_NE_Revolution_Inter_Miami_7.9.25-178_(cropped_2).jpg |
+| Cristiano Ronaldo | `ronaldo.jpg` (613×817, cropped from 613×920) | Анна Нэсси (Anna Nessi) | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Cristiano_Ronaldo_2018.jpg |
 
 Suggested credit line (must appear in the live product before launch):
 
-> Player photos: Lionel Messi & Cristiano Ronaldo by Hossein Zohrevand / Tasnim
-> News Agency, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
-> via Wikimedia Commons.
+> Player photos: Lionel Messi by Bryan Berlin (CC BY-SA 4.0) and Cristiano
+> Ronaldo by Anna Nessi (CC BY-SA 3.0), cropped, via Wikimedia Commons.
 
-**Note on personality rights:** CC BY 4.0 covers the *photographer's copyright*,
+**Note on personality rights:** the CC BY-SA licenses cover the *photographer's copyright*,
 not the subject's personality/publicity rights. At viral scale, an
 image-rights/personality-rights review is still advisable. Swapping assets stays
 a one-line change per player in `src/components/card/player-meta.ts`
