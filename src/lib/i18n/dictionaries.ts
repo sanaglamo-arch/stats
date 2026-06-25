@@ -116,6 +116,16 @@ const en = {
   arenaToProfile: "View {name} profile",
   arenaLeaderboardCrown: "Leader",
 
+  // ── BY-LEAGUE SPLIT (P10-5) — read-only evidence inside the expanded row ──
+  arenaByLeague: "By league",
+  arenaLeaguePremierLeague: "Premier League",
+  arenaLeagueLaLiga: "La Liga",
+  arenaLeagueSerieA: "Serie A",
+  arenaLeagueLigue1: "Ligue 1",
+  arenaLeaguePrimeiraLiga: "Primeira Liga",
+  arenaLeagueSaudiProLeague: "Saudi Pro League",
+  arenaLeagueMls: "MLS",
+
   // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
   cardsTitle: "The Greatest Of All Time?",
   cardsSubtitle: "Two legends, two cards — then the real numbers settle it",
@@ -458,6 +468,16 @@ const ru: Dictionary = {
   arenaShareVerdict: "Поделиться вердиктом",
   arenaToProfile: "Профиль игрока {name}",
   arenaLeaderboardCrown: "Лидер",
+
+  // ── BY-LEAGUE SPLIT (P10-5) — read-only evidence inside the expanded row ──
+  arenaByLeague: "По лигам",
+  arenaLeaguePremierLeague: "Премьер-лига",
+  arenaLeagueLaLiga: "Ла Лига",
+  arenaLeagueSerieA: "Серия A",
+  arenaLeagueLigue1: "Лига 1",
+  arenaLeaguePrimeiraLiga: "Примейра",
+  arenaLeagueSaudiProLeague: "Про-лига Сауд. Аравии",
+  arenaLeagueMls: "MLS",
 
   // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
   cardsTitle: "Величайший всех времён?",

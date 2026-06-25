@@ -163,6 +163,23 @@ const CATEGORIES: CategorySpec[] = [
   },
 ];
 
+/**
+ * One named-league row inside a category's "By league" group (P10-5). Same
+ * shape as an {@link ArenaRow} (both values + a LOCAL per-league leader marker)
+ * but its `winner` is read-only evidence: it is NOT tallied into the category
+ * winner, the score, or the verdict.
+ */
+export type LeagueSplitRow = {
+  /** Dictionary key for the user-facing league label (mapped from competitionName). */
+  labelKey: keyof Dictionary;
+  ronaldo: number;
+  messi: number;
+  /** LOCAL "who did more in THIS league" marker. Tallied into nothing. */
+  winner: RowWinner;
+  ronaldoFill: number;
+  messiFill: number;
+};
+
 /** A single resolved comparison row, both values + winner. */
 export type ArenaRow = {
   labelKey: keyof Dictionary;
@@ -175,6 +192,12 @@ export type ArenaRow = {
   /** 0..1 share of the larger value, per side, for the divergent bar fill. */
   ronaldoFill: number;
   messiFill: number;
+  /**
+   * When present, this row is the aggregate "League" sub-metric and carries a
+   * per-named-league breakdown. The breakdown UI REPLACES this single row with a
+   * labelled "By league" group. Read-only evidence — never affects the verdict.
+   */
+  leagueSplit?: LeagueSplitRow[];
 };
 
 export type ArenaCategory = {
@@ -185,6 +208,135 @@ export type ArenaCategory = {
   /** Category winner = whoever wins more rows (tie if equal). */
   winner: RowWinner;
 };
+
+/* ── BY-LEAGUE SPLIT (P10-5) ────────────────────────────────────────────────
+ * Read-only evidence: the single aggregate "League" sub-metric row (League Goals
+ * / League Assists / League Titles) is REPLACED in the UI by a labelled
+ * "By league" group of the NAMED leagues. The per-league leader marker is LOCAL
+ * and is tallied into NOTHING — it must not change the category winner, the
+ * score, the verdict or `?cats=`. This is pure presentation over data that
+ * already exists: each `competitionType:"league"` row carries a real
+ * `competitionName`; we group BOTH players' rows by a mapped league label (by
+ * name, not club — Real + Barça → La Liga) and reuse the same
+ * aggregate→metricValue machinery as every other metric. Cups are excluded so
+ * "by league" stays literally true.
+ */
+
+/** A user-facing league a "by league" group fans out to (UX.md mapping table). */
+type LeagueLabelKey =
+  | "arenaLeaguePremierLeague"
+  | "arenaLeagueLaLiga"
+  | "arenaLeagueSerieA"
+  | "arenaLeagueLigue1"
+  | "arenaLeaguePrimeiraLiga"
+  | "arenaLeagueSaudiProLeague"
+  | "arenaLeagueMls";
+
+/**
+ * Map a raw `competitionName` (only ever consulted for `competitionType:"league"`
+ * rows) to a user-facing league label key, per the UX.md table. Returns null for
+ * names that are not a real league (cups/playoffs typed as league are excluded so
+ * "by league" means league). Mixed-season labels collapse to their league.
+ */
+function mapLeagueLabel(competitionName: string): LeagueLabelKey | null {
+  switch (competitionName) {
+    case "Premier League":
+      return "arenaLeaguePremierLeague";
+    case "La Liga":
+      return "arenaLeagueLaLiga";
+    case "Serie A":
+      return "arenaLeagueSerieA";
+    case "Ligue 1":
+      return "arenaLeagueLigue1";
+    case "Primeira Liga":
+      return "arenaLeaguePrimeiraLiga";
+    case "Saudi Pro League":
+    case "Saudi Pro League / Premier League": // mixed-season label → its league
+      return "arenaLeagueSaudiProLeague";
+    case "Major League Soccer":
+    case "MLS Cup Playoffs": // MLS post-season, grouped under MLS
+      return "arenaLeagueMls";
+    default:
+      return null; // not a league (cups, etc.) — excluded from the strip
+  }
+}
+
+/** UX.md display order for the by-league group (stable, deterministic). */
+const LEAGUE_ORDER: readonly LeagueLabelKey[] = [
+  "arenaLeaguePremierLeague",
+  "arenaLeagueLaLiga",
+  "arenaLeagueSerieA",
+  "arenaLeagueLigue1",
+  "arenaLeaguePrimeiraLiga",
+  "arenaLeagueSaudiProLeague",
+  "arenaLeagueMls",
+];
+
+/** Metrics that exist per league → the only sub-metric rows that get a split. */
+type LeagueSplitMetric = "goals" | "assists" | "trophies";
+
+/** Row labelKey → the metric its by-league group reads (the aggregate rows we upgrade). */
+const LEAGUE_SPLIT_ROWS: Partial<Record<keyof Dictionary, LeagueSplitMetric>> = {
+  arenaRowLeagueGoals: "goals",
+  arenaRowLeagueAssists: "assists",
+  arenaRowLeagueTitles: "trophies",
+};
+
+/** All league-bucket rows for a player, grouped by mapped league label. */
+type LeagueGroups = Map<LeagueLabelKey, PlayerSeasonComp[]>;
+
+function groupLeagueRows(playerRows: readonly PlayerSeasonComp[]): LeagueGroups {
+  const groups: LeagueGroups = new Map();
+  for (const r of playerRows) {
+    if (r.competitionType !== "league") continue;
+    const label = mapLeagueLabel(r.competitionName);
+    if (!label) continue;
+    const bucket = groups.get(label);
+    if (bucket) bucket.push(r);
+    else groups.set(label, [r]);
+  }
+  return groups;
+}
+
+/** Read one metric over a set of league rows, reusing the canonical aggregator. */
+function leagueMetric(rows: readonly PlayerSeasonComp[], metric: LeagueSplitMetric): number {
+  const totals = aggregate(rows, true);
+  return metricValue(metric, totals, deriveMetrics(totals)) ?? 0;
+}
+
+/**
+ * Pure selector: given both players' raw rows and a per-league metric, return the
+ * named-league rows (mapped label, both values, a LOCAL per-league leader marker
+ * and bar fills), in UX.md order, restricted to leagues where at least one player
+ * has a non-zero value. Sole consumer of the by-league grouping; reused by tests.
+ *
+ * NB: the `winner` here is local evidence only — it is never summed into the
+ * category/score/verdict.
+ */
+export function selectLeagueSplit(
+  rows: readonly PlayerSeasonComp[],
+  metric: LeagueSplitMetric,
+): LeagueSplitRow[] {
+  const ronaldoGroups = groupLeagueRows(rowsForPlayer(rows, "ronaldo"));
+  const messiGroups = groupLeagueRows(rowsForPlayer(rows, "messi"));
+
+  const out: LeagueSplitRow[] = [];
+  for (const label of LEAGUE_ORDER) {
+    const rVal = leagueMetric(ronaldoGroups.get(label) ?? [], metric);
+    const mVal = leagueMetric(messiGroups.get(label) ?? [], metric);
+    if (rVal === 0 && mVal === 0) continue; // neither played/scored here — omit
+    const max = Math.max(rVal, mVal);
+    out.push({
+      labelKey: label,
+      ronaldo: rVal,
+      messi: mVal,
+      winner: rowWinner(rVal, mVal, true),
+      ronaldoFill: fill(rVal, max),
+      messiFill: fill(mVal, max),
+    });
+  }
+  return out;
+}
 
 /** A player's identity facts for the glass card (numbers from the dataset). */
 export type ArenaIdentity = {
@@ -270,6 +422,11 @@ export function buildArenaModel(rows: readonly PlayerSeasonComp[]): ArenaModel {
       if (winner === "ronaldo") ronaldoRowWins += 1;
       else if (winner === "messi") messiRowWins += 1;
       const max = Math.max(rVal, mVal);
+      // P10-5: only the aggregate "League" sub-metric rows (League Goals /
+      // Assists / Titles) carry a by-league fan-out — read-only evidence, never
+      // tallied. Every other row is unchanged.
+      const splitMetric = LEAGUE_SPLIT_ROWS[row.labelKey];
+      const leagueSplit = splitMetric ? selectLeagueSplit(rows, splitMetric) : undefined;
       return {
         labelKey: row.labelKey,
         format: row.format,
@@ -280,6 +437,7 @@ export function buildArenaModel(rows: readonly PlayerSeasonComp[]): ArenaModel {
         winner,
         ronaldoFill: fill(rVal, max),
         messiFill: fill(mVal, max),
+        ...(leagueSplit && leagueSplit.length > 0 ? { leagueSplit } : {}),
       };
     });
 

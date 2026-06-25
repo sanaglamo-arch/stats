@@ -12,6 +12,7 @@ import {
   type ArenaCategory,
   type ArenaRow,
   type CategoryKey,
+  type LeagueSplitRow,
 } from "./arena-model";
 
 const FOCUS_RING =
@@ -195,33 +196,105 @@ function BreakdownRow({
           >
             {/* BOSS O1 — Messi value left, Ronaldo value right */}
             <ul className="flex flex-col gap-2.5 border-t border-[var(--color-border-glass)] px-3 py-3 sm:px-4">
-              {category.rows.map((row) => (
-                <li key={row.labelKey} className="grid grid-cols-[3rem_1fr_3rem] items-center gap-2 sm:grid-cols-[3.5rem_1fr_3.5rem] sm:gap-3">
-                  <span
-                    className="tabular text-right text-sm font-bold tabular-nums"
-                    style={{ color: showWinner && counted && row.winner === "messi" ? "var(--color-messi-bright)" : "var(--color-text-secondary)" }}
-                  >
-                    {formatArenaValue(row, row.messi)}
-                  </span>
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-[11px] font-medium text-[var(--color-text-secondary)]">
-                      {t[row.labelKey]}
-                    </span>
-                    <DualBar row={row} showWinner={showWinner && counted} winner={row.winner} thin />
-                  </div>
-                  <span
-                    className="tabular text-left text-sm font-bold tabular-nums"
-                    style={{ color: showWinner && counted && row.winner === "ronaldo" ? "var(--color-ronaldo-bright)" : "var(--color-text-secondary)" }}
-                  >
-                    {formatArenaValue(row, row.ronaldo)}
-                  </span>
-                </li>
-              ))}
+              {category.rows.map((row) =>
+                row.leagueSplit ? (
+                  // P10-5: the aggregate "League" sub-metric is REPLACED by a
+                  // labelled "By league" group (read-only evidence; the local
+                  // per-league markers are NOT tallied into the verdict).
+                  <ByLeagueGroup
+                    key={row.labelKey}
+                    row={row}
+                    showWinner={showWinner && counted}
+                  />
+                ) : (
+                  <SubMetricRow key={row.labelKey} row={row} showWinner={showWinner && counted} />
+                ),
+              )}
             </ul>
           </motion.div>
         ) : null}
       </AnimatePresence>
     </motion.li>
+  );
+}
+
+/**
+ * One expanded sub-metric row: Messi value left / Ronaldo value right (Inter 700
+ * .tabular), the small thin dual bar between them, label above the bar. `showWinner`
+ * here is the already-combined "show winner AND this category is counted" flag.
+ */
+function SubMetricRow({ row, showWinner }: { row: ArenaRow; showWinner: boolean }) {
+  const { t } = useI18n();
+  return (
+    <li className="grid grid-cols-[3rem_1fr_3rem] items-center gap-2 sm:grid-cols-[3.5rem_1fr_3.5rem] sm:gap-3">
+      <span
+        className="tabular text-right text-sm font-bold tabular-nums"
+        style={{ color: showWinner && row.winner === "messi" ? "var(--color-messi-bright)" : "var(--color-text-secondary)" }}
+      >
+        {formatArenaValue(row, row.messi)}
+      </span>
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-[11px] font-medium text-[var(--color-text-secondary)]">{t[row.labelKey]}</span>
+        <DualBar row={row} showWinner={showWinner} winner={row.winner} thin />
+      </div>
+      <span
+        className="tabular text-left text-sm font-bold tabular-nums"
+        style={{ color: showWinner && row.winner === "ronaldo" ? "var(--color-ronaldo-bright)" : "var(--color-text-secondary)" }}
+      >
+        {formatArenaValue(row, row.ronaldo)}
+      </span>
+    </li>
+  );
+}
+
+/**
+ * P10-5 — the "By league" group that REPLACES the single aggregate "League"
+ * sub-metric (League Goals / Assists / Titles). A static labelled group inside
+ * the already-open panel (NOT a second accordion): a small "By league" heading,
+ * then one row per named league, each styled exactly like a sub-metric row
+ * (Messi left / Ronaldo right, .tabular, thin dual bar) with a LOCAL per-league
+ * leader marker. Read-only evidence: these markers are tallied into NOTHING —
+ * they never change the category winner, the score, the verdict or `?cats=`.
+ */
+function ByLeagueGroup({ row, showWinner }: { row: ArenaRow; showWinner: boolean }) {
+  const { t } = useI18n();
+  const leagues = row.leagueSplit ?? [];
+  return (
+    <li className="flex flex-col gap-2.5">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-muted)]">
+        {t.arenaByLeague}
+      </span>
+      <ul className="flex flex-col gap-2.5">
+        {leagues.map((league) => (
+          <LeagueRow key={league.labelKey} league={league} showWinner={showWinner} />
+        ))}
+      </ul>
+    </li>
+  );
+}
+
+/** One named-league row inside the "By league" group — same styling as a sub-metric. */
+function LeagueRow({ league, showWinner }: { league: LeagueSplitRow; showWinner: boolean }) {
+  const { t } = useI18n();
+  return (
+    <li className="grid grid-cols-[3rem_1fr_3rem] items-center gap-2 sm:grid-cols-[3.5rem_1fr_3.5rem] sm:gap-3">
+      <span
+        className="tabular text-right text-sm font-bold tabular-nums"
+        style={{ color: showWinner && league.winner === "messi" ? "var(--color-messi-bright)" : "var(--color-text-secondary)" }}
+      >
+        {league.messi}
+      </span>
+      <div className="flex flex-col items-center gap-1">
+        <span className="text-[11px] font-medium text-[var(--color-text-secondary)]">{t[league.labelKey]}</span>
+        <DualBar row={league} showWinner={showWinner} winner={league.winner} thin />
+      </div>
+      <span
+        className="tabular text-left text-sm font-bold tabular-nums"
+        style={{ color: showWinner && league.winner === "ronaldo" ? "var(--color-ronaldo-bright)" : "var(--color-text-secondary)" }}
+      >
+        {league.ronaldo}
+      </span>
+    </li>
   );
 }
 
@@ -238,7 +311,8 @@ function DualBar({
   thin = false,
   winner = "tie",
 }: {
-  row: ArenaRow;
+  /** Only the bar fills are read here — accepts a sub-metric row or a league row. */
+  row: Pick<ArenaRow, "messiFill" | "ronaldoFill">;
   showWinner: boolean;
   thin?: boolean;
   /** The CATEGORY winner — drives the leader crown over the winning half. */
