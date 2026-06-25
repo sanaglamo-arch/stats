@@ -207,7 +207,7 @@ function BreakdownRow({
                     <span className="text-[11px] font-medium text-[var(--color-text-secondary)]">
                       {t[row.labelKey]}
                     </span>
-                    <DualBar row={row} showWinner={showWinner && counted} thin />
+                    <DualBar row={row} showWinner={showWinner && counted} winner={row.winner} thin />
                   </div>
                   <span
                     className="tabular text-left text-sm font-bold tabular-nums"
@@ -246,8 +246,13 @@ function DualBar({
 }) {
   const reduce = useReducedMotion();
 
-  const ronaldoWon = showWinner && row.winner === "ronaldo";
-  const messiWon = showWinner && row.winner === "messi";
+  // Colour emphasis follows the passed `winner` (the CATEGORY winner for the
+  // collapsed headline bar; the per-row winner for sub-metric bars) so the bar,
+  // the crown and the flanking values never disagree — e.g. a TIED category
+  // (World Cup) renders both bars neutral instead of greying a "loser" the
+  // headline metric happens to beat.
+  const ronaldoWon = showWinner && winner === "ronaldo";
+  const messiWon = showWinner && winner === "messi";
   const ronaldoLost = messiWon;
   const messiLost = ronaldoWon;
 
