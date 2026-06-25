@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { useReducedMotion } from "framer-motion";
 import { DURATION_MS, EASE } from "./tokens";
 
@@ -70,4 +70,87 @@ export function useCountUp(target: number, enabled: boolean): number {
   }, [active, target]);
 
   return active ? value : target;
+}
+
+/**
+ * IntersectionObserver gate — flips to `true` the first time `ref` scrolls into
+ * view, then stays true (it disconnects after the first hit). This is the shared
+ * "reveal" trigger for the whole motion layer (CountUp, AnimatedBar,
+ * AnimatedDelta) so they all fire on the same scroll-into-view contract.
+ *
+ * SSR / no-IO safe: returns `true` immediately when IntersectionObserver is
+ * unavailable, so content is never stuck at its pre-reveal state.
+ */
+export function useInView(
+  ref: RefObject<Element | null>,
+  { threshold = 0.25, rootMargin = "0px 0px -8% 0px" }: { threshold?: number; rootMargin?: string } = {},
+): boolean {
+  const [inView, setInView] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { threshold, rootMargin },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, threshold, rootMargin]);
+
+  return inView;
+}
+
+/**
+ * rAF count-up that animates from 0 → `target` ONCE, the first time `active`
+ * flips true (the scroll-reveal entrance). Unlike `useCountUp` (which tweens on
+ * every value change), this is a single fire-and-settle sweep for figures that
+ * "tick up" as they enter the viewport.
+ *
+ * Hard gates (identical honesty contract to `useCountUp`):
+ *  - `active === false` → returns `target` verbatim (pre-reveal shows nothing
+ *    animating; callers gate non-numeric «н/д»/«—» BEFORE this hook so they are
+ *    never tweened);
+ *  - `prefers-reduced-motion` → returns `target` instantly, no frames.
+ */
+export function useCountUpReveal(target: number, active: boolean): number {
+  const reduce = useReducedMotion();
+  const animate = active && !reduce;
+  const [value, setValue] = useState(target);
+  const startedRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!animate || startedRef.current) {
+      if (!animate) setValue(target);
+      return;
+    }
+    startedRef.current = true;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min((now - start) / DURATION_MS.countUp, 1);
+      const eased = cubicBezier(EASE.out, t);
+      setValue(target * eased);
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        setValue(target);
+      }
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [animate, target]);
+
+  return animate ? value : target;
 }

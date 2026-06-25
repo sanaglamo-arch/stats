@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n/provider";
-import { DURATION, EASE } from "@/lib/motion/tokens";
 import { PLAYER_META } from "@/components/card/player-meta";
 import { statLabel, competitionLabel } from "@/components/card/card-labels";
 import {
@@ -13,6 +11,7 @@ import {
   type CompetitionContext,
 } from "@/components/studio/competition-tabs";
 import { SegmentedControl, FOCUS_RING } from "@/components/studio/control-primitives";
+import { Reveal, StaggerGroup, StaggerItem, TabTransition, CountUp, AnimatedBar } from "@/components/motion";
 import { StatTable } from "./stat-table";
 import type {
   ClubCut,
@@ -38,28 +37,12 @@ const RONALDO_BRIGHT = "var(--color-ronaldo-bright)";
 
 type Cut = "seasons" | "clubs" | "types" | "totals";
 
-/** On-mount staggered reveal (transform+opacity only; no-op under reduced motion). */
-function Reveal({
-  children,
-  delay = 0,
-  className,
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={reduce ? false : { opacity: 0, y: 18 }}
-      animate={reduce ? undefined : { opacity: 1, y: 0 }}
-      transition={{ duration: DURATION.morph, ease: EASE.out, delay: reduce ? 0 : delay }}
-    >
-      {children}
-    </motion.div>
-  );
-}
+/**
+ * Metrics where "lower is better" (minutes-per-goal): a magnitude divergent bar
+ * would read backwards (longer = worse), so we show the numbers + leader accent
+ * only and skip the AnimatedBar. The leader colour/▲ still convey who's ahead.
+ */
+const NO_BAR_KEYS = new Set<string>(["minutesPerGoal"]);
 
 export function StatsBody({ model }: { model: StatsBodyModel }) {
   const { t, locale } = useI18n();
@@ -77,6 +60,14 @@ export function StatsBody({ model }: { model: StatsBodyModel }) {
     if (row.format === "percent") return `${(value * 100).toFixed(row.decimals)}%`;
     if (row.decimals > 0) return value.toFixed(row.decimals);
     return nf(value);
+  };
+
+  // Per-row live formatter for CountUp — formats the in-progress (fractional)
+  // value each frame so percent/decimal metrics never jump format mid-count.
+  const fmtLive = (row: MetricGridRow) => (n: number): string => {
+    if (row.format === "percent") return `${(n * 100).toFixed(row.decimals)}%`;
+    if (row.decimals > 0) return n.toFixed(row.decimals);
+    return nf(Math.round(n));
   };
 
   const visibleMetrics = model.metricGrid.filter(
@@ -131,9 +122,9 @@ export function StatsBody({ model }: { model: StatsBodyModel }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-x-10 gap-y-0 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-x-10 gap-y-1 sm:grid-cols-2">
             {visibleMetrics.map((row) => (
-              <MetricRow key={row.key} row={row} t={t} formatVal={formatVal} />
+              <MetricRow key={row.key} row={row} t={t} formatVal={formatVal} fmtLive={fmtLive} />
             ))}
           </div>
         </div>
@@ -186,59 +177,63 @@ export function StatsBody({ model }: { model: StatsBodyModel }) {
             })}
           </div>
 
-          {cut === "seasons" && (
-            <StatTable
-              table={table}
-              t={t}
-              locale={locale}
-              messiName={messiName}
-              ronaldoName={ronaldoName}
-            />
-          )}
+          {/* Smooth opacity crossfade as the cut/context changes — sticky table
+              header stays anchored (TabTransition is transform-free). */}
+          <TabTransition id={`${cut}:${context}`}>
+            {cut === "seasons" && (
+              <StatTable
+                table={table}
+                t={t}
+                locale={locale}
+                messiName={messiName}
+                ronaldoName={ronaldoName}
+              />
+            )}
 
-          {cut === "clubs" && (
-            <div className="grid gap-5 lg:grid-cols-2">
-              <ClubTable
-                title={messiName}
-                accent={MESSI_BRIGHT}
-                clubs={model.clubs.messi}
+            {cut === "clubs" && (
+              <div className="grid gap-5 lg:grid-cols-2">
+                <ClubTable
+                  title={messiName}
+                  accent={MESSI_BRIGHT}
+                  clubs={model.clubs.messi}
+                  t={t}
+                  nf={nf}
+                />
+                <ClubTable
+                  title={ronaldoName}
+                  accent={RONALDO_BRIGHT}
+                  clubs={model.clubs.ronaldo}
+                  t={t}
+                  nf={nf}
+                />
+                <p className="text-xs text-[var(--color-text-muted)] lg:col-span-2">
+                  {t.statsClubsNote}
+                </p>
+              </div>
+            )}
+
+            {cut === "types" && (
+              <TypeTable
+                byType={model.byType}
                 t={t}
                 nf={nf}
+                messiName={messiName}
+                ronaldoName={ronaldoName}
               />
-              <ClubTable
-                title={ronaldoName}
-                accent={RONALDO_BRIGHT}
-                clubs={model.clubs.ronaldo}
-                t={t}
-                nf={nf}
-              />
-              <p className="text-xs text-[var(--color-text-muted)] lg:col-span-2">
-                {t.statsClubsNote}
-              </p>
-            </div>
-          )}
+            )}
 
-          {cut === "types" && (
-            <TypeTable
-              byType={model.byType}
-              t={t}
-              nf={nf}
-              messiName={messiName}
-              ronaldoName={ronaldoName}
-            />
-          )}
-
-          {cut === "totals" && (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <TotalStat label={t.statGoals} m={table.messiTotals.goals} r={table.ronaldoTotals.goals} nf={nf} />
-              <TotalStat label={t.statAssists} m={table.messiTotals.assists} r={table.ronaldoTotals.assists} nf={nf} />
-              <TotalStat label={t.statsColGA} m={table.messiTotals.ga} r={table.ronaldoTotals.ga} nf={nf} />
-              <TotalStat label={t.profileColMatches} m={table.messiTotals.matches} r={table.ronaldoTotals.matches} nf={nf} />
-              <p className="col-span-2 text-xs text-[var(--color-text-muted)] sm:col-span-4">
-                {t.statsTotalsNote}
-              </p>
-            </div>
-          )}
+            {cut === "totals" && (
+              <StaggerGroup className="grid grid-cols-2 gap-3 sm:grid-cols-4" step={0.06}>
+                <TotalStat label={t.statGoals} m={table.messiTotals.goals} r={table.ronaldoTotals.goals} nf={nf} />
+                <TotalStat label={t.statAssists} m={table.messiTotals.assists} r={table.ronaldoTotals.assists} nf={nf} />
+                <TotalStat label={t.statsColGA} m={table.messiTotals.ga} r={table.ronaldoTotals.ga} nf={nf} />
+                <TotalStat label={t.profileColMatches} m={table.messiTotals.matches} r={table.ronaldoTotals.matches} nf={nf} />
+                <p className="col-span-2 text-xs text-[var(--color-text-muted)] sm:col-span-4">
+                  {t.statsTotalsNote}
+                </p>
+              </StaggerGroup>
+            )}
+          </TabTransition>
         </div>
       </Reveal>
 
@@ -247,7 +242,7 @@ export function StatsBody({ model }: { model: StatsBodyModel }) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Link
             href="/compare"
-            className={`group glass-panel flex flex-col justify-between gap-4 p-6 transition-transform duration-200 hover:-translate-y-px sm:col-span-2 ${FOCUS_RING}`}
+            className={`group lift-hover glass-panel flex flex-col justify-between gap-4 p-6 sm:col-span-2 ${FOCUS_RING}`}
             style={{
               background:
                 "linear-gradient(120deg, color-mix(in srgb, var(--color-messi) 14%, transparent), color-mix(in srgb, var(--color-ronaldo) 14%, transparent))",
@@ -277,15 +272,22 @@ export function StatsBody({ model }: { model: StatsBodyModel }) {
   );
 }
 
-/** One head-to-head career metric row: Messi (right) · label · Ronaldo (left). */
+/**
+ * One head-to-head career metric row: Messi (left, blue) · label · Ronaldo
+ * (right, red), with a divergent AnimatedBar beneath for comparable rows. The
+ * leader's value tints + carries a popping ▲; «н/д» values render static (never
+ * counted up). Hover floats the row and re-pops the ▲ (`.h2h-row`).
+ */
 function MetricRow({
   row,
   t,
   formatVal,
+  fmtLive,
 }: {
   row: MetricGridRow;
   t: ReturnType<typeof useI18n>["t"];
   formatVal: (row: MetricGridRow, value: number | null) => string;
+  fmtLive: (row: MetricGridRow) => (n: number) => string;
 }) {
   const messiLeads = row.leader === "messi";
   const ronaldoLeads = row.leader === "ronaldo";
@@ -298,30 +300,60 @@ function MetricRow({
           ? t.illustrative
           : null;
 
+  const showBar = row.messi !== null && row.ronaldo !== null && !NO_BAR_KEYS.has(row.key);
+  const format = fmtLive(row);
+
   return (
-    <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 border-b border-[var(--color-border-glass)]/50 py-2.5">
-      <span
-        className="tabular text-right text-lg font-extrabold sm:text-xl"
-        style={messiLeads ? { color: MESSI_BRIGHT } : undefined}
-      >
-        {formatVal(row, row.messi)}
-        {messiLeads && <span aria-hidden className="ml-1 align-super text-[0.6em]">▲</span>}
-      </span>
-      <span className="flex items-center gap-1.5 whitespace-nowrap text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)]">
-        {statLabel(t, row.key)}
-        {badge && (
-          <span className="rounded-[4px] border border-[color-mix(in_srgb,var(--color-gold)_30%,transparent)] bg-[color-mix(in_srgb,var(--color-gold)_12%,transparent)] px-1.5 py-px text-[0.58rem] font-bold normal-case tracking-normal text-[var(--color-gold)]">
-            {badge}
-          </span>
-        )}
-      </span>
-      <span
-        className="tabular text-left text-lg font-extrabold sm:text-xl"
-        style={ronaldoLeads ? { color: RONALDO_BRIGHT } : undefined}
-      >
-        {ronaldoLeads && <span aria-hidden className="mr-1 align-super text-[0.6em]">▲</span>}
-        {formatVal(row, row.ronaldo)}
-      </span>
+    <div className="h2h-row border-b border-[var(--color-border-glass)]/50 px-2 py-2.5">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <span
+          className="text-right text-lg font-extrabold sm:text-xl"
+          style={messiLeads ? { color: MESSI_BRIGHT } : undefined}
+        >
+          {/* Honesty: «н/д» renders static; only real numbers count up. */}
+          {row.messi === null ? (
+            <span className="tabular text-[var(--color-text-muted)]">{formatVal(row, null)}</span>
+          ) : (
+            <CountUp value={row.messi} format={format} />
+          )}
+          {messiLeads && (
+            <span aria-hidden className="leader-mark ml-1 align-super text-[0.6em]">
+              ▲
+            </span>
+          )}
+        </span>
+        <span className="flex items-center gap-1.5 whitespace-nowrap text-[0.66rem] font-bold uppercase tracking-[0.08em] text-[var(--color-text-muted)]">
+          {statLabel(t, row.key)}
+          {badge && (
+            <span className="rounded-[4px] border border-[color-mix(in_srgb,var(--color-gold)_30%,transparent)] bg-[color-mix(in_srgb,var(--color-gold)_12%,transparent)] px-1.5 py-px text-[0.58rem] font-bold normal-case tracking-normal text-[var(--color-gold)]">
+              {badge}
+            </span>
+          )}
+        </span>
+        <span
+          className="text-left text-lg font-extrabold sm:text-xl"
+          style={ronaldoLeads ? { color: RONALDO_BRIGHT } : undefined}
+        >
+          {ronaldoLeads && (
+            <span aria-hidden className="leader-mark mr-1 align-super text-[0.6em]">
+              ▲
+            </span>
+          )}
+          {row.ronaldo === null ? (
+            <span className="tabular text-[var(--color-text-muted)]">{formatVal(row, null)}</span>
+          ) : (
+            <CountUp value={row.ronaldo} format={format} />
+          )}
+        </span>
+      </div>
+      {showBar && (
+        <AnimatedBar
+          messi={row.messi as number}
+          ronaldo={row.ronaldo as number}
+          leader={row.leader}
+          className="mt-2"
+        />
+      )}
     </div>
   );
 }
@@ -361,7 +393,7 @@ function ClubTable({
           {clubs.map((c) => (
             <tr
               key={c.club}
-              className="border-t border-[var(--color-border-glass)]/60"
+              className="season-row border-t border-[var(--color-border-glass)]/60"
             >
               <th scope="row" className="px-4 py-2 text-left font-semibold">
                 <span className="inline-flex items-center gap-2">
@@ -374,7 +406,9 @@ function ClubTable({
                 </span>
               </th>
               <td className="px-3 py-2 text-right text-[var(--color-text-secondary)]">{nf(c.matches)}</td>
-              <td className="px-3 py-2 text-right font-black" style={{ color: accent }}>{nf(c.goals)}</td>
+              <td className="px-3 py-2 text-right font-black" style={{ color: accent }}>
+                <CountUp value={c.goals} format={(n) => nf(Math.round(n))} />
+              </td>
               <td className="px-3 py-2 text-right">{nf(c.assists)}</td>
             </tr>
           ))}
@@ -424,15 +458,19 @@ function TypeTable({
         </thead>
         <tbody>
           {byType.map((row) => (
-            <tr key={row.type} className="border-t border-[var(--color-border-glass)]/60">
+            <tr key={row.type} className="season-row border-t border-[var(--color-border-glass)]/60">
               <th scope="row" className="px-4 py-2.5 text-left font-[family-name:var(--font-display)] text-sm font-bold uppercase tracking-[0.04em]">
                 {competitionLabel(t, row.type)}
               </th>
               <td className="px-3 py-2.5 text-right text-[var(--color-text-secondary)]">{nf(row.messi.matches)}</td>
-              <td className="px-3 py-2.5 text-right font-black text-[var(--color-messi-bright)]">{nf(row.messi.goals)}</td>
+              <td className="px-3 py-2.5 text-right font-black text-[var(--color-messi-bright)]">
+                <CountUp value={row.messi.goals} format={(n) => nf(Math.round(n))} />
+              </td>
               <td className="px-3 py-2.5 text-right">{nf(row.messi.assists)}</td>
               <td className="px-3 py-2.5 text-right text-[var(--color-text-secondary)]">{nf(row.ronaldo.matches)}</td>
-              <td className="px-3 py-2.5 text-right font-black text-[var(--color-ronaldo-bright)]">{nf(row.ronaldo.goals)}</td>
+              <td className="px-3 py-2.5 text-right font-black text-[var(--color-ronaldo-bright)]">
+                <CountUp value={row.ronaldo.goals} format={(n) => nf(Math.round(n))} />
+              </td>
               <td className="px-3 py-2.5 text-right">{nf(row.ronaldo.assists)}</td>
             </tr>
           ))}
@@ -456,26 +494,27 @@ function TotalStat({
 }) {
   const messiLeads = m > r;
   const ronaldoLeads = r > m;
+  const format = (n: number) => nf(Math.round(n));
   return (
-    <div className="glass-panel flex flex-col gap-2 p-4">
+    <StaggerItem className="glass-panel lift-hover flex flex-col gap-2 p-4">
       <span className="text-[0.62rem] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-muted)]">
         {label}
       </span>
       <div className="flex items-baseline justify-between gap-2">
         <span
-          className="tabular font-[family-name:var(--font-display)] text-2xl font-black"
+          className="font-[family-name:var(--font-display)] text-2xl font-black"
           style={{ color: messiLeads ? MESSI_BRIGHT : "var(--color-text-secondary)" }}
         >
-          {nf(m)}
+          <CountUp value={m} format={format} />
         </span>
         <span
-          className="tabular font-[family-name:var(--font-display)] text-2xl font-black"
+          className="font-[family-name:var(--font-display)] text-2xl font-black"
           style={{ color: ronaldoLeads ? RONALDO_BRIGHT : "var(--color-text-secondary)" }}
         >
-          {nf(r)}
+          <CountUp value={r} format={format} />
         </span>
       </div>
-    </div>
+    </StaggerItem>
   );
 }
 
@@ -493,7 +532,7 @@ function ProfileEntry({
   return (
     <Link
       href={`/player/${id}`}
-      className={`group glass-panel flex flex-col justify-between gap-4 p-6 transition-transform duration-200 hover:-translate-y-px ${FOCUS_RING}`}
+      className={`group lift-hover glass-panel flex flex-col justify-between gap-4 p-6 ${FOCUS_RING}`}
     >
       <span
         className="font-[family-name:var(--font-display)] text-2xl font-black uppercase tracking-tight"

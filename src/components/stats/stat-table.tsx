@@ -1,5 +1,8 @@
 "use client";
 
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { DURATION, EASE } from "@/lib/motion/tokens";
+import { AnimatedDelta } from "@/components/motion/animated-delta";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/dictionaries";
 import type { ContextTable, SeasonSide, SideTotals } from "./stats-model";
@@ -23,11 +26,17 @@ function fmt(n: number, locale: Locale): string {
   return n.toLocaleString(locale === "ru" ? "ru-RU" : "en-US");
 }
 
-function deltaText(delta: number | null): string {
-  if (delta === null) return "·";
-  if (delta > 0) return `+${delta}`;
-  return String(delta);
-}
+/**
+ * Season rows fade-cascade into view (opacity-only — NEVER a transform, which
+ * would re-base the sticky season-label cell and break horizontal sticky). The
+ * stagger is driven by the `<tbody>` container variants.
+ */
+const ROW_STAGGER = 0.035;
+const tbodyVariants: Variants = { hidden: {}, show: { transition: { staggerChildren: ROW_STAGGER } } };
+const rowVariants: Variants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { duration: DURATION.base, ease: EASE.out } },
+};
 
 export function StatTable({
   table,
@@ -42,6 +51,7 @@ export function StatTable({
   messiName: string;
   ronaldoName: string;
 }) {
+  const reduce = useReducedMotion();
   const totalsRow = (totals: SideTotals) => (
     <>
       <td className="tabular px-3 py-3 text-center">{totals.goals}</td>
@@ -114,14 +124,20 @@ export function StatTable({
             )}
           </tr>
         </thead>
-        <tbody>
+        <motion.tbody
+          initial={reduce ? false : "hidden"}
+          whileInView={reduce ? undefined : "show"}
+          viewport={reduce ? undefined : { once: true, margin: "0px 0px -8% 0px" }}
+          variants={reduce ? undefined : tbodyVariants}
+        >
           {table.rows.map((row) => {
             const messiLeads = row.delta !== null && row.delta > 0;
             const ronaldoLeads = row.delta !== null && row.delta < 0;
             return (
-              <tr
+              <motion.tr
                 key={row.season}
-                className="border-b border-[var(--color-border-glass)]/60 last:border-0 transition-colors duration-150 hover:bg-[var(--color-surface)]"
+                variants={reduce ? undefined : rowVariants}
+                className="season-row border-b border-[var(--color-border-glass)]/60 last:border-0"
               >
                 <th
                   scope="row"
@@ -136,16 +152,8 @@ export function StatTable({
                   didNotPlay={t.statsDidNotPlay}
                   locale={locale}
                 />
-                <td
-                  className={`tabular px-3 py-2.5 text-center text-xs font-black ${
-                    messiLeads
-                      ? HL_MESSI
-                      : ronaldoLeads
-                        ? HL_RONALDO
-                        : "text-[var(--color-text-muted)]"
-                  }`}
-                >
-                  {deltaText(row.delta)}
+                <td className="px-3 py-2.5 text-center text-xs">
+                  <AnimatedDelta delta={row.delta} />
                 </td>
                 <SideCellsTinted
                   side={row.ronaldo}
@@ -154,10 +162,10 @@ export function StatTable({
                   didNotPlay={t.statsDidNotPlay}
                   locale={locale}
                 />
-              </tr>
+              </motion.tr>
             );
           })}
-        </tbody>
+        </motion.tbody>
         <tfoot>
           <tr className="border-t-2 border-[color-mix(in_srgb,var(--color-gold)_40%,transparent)] bg-[color-mix(in_srgb,var(--color-gold)_7%,transparent)] font-black">
             <th
@@ -168,12 +176,8 @@ export function StatTable({
               {t.statsCareerRow}
             </th>
             {totalsRow(table.messiTotals)}
-            <td
-              className={`tabular px-3 py-3 text-center text-xs ${
-                table.delta > 0 ? HL_MESSI : table.delta < 0 ? HL_RONALDO : "text-[var(--color-text-muted)]"
-              }`}
-            >
-              {deltaText(table.delta)}
+            <td className="px-3 py-3 text-center text-xs">
+              <AnimatedDelta delta={table.delta} />
             </td>
             {totalsRow(table.ronaldoTotals)}
           </tr>
