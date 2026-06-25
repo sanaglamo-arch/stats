@@ -16,9 +16,12 @@ import { AppFooter } from "@/components/shell/app-footer";
  */
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isRenderRoute = pathname?.startsWith("/render");
+  // /render/* is the headless PNG target; /wireframe is the Phase-10 styleless
+  // UX skeleton — both must render bare (no brand chrome) so the page is exactly
+  // what it claims to be.
+  const isBareRoute = pathname?.startsWith("/render") || pathname?.startsWith("/wireframe");
 
-  if (isRenderRoute) {
+  if (isBareRoute) {
     return <>{children}</>;
   }
 
