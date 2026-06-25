@@ -94,39 +94,43 @@ async function main(): Promise<void> {
   });
   const page = await desktop.newPage();
 
-  // 1) GOAT Arena home — hero cinematic entrance, then the scrolled arena.
+  // Phase-10 single-screen IA: `/` is the whole Verdict Arena; /compare + /verdict
+  // are merged in (they 307-redirect); /cards is demoted off-path; /player/[id]
+  // is off-path depth; Share is a sheet over `/`.
+
+  // 1) GOAT Arena home — hero cinematic entrance (clash + score band).
   await page.goto(BASE_URL + "/", { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   await sleep(1700);
   await page.screenshot({ path: join(PREVIEW, "home-desktop-1366.png") });
 
-  // Momentum-scroll into the player renders + divergent comparison bars.
-  await wheelTo(page, 820);
+  // Momentum-scroll into the clash + verdict + category breakdown.
+  await wheelTo(page, 860);
   await sleep(900);
-  // Switch the live category context (tab) to show the bars re-animate.
-  const assistsTab = page.getByRole("tab", { name: /^assists$/i });
-  if (await assistsTab.count()) {
-    await assistsTab.first().click();
-    await sleep(1100);
-  }
   await page.screenshot({ path: join(PREVIEW, "home-desktop-arena.png") });
 
-  // Scroll on to the verdict panel + share CTA (parallax / reveal).
-  await wheelTo(page, 900);
-  await sleep(900);
   // Full-page arena capture (all sections revealed).
   await revealAll(page);
   await page.screenshot({ path: join(PREVIEW, "home-desktop-fullpage.png"), fullPage: true });
 
-  // 2) Guided flow screens (desktop, full page).
-  await fullShot(page, "/compare", "compare-desktop.png");
-  await fullShot(page, "/verdict", "verdict-desktop.png");
-  await fullShot(page, "/cards", "cards-desktop.png");
+  // 2) Expand a category to reveal the inline "By league" split (p10-5).
+  const goalsRow = page.getByRole("button", { name: /show goals/i });
+  if (await goalsRow.count()) {
+    await goalsRow.first().scrollIntoViewIfNeeded();
+    await goalsRow.first().click();
+    await sleep(900);
+    await revealAll(page);
+    await page.screenshot({ path: join(PREVIEW, "arena-leagues-desktop.png"), fullPage: true });
+  }
 
-  // 3) Share modal (opened from the verdict's Share action).
-  await page.goto(BASE_URL + "/verdict", { waitUntil: "networkidle" });
+  // 3) Off-path screens: demoted /cards + a player profile.
+  await fullShot(page, "/cards", "cards-desktop.png");
+  await fullShot(page, "/player/messi", "player-messi-desktop.png");
+
+  // 4) Share sheet — opened from the single "Share Verdict" CTA on `/`.
+  await page.goto(BASE_URL + "/", { waitUntil: "networkidle" });
   await sleep(900);
-  const share = page.getByRole("button", { name: /^share$|поделиться/i });
+  const share = page.getByRole("button", { name: /share verdict|поделиться вердиктом/i });
   if (await share.count()) {
     await share.first().click();
     await sleep(1200);
@@ -143,7 +147,7 @@ async function main(): Promise<void> {
   }
   rmSync(VIDEO_TMP, { recursive: true, force: true });
 
-  // ── Mobile: true 390px, every screen of the flow ──
+  // ── Mobile: true 390px ──
   const mobile = await browser.newContext({
     viewport: { width: 390, height: 844 },
     deviceScaleFactor: 2,
@@ -154,14 +158,23 @@ async function main(): Promise<void> {
   const mpage = await mobile.newPage();
 
   await fullShot(mpage, "/", "home-mobile-390.png");
-  await fullShot(mpage, "/compare", "compare-mobile-390.png");
-  await fullShot(mpage, "/verdict", "verdict-mobile-390.png");
+
+  // Mobile by-league split (expand Goals).
+  const mGoals = mpage.getByRole("button", { name: /show goals/i });
+  if (await mGoals.count()) {
+    await mGoals.first().scrollIntoViewIfNeeded();
+    await mGoals.first().click();
+    await sleep(800);
+    await revealAll(mpage);
+    await mpage.screenshot({ path: join(PREVIEW, "arena-leagues-mobile-390.png"), fullPage: true });
+  }
+
   await fullShot(mpage, "/cards", "cards-mobile-390.png");
 
-  // Mobile share modal (bottom-sheet).
-  await mpage.goto(BASE_URL + "/verdict", { waitUntil: "networkidle" });
+  // Mobile share bottom-sheet.
+  await mpage.goto(BASE_URL + "/", { waitUntil: "networkidle" });
   await sleep(900);
-  const mShare = mpage.getByRole("button", { name: /^share$|поделиться/i });
+  const mShare = mpage.getByRole("button", { name: /share verdict|поделиться вердиктом/i });
   if (await mShare.count()) {
     await mShare.first().click();
     await sleep(1300);
