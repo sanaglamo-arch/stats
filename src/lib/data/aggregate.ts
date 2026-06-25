@@ -127,6 +127,10 @@ export type AggregateTotals = {
   starts: number;
   minutes: number;
   goals: number; // already penalty-adjusted per options (slice 4)
+  /** RAW goals (penalty-inclusive) scored only in rows that carry xG (2014+), so
+   * xG-performance compares goals and xG over the SAME slice — never all-time
+   * goals − modern-only xG. 0 when the slice has no xG rows. */
+  modernGoals: number;
   penaltyGoals: number;
   freekickGoals: number;
   assists: number;
@@ -169,6 +173,7 @@ export function aggregate(
     starts: 0,
     minutes: 0,
     goals: 0,
+    modernGoals: 0,
     penaltyGoals: 0,
     freekickGoals: 0,
     assists: 0,
@@ -211,6 +216,7 @@ export function aggregate(
     if (r.xg !== null) {
       xgSum += r.xg;
       xgCount += 1;
+      totals.modernGoals += r.goals; // same (modern) slice as xG, penalty-inclusive
     }
     if (r.xa !== null) {
       xaSum += r.xa;
@@ -262,6 +268,15 @@ export type DerivedMetrics = {
   /** Null when xG is unavailable for the selection (pre-2014). */
   xgPer90: number | null;
   xaPer90: number | null;
+  /**
+   * Goals minus xG (finishing over-/under-performance). MODERN ONLY: null when
+   * xG is unavailable (pre-2014) so the UI shows «н/д», never a fake number.
+   */
+  xgPerformance: number | null;
+  /** Penalty goals / goals, as a fraction (0..1); 0 when no goals. */
+  penaltyPct: number;
+  /** Starts / matches, as a fraction (0..1); 0 when no matches. */
+  startShare: number;
 };
 
 export function deriveMetrics(totals: AggregateTotals): DerivedMetrics {
@@ -279,6 +294,9 @@ export function deriveMetrics(totals: AggregateTotals): DerivedMetrics {
     minutesPerGoal: totals.goals > 0 ? round1(totals.minutes / totals.goals) : 0,
     xgPer90: totals.xg !== null ? per90(totals.xg) : null,
     xaPer90: totals.xa !== null ? per90(totals.xa) : null,
+    xgPerformance: totals.xg !== null ? round1(totals.modernGoals - totals.xg) : null,
+    penaltyPct: totals.goals > 0 ? round2(totals.penaltyGoals / totals.goals) : 0,
+    startShare: totals.matches > 0 ? round2(totals.starts / totals.matches) : 0,
   };
 }
 
@@ -328,6 +346,9 @@ export type MetricKey =
   | "xa"
   | "xgPer90"
   | "xaPer90"
+  | "xgPerformance"
+  | "penaltyPct"
+  | "startShare"
   | "trophies"
   | "ballonDor"
   | "hatTricks"
@@ -374,6 +395,9 @@ export const METRIC_CATALOG: Record<MetricKey, MetricDef> = {
   xa: { key: "xa", group: "creation", labelKey: "statXa", icon: "xa", decimals: 1, higherIsBetter: true, format: "number", definition: "Expected assists (xA); available for 2014+ seasons only.", availability: "modern" },
   xgPer90: { key: "xgPer90", group: "attack", labelKey: "statXgPer90", icon: "xgPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Expected goals per 90 minutes; 2014+ seasons only.", availability: "modern" },
   xaPer90: { key: "xaPer90", group: "creation", labelKey: "statXaPer90", icon: "xaPer90", decimals: 2, higherIsBetter: true, format: "number", definition: "Expected assists per 90 minutes; 2014+ seasons only.", availability: "modern" },
+  xgPerformance: { key: "xgPerformance", group: "attack", labelKey: "statXgPerformance", icon: "xgPerformance", decimals: 1, higherIsBetter: true, format: "number", definition: "Goals minus expected goals (finishing over-/under-performance); 2014+ seasons only.", availability: "modern" },
+  penaltyPct: { key: "penaltyPct", group: "attack", labelKey: "statPenaltyPct", icon: "penaltyPct", decimals: 0, higherIsBetter: true, format: "percent", definition: "Share of goals scored from penalties (neutral indicator).", availability: "always" },
+  startShare: { key: "startShare", group: "efficiency", labelKey: "statStartShare", icon: "startShare", decimals: 0, higherIsBetter: true, format: "percent", definition: "Share of appearances that were starts (starts divided by matches).", availability: "always" },
   trophies: { key: "trophies", group: "trophies", labelKey: "statTrophies", icon: "trophies", decimals: 0, higherIsBetter: true, format: "count", definition: "Team trophies won in the slice (each season+trophy counts once).", availability: "always" },
   ballonDor: { key: "ballonDor", group: "trophies", labelKey: "statBallonDor", icon: "ballonDor", decimals: 0, higherIsBetter: true, format: "count", definition: "Ballon d'Or wins in the slice (distinct seasons).", availability: "always" },
   hatTricks: { key: "hatTricks", group: "attack", labelKey: "statHatTricks", icon: "hatTricks", decimals: 0, higherIsBetter: true, format: "count", definition: "Hat-tricks. ILLUSTRATIVE placeholder — not real data.", availability: "illustrative" },
@@ -471,6 +495,12 @@ export function metricValue(
       return derived.xgPer90;
     case "xaPer90":
       return derived.xaPer90;
+    case "xgPerformance":
+      return derived.xgPerformance;
+    case "penaltyPct":
+      return derived.penaltyPct;
+    case "startShare":
+      return derived.startShare;
     case "trophies":
       return totals.trophyCount;
     case "ballonDor":

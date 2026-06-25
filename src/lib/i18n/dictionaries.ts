@@ -311,6 +311,9 @@ const en = {
   statHatTricks: "Hat-tricks",
   statYellowCards: "Yellow cards",
   statRedCards: "Red cards",
+  statXgPerformance: "xG performance",
+  statPenaltyPct: "Penalty share",
+  statStartShare: "Start share",
 
   // Insights section (P6-9) — wraps the Phase 6 visualizations
   insightsKicker: "Deep dive",
@@ -683,6 +686,9 @@ const ru: Dictionary = {
   statHatTricks: "Хет-трики",
   statYellowCards: "Жёлтые карточки",
   statRedCards: "Красные карточки",
+  statXgPerformance: "xG-перформанс",
+  statPenaltyPct: "Доля пенальти",
+  statStartShare: "Доля стартов",
 
   insightsKicker: "Подробнее",
   insightsTitle: "Полная картина",

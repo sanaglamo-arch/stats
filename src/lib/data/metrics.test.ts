@@ -3,10 +3,37 @@ import {
   DEFAULT_METRICS,
   METRIC_CATALOG,
   METRIC_KEYS,
+  deriveMetrics,
+  type AggregateTotals,
   type MetricKey,
 } from "./aggregate";
 import { dictionaries } from "@/lib/i18n/dictionaries";
 import { STAT_ICONS } from "@/components/card/card-labels";
+
+function totals(overrides: Partial<AggregateTotals>): AggregateTotals {
+  return {
+    matches: 0,
+    starts: 0,
+    minutes: 0,
+    goals: 0,
+    modernGoals: 0,
+    penaltyGoals: 0,
+    freekickGoals: 0,
+    assists: 0,
+    shots: 0,
+    shotsOnTarget: 0,
+    xg: null,
+    xa: null,
+    yellowCards: 0,
+    redCards: 0,
+    hatTricks: 0,
+    trophies: [],
+    trophyCount: 0,
+    individualAwards: [],
+    ballonDor: 0,
+    ...overrides,
+  };
+}
 
 describe("METRIC_CATALOG (P6-1)", () => {
   it("has a self-consistent definition for every catalog key", () => {
@@ -63,5 +90,45 @@ describe("METRIC_CATALOG (P6-1)", () => {
       expect(METRIC_CATALOG[key].availability).toBe("modern");
     }
     expect(METRIC_CATALOG.hatTricks.availability).toBe("illustrative");
+  });
+});
+
+describe("derived metrics p11-3a (xgPerformance / penaltyPct / startShare)", () => {
+  it("xgPerformance = modernGoals − xg (same slice) when xG is present", () => {
+    // all-time goals may exceed modern goals; xG-performance uses the modern slice only
+    const d = deriveMetrics(totals({ goals: 50, modernGoals: 30, xg: 24.4 }));
+    expect(d.xgPerformance).toBeCloseTo(5.6, 5);
+  });
+
+  it("xgPerformance is null when xG is unavailable (pre-2014)", () => {
+    const d = deriveMetrics(totals({ goals: 30, xg: null }));
+    expect(d.xgPerformance).toBeNull();
+  });
+
+  it("penaltyPct = penaltyGoals / goals (0 when no goals)", () => {
+    expect(deriveMetrics(totals({ goals: 20, penaltyGoals: 5 })).penaltyPct).toBe(0.25);
+    expect(deriveMetrics(totals({ goals: 0, penaltyGoals: 0 })).penaltyPct).toBe(0);
+  });
+
+  it("startShare = starts / matches (0 when no matches)", () => {
+    expect(deriveMetrics(totals({ matches: 40, starts: 30 })).startShare).toBe(0.75);
+    expect(deriveMetrics(totals({ matches: 0, starts: 0 })).startShare).toBe(0);
+  });
+
+  it("all three are in METRIC_CATALOG with an icon + en/ru labels", () => {
+    const keys: MetricKey[] = ["xgPerformance", "penaltyPct", "startShare"];
+    for (const key of keys) {
+      expect(METRIC_KEYS).toContain(key);
+      const def = METRIC_CATALOG[key];
+      expect(def.key).toBe(key);
+      expect(STAT_ICONS[key]).toBeDefined();
+      expect(dictionaries.en[def.labelKey]).toBeTruthy();
+      expect(dictionaries.ru[def.labelKey]).toBeTruthy();
+    }
+    expect(METRIC_CATALOG.xgPerformance.availability).toBe("modern");
+    expect(METRIC_CATALOG.penaltyPct.availability).toBe("always");
+    expect(METRIC_CATALOG.startShare.availability).toBe("always");
+    // not added to the default card set (byte-identical guarantee)
+    for (const key of keys) expect(DEFAULT_METRICS).not.toContain(key);
   });
 });
