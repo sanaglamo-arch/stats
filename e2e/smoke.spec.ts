@@ -1,12 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 /**
- * Smoke: the new HOME ARENA (P9-2) renders end-to-end. Asserts the CompareGOATs
- * brand chrome, both players' identity cards, the category tablist + a live
- * comparison/verdict, the share modal, and the RU/EN toggle — all via resilient
- * role/text selectors (no brittle class/DOM coupling).
+ * Smoke: the Phase-10 VERDICT ARENA (`/`) — the whole product on one screen.
+ * Asserts the brand wordmark, the arena H1, both players present, the inline
+ * category breakdown, the verdict score band, the single Share CTA + sheet, and
+ * the RU/EN toggle — all via resilient role/text selectors (no DOM coupling).
  */
-test("home arena renders the brand, both players, category tabs, verdict and share", async ({
+test("verdict arena renders the brand, both players, breakdown, score and share", async ({
   page,
 }) => {
   await page.goto("/");
@@ -18,39 +18,34 @@ test("home arena renders the brand, both players, category tabs, verdict and sha
   const heading = page.getByRole("heading", { level: 1 });
   await expect(heading).toContainText(/ARENA/i);
 
-  // Both players' identity cards (their names render as headings).
-  await expect(page.getByRole("heading", { name: "Cristiano Ronaldo" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Lionel Messi" })).toBeVisible();
+  // Both players present on the clash (names appear in the identity chips / score).
+  await expect(page.getByText(/Cristiano Ronaldo/i).first()).toBeVisible();
+  await expect(page.getByText(/Lionel Messi/i).first()).toBeVisible();
 
-  // Category tablist with selectable tabs (a real WAI-ARIA tablist).
-  const tablist = page.getByRole("tablist");
-  await expect(tablist).toBeVisible();
-  const goalsTab = page.getByRole("tab", { name: /Goals|Голы/i });
-  await expect(goalsTab).toBeVisible();
-  // Selecting a different category swaps the live comparison panel.
-  const assistsTab = page.getByRole("tab", { name: /Assists|Передачи/i });
-  await assistsTab.click();
-  await expect(assistsTab).toHaveAttribute("aria-selected", "true");
+  // The inline category breakdown with per-category count checkboxes.
+  await expect(page.getByText(/category breakdown|разбор по категориям/i).first()).toBeVisible();
+  const checkboxes = page.getByRole("checkbox");
+  await expect(checkboxes.first()).toBeVisible();
+  expect(await checkboxes.count()).toBeGreaterThanOrEqual(4);
 
-  // A final verdict panel is present on the page.
-  await expect(page.getByText(/final verdict|итоговый вердикт/i).first()).toBeVisible();
+  // The Show-winner switch governs the verdict (default ON).
+  const winnerSwitch = page.getByRole("switch", { name: /show winner|показать победителя/i });
+  await expect(winnerSwitch).toBeVisible();
+  await expect(winnerSwitch).toHaveAttribute("aria-checked", "true");
 
-  // Share modal opens from the "Generate share card" button.
-  await page.getByRole("button", { name: /share card|карточк/i }).first().click();
+  // The share sheet opens from the single primary CTA.
+  await page.getByRole("button", { name: /share verdict|поделиться вердиктом/i }).first().click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  // It carries a live preview + a caption field + a download action.
   await expect(dialog.getByRole("img", { name: /preview|превью/i })).toBeVisible();
+
   // Close it (Esc) and confirm it dismisses.
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
 
-  // RU/EN toggle flips the UI copy: switching to RU changes the arena subtitle.
+  // RU/EN toggle flips the UI copy: switching to RU changes the H1 to Cyrillic.
   const langGroup = page.getByRole("group", { name: /language|язык/i }).first();
   await expect(langGroup).toBeVisible();
   await langGroup.getByRole("button", { name: "RU" }).click();
-  // The H1 copy is now Russian: "GOAT Арена". Assert the RU-only Cyrillic word
-  // so the flip genuinely fails if the locale didn't change (the Latin "ARENA"
-  // would otherwise pass even with no switch).
   await expect(page.getByRole("heading", { level: 1 })).toContainText(/Арена/i);
 });

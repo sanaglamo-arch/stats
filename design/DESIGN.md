@@ -16,6 +16,51 @@
 
 ---
 
+## ⚠️ BOSS-NOTES OVERRIDES (2026-06-25, MANDATORY) — supersede §2 & §3 where they conflict
+
+Source: `design/BOSS-NOTES.md`. These are hard requirements and OVERRIDE the
+original atmosphere/render direction below where they differ.
+
+**O1 — SIDE ORIENTATION FLIP (site-wide): Messi LEFT, Ronaldo RIGHT.**
+The boss specifies **Messi on the LEFT facing RIGHT**, **Ronaldo on the RIGHT
+facing LEFT** (clash inward). This is the opposite of ref1/Phase-9. Apply it
+**consistently everywhere** for coherence — the hero render-clash, the divergent
+comparison bars (Messi fills left→centre, Ronaldo centre→right), the identity/
+name placement, the verdict score band order, and the share card. A half-flip
+(hero one way, bars the other) is NOT acceptable. (§3 examples below say
+Ronaldo-left — invert them.)
+
+**O2 — BACKGROUND = BLURRED FLAG-SPLIT (replaces the plain dark/stadium base as the primary backdrop).**
+Not flat black. A split atmospheric backdrop of heavily-blurred national flags:
+- **Left half (behind Messi):** Argentina — sky-blue/white bands + gold May Sun,
+  as a STRONGLY gaussian-blurred (~60–100px), darkened, low-opacity (15–30%)
+  bokeh wash over base `#0a0a0f`. Reads as MOOD, not a literal flag.
+- **Right half (behind Ronaldo):** same treatment for Portugal — green + red
+  field + crest/armillary.
+- **Centre (behind VS):** both dissolve into deep near-black `#0a0a0f` via a
+  SOFT vertical seam — gradient transition, NO hard edge.
+- Plus a light vignette + optional fine grain + sparse light particles. Colours
+  HINT at the nation; they must NOT overpower the foreground or kill AA text
+  contrast. Goal: "flags melted into stadium light", not "two flag images".
+- Implementation: CSS gradients in the flag colours + blur/bokeh layer (preferred,
+  deterministic) OR a generated background texture. The §2 stadium floodlights/
+  grain/embers may still layer subtly ON TOP, but the flag-split is the base.
+
+**O3 — PLAYER RENDERS = tall transparent PNG cut-outs (boss supplies the assets).**
+The current photos are placeholders ("так себе") and WILL be replaced by boss-
+generated full-length duotone cut-outs: tall **transparent-background PNGs**,
+**head-to-boots**, **identical scale/light/crop** for both, facing centre (Messi→
+right, Ronaldo→left). Build the hero layout to ACCEPT these as foreground over the
+flag-bg: expected asset path `public/players/{id}-render.png` (full-length,
+transparent); render them `object-fit: contain`, bottom-anchored, full hero height,
+no photo box, no mask-into-box needed (they're already cut out). KEEP a graceful
+fallback for when the PNG is absent (current head&shoulders jpg with the §3.2
+duotone+edge-mask treatment, or the silhouette SVG) so the site never breaks
+before the boss drops assets. The duotone tint per side still applies (Messi cool
+blue / Ronaldo warm red-gold) in case assets arrive un-tinted.
+
+---
+
 ## 0. The diagnosis (why the current site has no soul)
 
 The boss is right: Phase 9 copied the references' *layout* but not their

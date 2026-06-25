@@ -103,6 +103,19 @@ const en = {
   // Arena → share card (P9-6)
   arenaGenerateShareCard: "Generate Share Card",
 
+  // ── VERDICT ARENA — Phase 10 single-screen (P10) ──────────────────
+  arenaTrustLine:
+    "Accurate as of {date} · club & country, all competitions · by category, never “X is better”",
+  arenaScoreCategoriesWon: "{n} categories won",
+  arenaScoreTied: "{n} tied",
+  arenaScoreCategoryWon: "{n} category won",
+  arenaCategoryBreakdown: "Category Breakdown",
+  arenaCountThis: "Count {category} in the score",
+  arenaExpandRow: "Show {category} sub-metrics",
+  arenaShareVerdict: "Share Verdict",
+  arenaToProfile: "View {name} profile",
+  arenaLeaderboardCrown: "Leader",
+
   // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
   cardsTitle: "The Greatest Of All Time?",
   cardsSubtitle: "Two legends, two cards — then the real numbers settle it",
@@ -432,6 +445,19 @@ const ru: Dictionary = {
   arenaScope: "Включает выступления за клуб и сборную во всех турнирах",
   arenaViewCards: "Смотреть FUT-карточки",
   arenaGenerateShareCard: "Создать карточку",
+
+  // ── VERDICT ARENA — Phase 10 single-screen (P10) ──────────────────
+  arenaTrustLine:
+    "Актуально на {date} · клуб и сборная, все турниры · по категориям, не «X лучше»",
+  arenaScoreCategoriesWon: "Выиграно категорий: {n}",
+  arenaScoreTied: "ничьих: {n}",
+  arenaScoreCategoryWon: "Выиграна {n} категория",
+  arenaCategoryBreakdown: "Разбор по категориям",
+  arenaCountThis: "Учитывать «{category}» в счёте",
+  arenaExpandRow: "Показать метрики категории «{category}»",
+  arenaShareVerdict: "Поделиться вердиктом",
+  arenaToProfile: "Профиль игрока {name}",
+  arenaLeaderboardCrown: "Лидер",
 
   // ── FUT CARD BATTLE (P9-5, /cards) ────────────────────────────────
   cardsTitle: "Величайший всех времён?",

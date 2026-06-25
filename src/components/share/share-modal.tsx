@@ -196,9 +196,25 @@ export function ShareModal({
   const PREVIEW_WIDTH = 340;
   const scale = PREVIEW_WIDTH / SHARE_WIDTH;
 
+  // Mobile slides up from the bottom; desktop scales+fades from centre (DESIGN
+  // §5.6). matchMedia is read on open so SSR markup is stable.
+  const isMobile =
+    typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches;
+  const panelMotion = reduce
+    ? { initial: false as const, animate: undefined }
+    : isMobile
+      ? {
+          initial: { opacity: 0, y: "100%" as const },
+          animate: { opacity: 1, y: 0 },
+        }
+      : {
+          initial: { opacity: 0, scale: 0.96, y: 12 },
+          animate: { opacity: 1, scale: 1, y: 0 },
+        };
+
   const overlay = (
     <div
-      className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+      className="fixed inset-0 z-[1000] flex items-end justify-center sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -218,13 +234,13 @@ export function ShareModal({
         transition={{ duration: DURATION.fast, ease: EASE.out }}
       />
 
-      {/* Panel */}
+      {/* Panel — slides up on mobile (rounded top only), centred card on desktop */}
       <motion.div
         ref={panelRef}
-        className="glass-panel relative z-10 flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-[var(--radius-xl)] sm:max-h-[88vh]"
-        style={{ background: "var(--color-bg-elevated)", border: "1px solid var(--color-border-strong)" }}
-        initial={reduce ? false : { opacity: 0, scale: 0.96, y: 12 }}
-        animate={reduce ? undefined : { opacity: 1, scale: 1, y: 0 }}
+        className="glass-panel gold-hairline-top relative z-10 flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden rounded-t-[var(--radius-xl)] sm:max-h-[88vh] sm:rounded-[var(--radius-xl)]"
+        style={{ background: "var(--color-bg-elevated)", border: "1px solid var(--color-border-strong)", boxShadow: "var(--shadow-hero)" }}
+        initial={panelMotion.initial}
+        animate={panelMotion.animate}
         transition={{ duration: DURATION.base, ease: EASE.out }}
       >
         {/* Header */}

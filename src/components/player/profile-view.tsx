@@ -16,6 +16,7 @@ import { competitionLabel, statLabel } from "@/components/card/card-labels";
 import { useI18n } from "@/lib/i18n/provider";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { DURATION, EASE } from "@/lib/motion/tokens";
+import { Atmosphere } from "@/components/arena/atmosphere";
 import type { PlayerProfile, SeasonRow } from "./profile-model";
 
 const FOCUS_RING =
@@ -120,23 +121,25 @@ export function ProfileView({ profile }: { profile: PlayerProfile }) {
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
-      {/* Accent aura, static CSS, decorative. */}
+      {/* Quieter floodlit atmosphere (DESIGN §6.3 — off-path, dialled down). */}
+      <Atmosphere quiet />
+      {/* Single-accent aura over the atmosphere, static CSS, decorative. */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 z-0"
         style={{
-          background: `radial-gradient(60% 50% at 50% -10%, color-mix(in srgb, ${accent} 22%, transparent), transparent 70%)`,
+          background: `radial-gradient(60% 50% at 50% -10%, color-mix(in srgb, ${accent} 18%, transparent), transparent 70%)`,
         }}
       />
 
       <main className="relative z-10 mx-auto w-full max-w-5xl px-4 pb-24 pt-8 sm:px-6 sm:pt-12">
         <Reveal>
           <Link
-            href="/#studio"
+            href="/"
             className={`inline-flex items-center gap-2 rounded-full border border-[var(--color-border-glass)] bg-[var(--color-surface)] px-4 py-2 text-sm font-semibold text-[var(--color-text-secondary)] transition-colors duration-200 hover:text-[var(--color-text)] ${FOCUS_RING}`}
           >
             <ArrowLeft size={16} aria-hidden />
-            {t.profileBackToCompare}
+            {t.verdictBackToArena}
           </Link>
         </Reveal>
 

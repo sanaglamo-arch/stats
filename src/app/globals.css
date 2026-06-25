@@ -49,6 +49,9 @@
   --color-gold: #f5b43c;
   --color-gold-bright: #ffd75e;
 
+  /* Gold hairline — the gold top-edge on hero/score panels (DESIGN §4.1) */
+  --gold-hairline: rgba(245, 180, 60, 0.45);
+
   /* Focus ring — neutral azure (aligns to the blue lead) */
   --color-ring: #3a82ff;
 
@@ -69,6 +72,13 @@
   --shadow-hero:
     0 2px 8px rgba(0, 0, 0, 0.3), 0 18px 50px rgba(0, 0, 0, 0.55),
     0 40px 120px rgba(0, 0, 0, 0.5);
+
+  /* The primary Share CTA accent glow (DESIGN §4.6 / skill "accent glow behind
+     primary button"): gold hairline ring + soft lift + diffuse halo. */
+  --glow-cta:
+    0 0 0 1px var(--gold-hairline),
+    0 8px 24px rgba(245, 180, 60, 0.35),
+    0 0 40px rgba(245, 180, 60, 0.22);
 }
 
 :root {
@@ -366,6 +376,335 @@ body {
   transform-origin: var(--radix-select-content-transform-origin);
 }
 
+/* ============================================================================
+   PHASE 10 — ATMOSPHERE: the floodlit-stadium background layer stack (DESIGN §2)
+   A fixed, aria-hidden, pointer-events:none stack behind page content. Mostly
+   static CSS; only embers + (optional) floodlight breathe move, and both stop
+   under prefers-reduced-motion. Sits at z-index 0; page content at z-index 10+.
+   ========================================================================== */
+
+/* z0 base wash — deep navy vertical gradient, never pure black. */
+.arena-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #0a1124 0%, #070b16 46%, #04060e 100%);
+}
+/* Overlay mode — the flag-split (O2) is the base, so the floodlights/vignette
+   layer ON TOP with NO opaque base wash of their own. */
+.arena-atmosphere.is-overlay {
+  background: transparent;
+}
+
+/* BOSS-NOTES O2 — BLURRED FLAG-SPLIT backdrop (the primary base, replacing flat
+   black). Left half = Argentina (sky-blue/white + gold May Sun), right half =
+   Portugal (green + red + armillary), dissolving into deep near-black #0a0a0f at
+   the centre via a SOFT vertical seam (no hard edge). Heavily blurred + low
+   opacity so it reads as MOOD, not literal flags, and never kills AA contrast.
+   The §2 stadium floodlights/grain/embers layer subtly ON TOP of this. */
+.arena-flagsplit {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: #0a0a0f;
+}
+.arena-flagsplit::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  filter: blur(80px) saturate(125%);
+  opacity: 0.26;
+  background:
+    /* Argentina — left: sky-blue bands + white + a gold May-Sun bokeh */
+    radial-gradient(38% 30% at 16% 30%, rgba(255, 209, 102, 0.85), transparent 60%),
+    radial-gradient(60% 80% at 8% 24%, rgba(116, 172, 223, 0.95), transparent 66%),
+    radial-gradient(55% 60% at 22% 70%, rgba(116, 172, 223, 0.8), transparent 70%),
+    radial-gradient(40% 40% at 18% 50%, rgba(255, 255, 255, 0.7), transparent 64%),
+    /* Portugal — right: green field + red field + gold armillary bokeh */
+    radial-gradient(58% 80% at 92% 26%, rgba(20, 138, 94, 0.95), transparent 66%),
+    radial-gradient(55% 70% at 80% 72%, rgba(214, 40, 56, 0.9), transparent 70%),
+    radial-gradient(34% 30% at 84% 40%, rgba(245, 200, 92, 0.8), transparent 60%);
+}
+/* Centre seam — both halves dissolve into deep near-black via a soft vertical
+   gradient (no hard edge), plus a light vignette. */
+.arena-flagsplit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 30%, rgba(10, 10, 15, 0.92) 50%, transparent 70%),
+    radial-gradient(120% 120% at 50% 40%, transparent 52%, rgba(2, 4, 10, 0.6) 100%);
+}
+@media (max-width: 640px) {
+  .arena-flagsplit::before {
+    filter: blur(60px) saturate(120%);
+    opacity: 0.22;
+  }
+}
+
+/* z1 floor pitch-glow + z2 floodlight cones + z3 crown glow. */
+.arena-atmosphere::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    /* z3 crown glow (gold, center-top) */
+    radial-gradient(46% 36% at 50% -6%, rgba(245, 180, 60, 0.16), transparent 66%),
+    /* z2 floodlight cones (cool white, four shafts from the top corners) */
+    conic-gradient(from 202deg at 14% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+    conic-gradient(from 138deg at 86% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+    conic-gradient(from 210deg at 30% -12%, transparent 0deg, rgba(255, 255, 255, 0.05) 14deg, transparent 30deg),
+    conic-gradient(from 150deg at 70% -12%, transparent 0deg, rgba(255, 255, 255, 0.05) 14deg, transparent 30deg),
+    /* z1 floor pitch-glow (BOSS O1: blue left / Messi, red right / Ronaldo) */
+    radial-gradient(72% 46% at 22% 106%, rgba(44, 99, 219, 0.16), transparent 68%),
+    radial-gradient(72% 46% at 78% 106%, rgba(226, 16, 59, 0.16), transparent 68%);
+}
+
+/* z3 vignette + z4 volumetric haze. */
+.arena-atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(50% 38% at 50% 52%, rgba(120, 140, 200, 0.06), transparent 70%),
+    radial-gradient(120% 120% at 50% 38%, transparent 52%, rgba(2, 4, 10, 0.55) 100%);
+}
+
+/* z5 film grain — a tiny SVG turbulence tile at low opacity (kills banding). */
+.arena-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* z6 embers — drifting gold particles (decorative, motion-gated below). */
+@keyframes ember-rise {
+  0% {
+    transform: translate(0, 8vh) scale(0.6);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(var(--drift, 0), -92vh) scale(1);
+    opacity: 0;
+  }
+}
+.ember {
+  position: fixed;
+  bottom: -2vh;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(245, 180, 60, 0.9);
+  box-shadow: 0 0 6px 2px rgba(245, 180, 60, 0.5);
+  pointer-events: none;
+  z-index: 1;
+  animation: ember-rise linear infinite;
+}
+
+/* Floodlight life — imperceptible breathe so the stadium feels "on". */
+@keyframes floodlight-breathe {
+  0%,
+  100% {
+    opacity: 0.92;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.arena-atmosphere::before {
+  animation: floodlight-breathe 7s ease-in-out infinite;
+}
+
+/* Mobile: drop the two inner cones + soften, the embers count down in JS. */
+@media (max-width: 640px) {
+  .arena-atmosphere::before {
+    background:
+      radial-gradient(46% 36% at 50% -6%, rgba(245, 180, 60, 0.16), transparent 66%),
+      conic-gradient(from 202deg at 14% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+      conic-gradient(from 138deg at 86% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+      radial-gradient(72% 46% at 22% 106%, rgba(226, 16, 59, 0.16), transparent 68%),
+      radial-gradient(72% 46% at 78% 106%, rgba(44, 99, 219, 0.16), transparent 68%);
+  }
+}
+
+/* ============================================================================
+   PHASE 10 — RENDER-CLASH: big duotone figures facing the central VS (DESIGN §3)
+   Extends .arena-render. At hero scale the photo is a single-hue render with an
+   inner+bottom edge-fade so it dissolves into the stadium (no photo box). One
+   side is mirrored (scaleX(-1)) so both figures turn inward toward the VS.
+   ========================================================================== */
+.render-hero {
+  position: relative;
+  height: 100%;
+  overflow: visible;
+}
+.render-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(1) contrast(1.22) brightness(0.9);
+  -webkit-mask-image:
+    linear-gradient(180deg, #000 60%, transparent 100%),
+    linear-gradient(var(--inward), #000 64%, transparent 100%);
+  mask-image:
+    linear-gradient(180deg, #000 60%, transparent 100%),
+    linear-gradient(var(--inward), #000 64%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+/* BOSS-NOTES O1 — Messi LEFT (faces RIGHT), Ronaldo RIGHT (faces LEFT).
+   Messi (left) faces RIGHT → inner = right edge fades (90deg). */
+.render-hero.is-messi {
+  --inward: 90deg;
+}
+/* Ronaldo (right) faces LEFT → inner = left edge fades (270deg); mirror so the
+   forward-facing portrait turns inward toward the VS. */
+.render-hero.is-ronaldo {
+  --inward: 270deg;
+}
+.render-hero.is-ronaldo img {
+  transform: scaleX(-1);
+}
+/* duotone color overlay (mix-blend color) — per side. */
+.render-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color;
+}
+/* inward rim-light (mix-blend screen) — lit by the clash. */
+.render-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0.6;
+}
+/* Ronaldo (RIGHT) — warm gold→crimson; inward rim-light on the LEFT (toward VS). */
+.render-hero.is-ronaldo::after {
+  background: linear-gradient(205deg, var(--color-gold) 0%, var(--color-ronaldo) 66%, #7a0a20 100%);
+}
+.render-hero.is-ronaldo::before {
+  background: radial-gradient(56% 50% at 30% 26%, rgba(255, 215, 94, 0.55), transparent 70%);
+}
+/* Messi (LEFT) — cool azure; inward rim-light on the RIGHT (toward VS). */
+.render-hero.is-messi::after {
+  background: linear-gradient(155deg, var(--color-messi-bright) 0%, var(--color-messi) 70%, #0a1f5c 100%);
+}
+.render-hero.is-messi::before {
+  background: radial-gradient(56% 50% at 70% 26%, rgba(58, 130, 255, 0.55), transparent 70%);
+}
+/* Fallback duotone silhouette (short source / future players): the same per-side
+   tint over the SVG, faded top+bottom so it never reads as a boxed photo. */
+.render-hero.is-fallback img {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 70%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 18%, #000 70%, transparent 100%);
+  object-fit: contain;
+}
+
+/* BOSS-NOTES O3 — full-length transparent cut-out PNG (boss-supplied assets):
+   head-to-boots, already cut out, so NO box and NO mask — just bottom-anchored
+   contain over the flag-bg. The per-side duotone tint still applies (in case the
+   asset arrives un-tinted); the mirror still turns Ronaldo inward. */
+.render-hero.is-cutout img {
+  object-fit: contain;
+  object-position: bottom center;
+  filter: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+/* the duotone color/rim overlays only make sense over a solid figure; for a
+   transparent cut-out they'd tint the empty area, so soften them right down. */
+.render-hero.is-cutout::after {
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+}
+.render-hero.is-cutout::before {
+  opacity: 0.4;
+}
+
+/* ============================================================================
+   PHASE 10 — VS ENERGY CLASH (DESIGN §3.4): shockwave ring + red↔blue seam.
+   ========================================================================== */
+@keyframes vs-shock {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 0.25;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.9);
+    opacity: 0;
+  }
+}
+.vs-shockwave {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 2px solid rgba(245, 180, 60, 0.7);
+  box-shadow: 0 0 24px rgba(245, 180, 60, 0.5), inset 0 0 18px rgba(245, 180, 60, 0.35);
+  pointer-events: none;
+  animation: vs-shock 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+/* lightning seam — a 2px vertical gold/white bolt at the red/blue boundary. */
+.vs-seam {
+  position: absolute;
+  left: 50%;
+  top: 6%;
+  bottom: 6%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(245, 180, 60, 0.9) 30%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(245, 180, 60, 0.9) 70%,
+    transparent
+  );
+  filter: blur(0.4px) drop-shadow(0 0 6px rgba(245, 180, 60, 0.7));
+  pointer-events: none;
+}
+/* one-shot VS flash on entrance (brightness pop + scale). */
+@keyframes vs-flash {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+    filter: brightness(2);
+  }
+  60% {
+    transform: scale(1.04);
+    opacity: 1;
+    filter: brightness(1.4);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+/* Gold top-hairline edge for hero/score panels (DESIGN §3.5 / §4.1). */
+.gold-hairline-top {
+  box-shadow: inset 0 1px 0 var(--gold-hairline);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -376,6 +715,20 @@ body {
   }
 
   .neon-popover[data-state="open"] {
+    animation: none;
+  }
+
+  /* Phase 10 motion contract: embers off, shockwave frozen to a static ring,
+     floodlight breathe off, VS flash neutralised. */
+  .ember {
+    display: none;
+  }
+  .vs-shockwave {
+    animation: none;
+    opacity: 0.35;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .arena-atmosphere::before {
     animation: none;
   }
 }

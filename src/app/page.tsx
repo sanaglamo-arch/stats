@@ -3,20 +3,16 @@ import { buildArenaModel } from "@/components/arena/arena-model";
 import { Arena } from "@/components/arena/arena";
 
 /**
- * The flagship HOME ARENA (P9-2). The comparison model is built on the server
- * from the real dataset (`dataSource.getAllRows()` → `buildArenaModel`, which
- * composes the existing aggregators) and handed to the client `Arena` for the
- * interactive shell (category tabs, the Show-winner toggle). The old hero+studio
- * home content is retired here; the Studio/card/profile routes stay intact for
- * the share-card flow.
+ * The VERDICT ARENA home (Phase 10) — the whole product on one screen. The
+ * comparison model is built on the server from the real dataset
+ * (`dataSource.getAllRows()` → `buildArenaModel`) and handed to the client
+ * `Arena`, which owns the floodlit atmosphere, the render-clash hero + verdict
+ * score, the inline category breakdown/selection, the winner toggle and the
+ * single Share CTA. The merged-away routes (/compare, /verdict) redirect here;
+ * /player/[id] and the demoted /cards stay reachable off-path.
  */
 export default function HomePage() {
   const model = buildArenaModel(dataSource.getAllRows());
 
-  return (
-    <div className="relative overflow-hidden">
-      <div className="studio-aura-fixed" aria-hidden />
-      <Arena model={model} accurateAsOf={datasetGeneratedAt} />
-    </div>
-  );
+  return <Arena model={model} accurateAsOf={datasetGeneratedAt} />;
 }
