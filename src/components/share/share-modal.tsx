@@ -67,7 +67,13 @@ export function ShareModal({
   const defaultCaption = useMemo(() => {
     if (model.showWinner && model.winner) {
       const name = PLAYER_META[model.winner].name.split(" ").slice(-1)[0];
-      const score = `${model.score.ronaldo}–${model.score.messi}`;
+      // Winner's count first so the caption always reads "X wins W–L" (the winner
+      // leads). Was ronaldo–messi fixed-order → printed "Messi wins 3–4" for a
+      // 4–3 Messi win.
+      const score =
+        model.winner === "messi"
+          ? `${model.score.messi}–${model.score.ronaldo}`
+          : `${model.score.ronaldo}–${model.score.messi}`;
       return t.shareCaptionWinner.replace("{winner}", name).replace("{score}", score);
     }
     return t.shareCaptionNeutral;

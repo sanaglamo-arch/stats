@@ -86,11 +86,12 @@ export function CardsCategoryPanel({ category }: { category: ArenaCategory }) {
 
       {/* Right: real stat rows with red/blue bars */}
       <div>
+        {/* BOSS O1 — Messi left, Ronaldo right */}
         <div className="mb-2 grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 text-[11px] font-bold uppercase tracking-wider sm:grid-cols-[4.5rem_1fr_4.5rem]">
-          <span style={{ color: "var(--color-ronaldo-bright)" }}>{PLAYER_META.ronaldo.name.split(" ")[0]}</span>
+          <span style={{ color: "var(--color-messi-bright)" }}>{PLAYER_META.messi.name.split(" ")[0]}</span>
           <span className="text-center text-[var(--color-text-muted)]">{t.arenaColTotal}</span>
-          <span className="text-right" style={{ color: "var(--color-messi-bright)" }}>
-            {PLAYER_META.messi.name.split(" ")[0]}
+          <span className="text-right" style={{ color: "var(--color-ronaldo-bright)" }}>
+            {PLAYER_META.ronaldo.name.split(" ")[0]}
           </span>
         </div>
         <ul className="flex flex-col gap-3">
@@ -116,34 +117,23 @@ function DetailRow({ row }: { row: ArenaRow }) {
 
   const barTransition = reduce ? { duration: 0 } : { duration: DURATION.base, ease: EASE.out };
 
+  // BOSS O1 — Messi value + fill on the LEFT, Ronaldo on the RIGHT.
   return (
     <li className="grid grid-cols-[3.5rem_1fr_3.5rem] items-center gap-2 sm:grid-cols-[4.5rem_1fr_4.5rem] sm:gap-3">
       <span
-        className={`tabular text-right text-lg font-bold tabular-nums sm:text-xl ${ronaldoWon ? "" : "opacity-60"}`}
-        style={{ color: ronaldoWon ? "var(--color-ronaldo-bright)" : "var(--color-text)" }}
+        className={`tabular text-right text-lg font-bold tabular-nums sm:text-xl ${messiWon ? "" : "opacity-60"}`}
+        style={{ color: messiWon ? "var(--color-messi-bright)" : "var(--color-text)" }}
       >
-        {formatArenaValue(row, row.ronaldo)}
+        {formatArenaValue(row, row.messi)}
       </span>
 
       <div className="flex flex-col items-center gap-1">
         <span className="text-xs font-medium text-[var(--color-text-secondary)]">{t[row.labelKey]}</span>
         <div className="flex w-full items-center gap-1">
+          {/* left (Messi) */}
           <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-surface)]">
             <motion.div
               className="absolute inset-y-0 right-0 rounded-full"
-              style={{
-                background: ronaldoLost ? "var(--color-text-muted)" : "var(--color-ronaldo)",
-                boxShadow: ronaldoWon ? "0 0 12px color-mix(in srgb, var(--color-ronaldo) 70%, transparent)" : "none",
-                opacity: ronaldoLost ? 0.55 : 1,
-              }}
-              initial={reduce ? false : { width: 0 }}
-              animate={{ width: `${row.ronaldoFill * 100}%` }}
-              transition={barTransition}
-            />
-          </div>
-          <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-surface)]">
-            <motion.div
-              className="absolute inset-y-0 left-0 rounded-full"
               style={{
                 background: messiLost ? "var(--color-text-muted)" : "var(--color-messi)",
                 boxShadow: messiWon ? "0 0 12px color-mix(in srgb, var(--color-messi) 70%, transparent)" : "none",
@@ -154,14 +144,28 @@ function DetailRow({ row }: { row: ArenaRow }) {
               transition={barTransition}
             />
           </div>
+          {/* right (Ronaldo) */}
+          <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--color-surface)]">
+            <motion.div
+              className="absolute inset-y-0 left-0 rounded-full"
+              style={{
+                background: ronaldoLost ? "var(--color-text-muted)" : "var(--color-ronaldo)",
+                boxShadow: ronaldoWon ? "0 0 12px color-mix(in srgb, var(--color-ronaldo) 70%, transparent)" : "none",
+                opacity: ronaldoLost ? 0.55 : 1,
+              }}
+              initial={reduce ? false : { width: 0 }}
+              animate={{ width: `${row.ronaldoFill * 100}%` }}
+              transition={barTransition}
+            />
+          </div>
         </div>
       </div>
 
       <span
-        className={`tabular text-left text-lg font-bold tabular-nums sm:text-xl ${messiWon ? "" : "opacity-60"}`}
-        style={{ color: messiWon ? "var(--color-messi-bright)" : "var(--color-text)" }}
+        className={`tabular text-left text-lg font-bold tabular-nums sm:text-xl ${ronaldoWon ? "" : "opacity-60"}`}
+        style={{ color: ronaldoWon ? "var(--color-ronaldo-bright)" : "var(--color-text)" }}
       >
-        {formatArenaValue(row, row.messi)}
+        {formatArenaValue(row, row.ronaldo)}
       </span>
     </li>
   );

@@ -1,42 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PLAYER_META } from "@/components/card/player-meta";
 import type { PlayerId } from "@/lib/data";
 
 /**
  * One side of the render-clash hero (DESIGN §3 + BOSS-NOTES O1/O3): a big,
- * near-full-height duotone player render that faces inward toward the central VS
+ * near-full-height duotone player render facing inward toward the central VS
  * (BOSS O1 — Messi LEFT faces right, Ronaldo RIGHT faces left; the inward mirror
- * lives in CSS). Built to ACCEPT boss-supplied full-length transparent cut-out
- * PNGs as the foreground over the flag-split background (BOSS O3).
+ * lives in CSS).
  *
- * Fallback chain (graceful, so the site never breaks before assets land):
- *   1. `/players/{id}-render.png`  — full-length transparent cut-out (is-cutout)
- *   2. `/players/{id}.jpg`         — head&shoulders photo, duotone + edge-mask
- *   3. `/players/{id}.svg`         — tinted silhouette (is-fallback)
- * Never a small boxed photo. The per-side duotone tint applies at every stage.
+ * Visibility-first strategy (fixes the "figure absent" blocker + headless-capture
+ * timing): the proven head&shoulders JPG duotone (`/players/{id}.jpg`, the same
+ * treatment that renders on /player and /cards) is ALWAYS painted as the visible
+ * figure. In parallel we probe for the boss-supplied full-length transparent
+ * cut-out (`/players/{id}-render.png`); only once it actually LOADS do we upgrade
+ * to it. So the hero is never empty before assets land, and auto-upgrades when
+ * they do. A JPG load failure degrades to the tinted silhouette SVG.
  */
-type Stage = "cutout" | "photo" | "silhouette";
-
-const NEXT_STAGE: Record<Stage, Stage | null> = {
-  cutout: "photo",
-  photo: "silhouette",
-  silhouette: null,
-};
-
 export function RenderHero({ id }: { id: PlayerId }) {
   const meta = PLAYER_META[id];
-  const [stage, setStage] = useState<Stage>("cutout");
+  const [cutoutReady, setCutoutReady] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
 
-  const src =
-    stage === "cutout"
-      ? `/players/${id}-render.png`
-      : stage === "photo"
-        ? meta.photoSrc
-        : `/players/${id}.svg`;
+  const cutoutSrc = `/players/${id}-render.png`;
 
-  const variant = stage === "cutout" ? "is-cutout" : stage === "silhouette" ? "is-fallback" : "";
+  // Probe the cut-out PNG without ever showing a broken image: load it off-DOM
+  // and only flip to it on success.
+  useEffect(() => {
+    let alive = true;
+    const probe = new Image();
+    probe.onload = () => {
+      if (alive) setCutoutReady(true);
+    };
+    probe.src = cutoutSrc;
+    return () => {
+      alive = false;
+    };
+  }, [cutoutSrc]);
+
+  if (cutoutReady) {
+    return (
+      <div className={`render-hero is-${id} is-cutout h-full w-full`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- static cut-out render */}
+        <img src={cutoutSrc} alt="" aria-hidden draggable={false} />
+      </div>
+    );
+  }
+
+  const src = photoFailed ? `/players/${id}.svg` : meta.photoSrc;
+  const variant = photoFailed ? "is-fallback" : "";
 
   return (
     <div className={`render-hero is-${id} ${variant} h-full w-full`}>
@@ -48,8 +61,7 @@ export function RenderHero({ id }: { id: PlayerId }) {
         aria-hidden
         draggable={false}
         onError={() => {
-          const next = NEXT_STAGE[stage];
-          if (next) setStage(next);
+          if (!photoFailed) setPhotoFailed(true);
         }}
       />
     </div>

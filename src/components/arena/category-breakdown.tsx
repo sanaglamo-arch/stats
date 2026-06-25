@@ -92,6 +92,9 @@ function BreakdownRow({
 
   const ronaldoWon = showWinner && counted && category.winner === "ronaldo";
   const messiWon = showWinner && counted && category.winner === "messi";
+  // A side reads as "lost" (dimmed) only when the OTHER side won the category.
+  const ronaldoLost = messiWon;
+  const messiLost = ronaldoWon;
 
   return (
     <motion.li
@@ -101,7 +104,7 @@ function BreakdownRow({
       animate={reduce ? undefined : { opacity: counted ? 1 : 0.5, y: 0 }}
       transition={{ duration: DURATION.fast, ease: EASE.out, delay: 0.12 + index * STAGGER * 0.5 }}
     >
-      <div className="grid grid-cols-[auto_1fr] items-center gap-3 px-3 py-2.5 sm:grid-cols-[auto_minmax(7rem,9rem)_1fr_auto] sm:px-4">
+      <div className="grid grid-cols-[auto_1fr] items-center gap-3 px-3 py-2.5 sm:grid-cols-[auto_minmax(7rem,9rem)_1fr] sm:px-4">
         {/* count checkbox */}
         <button
           type="button"
@@ -150,25 +153,32 @@ function BreakdownRow({
           />
         </button>
 
-        {/* dual bar + values (full width on mobile, centre column on desktop) */}
-        <div className="col-span-2 row-start-2 sm:col-auto sm:row-auto">
-          <DualBar row={headline} showWinner={showWinner && counted} />
-        </div>
-
-        {/* leader crown */}
-        <div className="col-start-2 row-start-3 flex items-center justify-start sm:col-auto sm:row-auto sm:justify-end">
-          {showWinner && counted && category.winner !== "tie" ? (
-            <span
-              className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide"
-              style={{
-                color: category.winner === "ronaldo" ? "var(--color-ronaldo-bright)" : "var(--color-messi-bright)",
-              }}
-            >
-              <Crown size={14} aria-hidden strokeWidth={2} />
-            </span>
-          ) : (
-            <span className="h-3.5 w-3.5" aria-hidden />
-          )}
+        {/* DESIGN §6.1C — "Messi value ——dual bar—— Ronaldo value": the headline
+            metric's two numbers flank the bar (Messi left / Ronaldo right, Inter
+            700 .tabular, each tinted its accent, loser dimmed), with the leader
+            crown over the winning side. */}
+        <div className="col-span-2 row-start-2 grid grid-cols-[2.75rem_1fr_2.75rem] items-center gap-2 sm:col-auto sm:row-auto sm:grid-cols-[3rem_1fr_3rem]">
+          <span
+            className={`tabular text-right text-sm font-bold tabular-nums sm:text-base ${
+              messiLost ? "opacity-55" : ""
+            }`}
+            style={{ color: messiWon ? "var(--color-messi-bright)" : "var(--color-text)" }}
+          >
+            {formatArenaValue(headline, headline.messi)}
+          </span>
+          <DualBar
+            row={headline}
+            showWinner={showWinner && counted}
+            winner={showWinner && counted ? category.winner : "tie"}
+          />
+          <span
+            className={`tabular text-left text-sm font-bold tabular-nums sm:text-base ${
+              ronaldoLost ? "opacity-55" : ""
+            }`}
+            style={{ color: ronaldoWon ? "var(--color-ronaldo-bright)" : "var(--color-text)" }}
+          >
+            {formatArenaValue(headline, headline.ronaldo)}
+          </span>
         </div>
       </div>
 
@@ -222,7 +232,18 @@ function BreakdownRow({
  * the existing cards/arena bars). Values flank it via the caller. When showWinner
  * is OFF both sides render neutral gold/white.
  */
-function DualBar({ row, showWinner, thin = false }: { row: ArenaRow; showWinner: boolean; thin?: boolean }) {
+function DualBar({
+  row,
+  showWinner,
+  thin = false,
+  winner = "tie",
+}: {
+  row: ArenaRow;
+  showWinner: boolean;
+  thin?: boolean;
+  /** The CATEGORY winner — drives the leader crown over the winning half. */
+  winner?: ArenaRow["winner"];
+}) {
   const reduce = useReducedMotion();
 
   const ronaldoWon = showWinner && row.winner === "ronaldo";
@@ -237,9 +258,29 @@ function DualBar({ row, showWinner, thin = false }: { row: ArenaRow; showWinner:
   const h = thin ? "h-2" : "h-2.5";
   const barTransition = reduce ? { duration: 0 } : { duration: DURATION.base, ease: EASE.out };
 
+  // Leader crown sits over the WINNING half: Messi → left, Ronaldo → right.
+  const crownSide = showWinner && winner === "messi" ? "left" : showWinner && winner === "ronaldo" ? "right" : null;
+
   // BOSS O1 — Messi fills left→centre, Ronaldo centre→right.
   return (
-    <div className="flex w-full items-center gap-1">
+    <div className="relative flex w-full items-center gap-1">
+      {crownSide ? (
+        <span
+          aria-label={`Leader: ${winner}`}
+          className="absolute -top-4 z-10 flex -translate-x-1/2 items-center"
+          style={{ left: crownSide === "left" ? "25%" : "75%" }}
+        >
+          <Crown
+            size={15}
+            aria-hidden
+            strokeWidth={2}
+            style={{
+              color: winner === "messi" ? "var(--color-messi-bright)" : "var(--color-ronaldo-bright)",
+              filter: "drop-shadow(0 0 6px rgba(245,180,60,0.5))",
+            }}
+          />
+        </span>
+      ) : null}
       {/* left (Messi) — fills from centre outward (right→left) */}
       <div className={`relative ${h} flex-1 overflow-hidden rounded-full bg-[var(--color-surface)]`}>
         <motion.div

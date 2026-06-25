@@ -16,7 +16,7 @@ import { FinalScoreStrip } from "./final-score-strip";
 
 /**
  * The FUT COLLECTIBLE-CARD BATTLE SCREEN (P9-5, /cards). Replicates ref2:
- *   • two FUT cards facing centre (Ronaldo RED left, Messi BLUE right) flanking
+ *   • two FUT cards facing centre (Messi BLUE left, Ronaldo RED right) flanking
  *     a gold crown + "THE GREATEST OF ALL TIME?" + the glowing VS;
  *   • a visible "FIFA-style ratings · cosmetic" caption so users know the card
  *     numbers are decorative (real stats live below + in /verdict);
@@ -65,11 +65,12 @@ export function CardsBattle({ model }: { model: ArenaModel }) {
         {...reveal(0.08)}
         aria-label={t.cardsBattleLabel}
       >
-        <FutCard id="ronaldo" align="left" delay={reduce ? 0 : 0.12} />
+        {/* BOSS O1 — Messi LEFT, Ronaldo RIGHT (site-wide orientation) */}
+        <FutCard id="messi" align="left" delay={reduce ? 0 : 0.12} />
         <div className="flex items-center justify-center">
           <VsMedallion />
         </div>
-        <FutCard id="messi" align="right" delay={reduce ? 0 : 0.2} />
+        <FutCard id="ronaldo" align="right" delay={reduce ? 0 : 0.2} />
       </motion.section>
 
       {/* Cosmetic-ratings caption */}

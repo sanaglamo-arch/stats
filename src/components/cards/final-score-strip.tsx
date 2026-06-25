@@ -46,21 +46,22 @@ export function FinalScoreStrip({ verdict }: { verdict: ArenaVerdict }) {
           <span className="font-[family-name:var(--font-display)] text-[11px] font-bold uppercase tracking-[0.28em] text-[var(--color-text-secondary)]">
             {t.verdictFinalScore}
           </span>
+          {/* BOSS O1 — Messi first (left), Ronaldo second (right) */}
           <div className="flex items-baseline gap-2.5 leading-none">
             <span
               className="tabular font-[family-name:var(--font-display)] text-4xl font-black tabular-nums"
-              style={{ color: "var(--color-ronaldo-bright)" }}
+              style={{ color: "var(--color-messi-bright)" }}
             >
-              {ronaldo}
+              {messi}
             </span>
             <span className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--color-text-muted)]">
               –
             </span>
             <span
               className="tabular font-[family-name:var(--font-display)] text-4xl font-black tabular-nums"
-              style={{ color: "var(--color-messi-bright)" }}
+              style={{ color: "var(--color-ronaldo-bright)" }}
             >
-              {messi}
+              {ronaldo}
             </span>
           </div>
           <span className="mt-1 block text-xs text-[var(--color-text-secondary)]">{leaderLine}</span>

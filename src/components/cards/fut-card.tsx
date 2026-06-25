@@ -37,7 +37,7 @@ export function FutCard({
   delay = 0,
 }: {
   id: PlayerId;
-  /** Which way the card leans — left = Ronaldo, right = Messi (mirrors layout). */
+  /** Which way the card leans — left = Messi, right = Ronaldo (BOSS O1 layout). */
   align: "left" | "right";
   delay?: number;
 }) {

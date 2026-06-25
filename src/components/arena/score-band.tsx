@@ -48,7 +48,14 @@ export function ScoreBand({
   return (
     <motion.div
       className="glass-panel gold-hairline-top relative mx-auto w-full max-w-3xl px-5 py-5 text-center sm:px-8 sm:py-6"
-      style={{ boxShadow: "var(--shadow-hero)" }}
+      style={{
+        // Strong dark backing so the accent player names NEVER sit on the hero's
+        // accent field showing through the glass (DESIGN §4.1: no accent-on-accent).
+        // The names then sit on near-solid dark and clear AA large-text contrast.
+        background:
+          "linear-gradient(180deg, rgba(8,12,22,0.94), rgba(5,8,16,0.97)), var(--color-surface)",
+        boxShadow: "var(--shadow-hero)",
+      }}
       aria-label={t.arenaFinalVerdict}
       {...reveal}
     >
@@ -56,7 +63,7 @@ export function ScoreBand({
       <p className="flex items-center justify-center gap-3 font-[family-name:var(--font-display)] leading-[0.9] tracking-[0.01em] sm:gap-5">
         <span
           className="text-[clamp(2rem,7vw,4.5rem)]"
-          style={{ color: "var(--color-messi-bright)" }}
+          style={{ color: "var(--color-messi-bright)", textShadow: "0 1px 8px rgba(2,4,10,0.9)" }}
         >
           {PLAYER_META.messi.name.split(" ").slice(-1)[0].toUpperCase()}
         </span>
@@ -75,7 +82,7 @@ export function ScoreBand({
         </span>
         <span
           className="text-[clamp(2rem,7vw,4.5rem)]"
-          style={{ color: "var(--color-ronaldo-bright)" }}
+          style={{ color: "var(--color-ronaldo-bright)", textShadow: "0 1px 8px rgba(2,4,10,0.9)" }}
         >
           {PLAYER_META.ronaldo.name.split(" ").slice(-1)[0].toUpperCase()}
         </span>

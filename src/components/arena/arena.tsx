@@ -136,7 +136,10 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
               {t.arenaTitleArena}
             </span>
           </h1>
-          <p className="mx-auto mt-2 max-w-xl text-xs text-[var(--color-text-muted)] sm:text-[0.8rem]">
+          <p
+            className="mx-auto mt-2 max-w-xl text-xs text-[var(--color-text-secondary)] sm:text-[0.8rem]"
+            style={{ textShadow: "0 1px 6px rgba(2,4,10,0.85)" }}
+          >
             {t.arenaTrustLine.replace("{date}", accurateDate)}
           </p>
         </motion.header>
@@ -149,19 +152,29 @@ export function Arena({ model, accurateAsOf }: { model: ArenaModel; accurateAsOf
           style={{ minHeight: "clamp(360px, 62vh, 720px)" }}
           aria-label={t.arenaSubtitle}
         >
-          {/* BOSS O1 — Messi render LEFT (faces right), bleeds off the left edge */}
-          <motion.div className="relative -ml-[6vw] min-w-0 lg:-ml-[7vw]" {...sideReveal(-24)}>
+          {/* BOSS O1 — Messi render LEFT (faces right), bleeds off the left edge.
+              Explicit height so the inner .render-hero (height:100%) + its <img>
+              resolve to a real box and the figure actually paints. */}
+          <motion.div
+            className="relative -ml-[6vw] min-w-0 self-stretch lg:-ml-[7vw]"
+            style={{ height: "clamp(360px, 62vh, 720px)" }}
+            {...sideReveal(-24)}
+          >
             <RenderHero id="messi" />
             <PlayerChip id="messi" align="left" />
           </motion.div>
 
           {/* VS energy clash, centred */}
-          <div className="relative flex items-center justify-center self-center px-1 sm:px-2">
+          <div className="relative z-10 flex items-center justify-center self-center px-1 sm:px-2">
             <VsMedallion />
           </div>
 
           {/* BOSS O1 — Ronaldo render RIGHT (faces left), bleeds off the right edge */}
-          <motion.div className="relative -mr-[6vw] min-w-0 lg:-mr-[7vw]" {...sideReveal(24)}>
+          <motion.div
+            className="relative -mr-[6vw] min-w-0 self-stretch lg:-mr-[7vw]"
+            style={{ height: "clamp(360px, 62vh, 720px)" }}
+            {...sideReveal(24)}
+          >
             <RenderHero id="ronaldo" />
             <PlayerChip id="ronaldo" align="right" />
           </motion.div>

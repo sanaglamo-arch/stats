@@ -121,8 +121,9 @@ export function ProfileView({ profile }: { profile: PlayerProfile }) {
 
   return (
     <div className="relative min-h-dvh overflow-hidden">
-      {/* Quieter floodlit atmosphere (DESIGN §6.3 — off-path, dialled down). */}
-      <Atmosphere quiet />
+      {/* Quieter, SINGLE-accent atmosphere (DESIGN §6.3 — off-path, dialled down,
+          only THIS player's nation/colour; the opponent's colours never appear). */}
+      <Atmosphere quiet side={profile.id} />
       {/* Single-accent aura over the atmosphere, static CSS, decorative. */}
       <div
         aria-hidden

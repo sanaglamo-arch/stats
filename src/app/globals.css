@@ -413,35 +413,100 @@ body {
 .arena-flagsplit::before {
   content: "";
   position: absolute;
-  inset: -8%;
-  filter: blur(80px) saturate(125%);
-  opacity: 0.26;
-  background:
-    /* Argentina — left: sky-blue bands + white + a gold May-Sun bokeh */
-    radial-gradient(38% 30% at 16% 30%, rgba(255, 209, 102, 0.85), transparent 60%),
-    radial-gradient(60% 80% at 8% 24%, rgba(116, 172, 223, 0.95), transparent 66%),
-    radial-gradient(55% 60% at 22% 70%, rgba(116, 172, 223, 0.8), transparent 70%),
-    radial-gradient(40% 40% at 18% 50%, rgba(255, 255, 255, 0.7), transparent 64%),
-    /* Portugal — right: green field + red field + gold armillary bokeh */
-    radial-gradient(58% 80% at 92% 26%, rgba(20, 138, 94, 0.95), transparent 66%),
-    radial-gradient(55% 70% at 80% 72%, rgba(214, 40, 56, 0.9), transparent 70%),
-    radial-gradient(34% 30% at 84% 40%, rgba(245, 200, 92, 0.8), transparent 60%);
+  inset: -10%;
+  filter: blur(96px) saturate(160%);
+  opacity: 0.46;
+  /* Each flag is its OWN background layer confined to its half via
+     background-size 50% + position left/right (no-repeat), so neither bleeds
+     across the soft centre. Layers paint front→back: gold bokeh on top of field. */
+  background-repeat: no-repeat;
+  background-position:
+    22% 50%, /* AR gold sun */
+    left center, /* AR bands */
+    80% 50%, /* PT gold armillary */
+    right center; /* PT fields */
+  background-size:
+    44% 36%,
+    50% 100%,
+    44% 36%,
+    50% 100%;
+  background-image:
+    /* ── Argentina (LEFT) — gold May-Sun bokeh in the white middle band ── */
+    radial-gradient(closest-side, rgba(255, 216, 122, 1), rgba(246, 192, 84, 0.5) 45%, transparent 78%),
+    /* light-blue / white / light-blue horizontal bands */
+    linear-gradient(
+      180deg,
+      rgba(110, 172, 230, 0.95) 0%,
+      rgba(110, 172, 230, 0.95) 30%,
+      rgba(248, 250, 255, 0.92) 38%,
+      rgba(248, 250, 255, 0.92) 62%,
+      rgba(110, 172, 230, 0.95) 70%,
+      rgba(110, 172, 230, 0.95) 100%
+    ),
+    /* ── Portugal (RIGHT) — gold armillary/crest bokeh over the green|red seam ── */
+    radial-gradient(closest-side, rgba(248, 206, 98, 1), rgba(216, 162, 62, 0.5) 46%, transparent 80%),
+    /* GREEN field (inner ~55%) + RED field (outer ~45%) vertical split */
+    linear-gradient(
+      90deg,
+      rgba(16, 142, 92, 1) 0%,
+      rgba(16, 142, 92, 1) 50%,
+      rgba(214, 44, 58, 1) 60%,
+      rgba(214, 44, 58, 1) 100%
+    );
 }
-/* Centre seam — both halves dissolve into deep near-black via a soft vertical
-   gradient (no hard edge), plus a light vignette. */
+/* Centre dissolve — both halves melt into deep near-black via a WIDE soft
+   vertical gradient (no hard seam), plus a corner vignette. */
 .arena-flagsplit::after {
   content: "";
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, transparent 30%, rgba(10, 10, 15, 0.92) 50%, transparent 70%),
-    radial-gradient(120% 120% at 50% 40%, transparent 52%, rgba(2, 4, 10, 0.6) 100%);
+    linear-gradient(
+      90deg,
+      transparent 18%,
+      rgba(10, 10, 15, 0.55) 38%,
+      rgba(10, 10, 15, 0.82) 50%,
+      rgba(10, 10, 15, 0.55) 62%,
+      transparent 82%
+    ),
+    radial-gradient(125% 125% at 50% 42%, transparent 50%, rgba(2, 4, 10, 0.62) 100%);
 }
 @media (max-width: 640px) {
   .arena-flagsplit::before {
-    filter: blur(60px) saturate(120%);
-    opacity: 0.22;
+    filter: blur(70px) saturate(140%);
+    opacity: 0.34;
   }
+}
+
+/* ── SOLO profile (DESIGN §6.3) — a single-accent calm wash in only the current
+   player's nation/colour; the opponent's colours never appear. Overrides the
+   full rivalry flag-split + neutralises the centre rivalry seam. ── */
+.arena-flagsplit.is-solo::before {
+  inset: -10%;
+  filter: blur(110px) saturate(135%);
+  opacity: 0.22;
+  background-repeat: no-repeat;
+  background-position: 50% 8%;
+  background-size: 120% 80%;
+  background-image: none; /* set per side below */
+}
+/* Messi — cool blue / Argentina hint (sky-blue + a soft gold sun). */
+.arena-flagsplit.is-solo-messi::before {
+  background-image:
+    radial-gradient(36% 26% at 50% 30%, rgba(255, 216, 122, 0.55), transparent 72%),
+    radial-gradient(80% 70% at 50% 8%, rgba(110, 172, 230, 0.9), transparent 74%);
+}
+/* Ronaldo — warm red / Portugal hint (green→red field, no rivalry blue). */
+.arena-flagsplit.is-solo-ronaldo::before {
+  background-image:
+    radial-gradient(34% 24% at 50% 32%, rgba(248, 206, 98, 0.5), transparent 74%),
+    radial-gradient(70% 64% at 38% 12%, rgba(16, 142, 92, 0.7), transparent 74%),
+    radial-gradient(82% 72% at 64% 10%, rgba(214, 44, 58, 0.9), transparent 74%);
+}
+/* Solo: a gentle top-down vignette instead of the rivalry centre seam. */
+.arena-flagsplit.is-solo::after {
+  background:
+    radial-gradient(120% 110% at 50% 30%, transparent 46%, rgba(2, 4, 10, 0.6) 100%);
 }
 
 /* z1 floor pitch-glow + z2 floodlight cones + z3 crown glow. */
@@ -460,6 +525,23 @@ body {
     /* z1 floor pitch-glow (BOSS O1: blue left / Messi, red right / Ronaldo) */
     radial-gradient(72% 46% at 22% 106%, rgba(44, 99, 219, 0.16), transparent 68%),
     radial-gradient(72% 46% at 78% 106%, rgba(226, 16, 59, 0.16), transparent 68%);
+}
+
+/* SOLO profile floor-glow — a SINGLE centred floor wash in the player's colour
+   (no rivalry blue+red), keeping the floodlight cones + crown. */
+.arena-atmosphere.is-solo-messi::before {
+  background:
+    radial-gradient(46% 36% at 50% -6%, rgba(245, 180, 60, 0.12), transparent 66%),
+    conic-gradient(from 202deg at 14% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+    conic-gradient(from 138deg at 86% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+    radial-gradient(80% 46% at 50% 108%, rgba(44, 99, 219, 0.14), transparent 70%);
+}
+.arena-atmosphere.is-solo-ronaldo::before {
+  background:
+    radial-gradient(46% 36% at 50% -6%, rgba(245, 180, 60, 0.12), transparent 66%),
+    conic-gradient(from 202deg at 14% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+    conic-gradient(from 138deg at 86% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
+    radial-gradient(80% 46% at 50% 108%, rgba(226, 16, 59, 0.14), transparent 70%);
 }
 
 /* z3 vignette + z4 volumetric haze. */
@@ -531,8 +613,8 @@ body {
       radial-gradient(46% 36% at 50% -6%, rgba(245, 180, 60, 0.16), transparent 66%),
       conic-gradient(from 202deg at 14% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
       conic-gradient(from 138deg at 86% -12%, transparent 0deg, rgba(255, 255, 255, 0.085) 20deg, transparent 42deg),
-      radial-gradient(72% 46% at 22% 106%, rgba(226, 16, 59, 0.16), transparent 68%),
-      radial-gradient(72% 46% at 78% 106%, rgba(44, 99, 219, 0.16), transparent 68%);
+      radial-gradient(72% 46% at 22% 106%, rgba(44, 99, 219, 0.16), transparent 68%),
+      radial-gradient(72% 46% at 78% 106%, rgba(226, 16, 59, 0.16), transparent 68%);
   }
 }
 
@@ -575,22 +657,44 @@ body {
 .render-hero.is-ronaldo img {
   transform: scaleX(-1);
 }
-/* duotone color overlay (mix-blend color) — per side. */
+/* duotone color overlay (mix-blend color) — per side. The tint is MASKED to the
+   same shape as the figure (bottom-fade + inward-fade) so it paints ONLY over the
+   player, not the empty column area — letting the blurred flag-split bg show
+   through the rest of each side (fixes "two flat color blocks"). Also softened
+   to 0.82 so the figure's photographic detail reads through the colour. */
 .render-hero::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   mix-blend-mode: color;
+  opacity: 0.82;
+  -webkit-mask-image:
+    linear-gradient(180deg, #000 52%, transparent 92%),
+    linear-gradient(var(--inward), #000 58%, transparent 96%);
+  mask-image:
+    linear-gradient(180deg, #000 52%, transparent 92%),
+    linear-gradient(var(--inward), #000 58%, transparent 96%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
-/* inward rim-light (mix-blend screen) — lit by the clash. */
+/* inward rim-light (mix-blend screen) — lit by the clash. Masked the same way so
+   it hugs the figure and doesn't wash the flag-split. */
 .render-hero::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   mix-blend-mode: screen;
-  opacity: 0.6;
+  opacity: 0.55;
+  -webkit-mask-image:
+    linear-gradient(180deg, #000 52%, transparent 92%),
+    linear-gradient(var(--inward), #000 58%, transparent 96%);
+  mask-image:
+    linear-gradient(180deg, #000 52%, transparent 92%),
+    linear-gradient(var(--inward), #000 58%, transparent 96%);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 /* Ronaldo (RIGHT) — warm gold→crimson; inward rim-light on the LEFT (toward VS). */
 .render-hero.is-ronaldo::after {

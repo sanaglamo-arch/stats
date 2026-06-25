@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import type { PlayerId } from "@/lib/data";
 
 /**
  * The floodlit-stadium ATMOSPHERE layer stack (DESIGN §2). A fixed, aria-hidden,
@@ -12,9 +13,14 @@ import { useMemo } from "react";
  * here, so server/client markup never mismatches).
  *
  * `quiet` dials the drama down for off-path screens (the player profile, DESIGN
- * §6.3): fewer embers, gentler — it just renders fewer ember particles.
+ * §6.3): fewer embers, gentler.
+ *
+ * `side` makes the backdrop SINGLE-accent for a solo profile (DESIGN §6.3 — only
+ * that player's nation/accent, never the opponent's): `messi` → cool blue /
+ * Argentina hint, `ronaldo` → warm red / Portugal hint. When omitted the full
+ * rivalry flag-split (both nations) is shown — the arena clash.
  */
-export function Atmosphere({ quiet = false }: { quiet?: boolean }) {
+export function Atmosphere({ quiet = false, side }: { quiet?: boolean; side?: PlayerId }) {
   // Deterministic ember placement (no RNG/clock) so SSR === CSR. Desktop count
   // 12 (5 when quiet); CSS hides them all under reduced-motion.
   const embers = useMemo(() => {
@@ -31,10 +37,16 @@ export function Atmosphere({ quiet = false }: { quiet?: boolean }) {
 
   return (
     <>
-      {/* O2: blurred flag-split is the primary base; the stadium floodlights +
-          vignette layer subtly on top in overlay mode (no opaque base wash). */}
-      <div className="arena-flagsplit" aria-hidden />
-      <div className="arena-atmosphere is-overlay" aria-hidden />
+      {/* O2: blurred flag base. Full rivalry split on the arena; a SINGLE-accent
+          solo wash on a player profile (DESIGN §6.3 — only that player's side). */}
+      <div
+        className={`arena-flagsplit${side ? ` is-solo is-solo-${side}` : ""}`}
+        aria-hidden
+      />
+      <div
+        className={`arena-atmosphere is-overlay${side ? ` is-solo is-solo-${side}` : ""}`}
+        aria-hidden
+      />
       <div className="arena-grain" aria-hidden />
       <div aria-hidden>
         {embers.map((e) => (

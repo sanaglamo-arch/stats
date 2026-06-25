@@ -275,19 +275,21 @@ function WinnerBanner({
       >
         {winnerName}
       </span>
+      {/* BOSS O1 — Messi LEFT, Ronaldo RIGHT: messi score first to match the
+          figures, the arena and /cards (was ronaldo–messi → showed "MESSI 3-4"). */}
       <span className="font-[family-name:var(--font-display)] text-[84px] font-black leading-none tracking-tight">
         <span
           className="tabular tabular-nums"
           style={{ color: "var(--color-gold-bright)", textShadow: "0 0 36px rgba(245,180,60,0.6)" }}
         >
-          {score.ronaldo}
+          {score.messi}
         </span>
         <span className="mx-5 text-[var(--color-gold)]">–</span>
         <span
           className="tabular tabular-nums"
           style={{ color: "var(--color-gold-bright)", textShadow: "0 0 36px rgba(245,180,60,0.6)" }}
         >
-          {score.messi}
+          {score.ronaldo}
         </span>
       </span>
       <span className="text-[19px] font-medium uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">
