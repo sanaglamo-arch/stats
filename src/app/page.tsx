@@ -1,6 +1,8 @@
 import { dataSource, datasetGeneratedAt } from "@/lib/data";
 import { buildArenaModel } from "@/components/arena/arena-model";
 import { Arena } from "@/components/arena/arena";
+import { buildStatsBodyModel } from "@/components/stats/stats-model";
+import { StatsBody } from "@/components/stats/stats-body";
 
 /**
  * The VERDICT ARENA home (Phase 10) — the whole product on one screen. The
@@ -12,7 +14,16 @@ import { Arena } from "@/components/arena/arena";
  * /player/[id] and the demoted /cards stay reachable off-path.
  */
 export default function HomePage() {
-  const model = buildArenaModel(dataSource.getAllRows());
+  const rows = dataSource.getAllRows();
+  const model = buildArenaModel(rows);
+  // Phase 11 (p11-2): the comprehensive stats body, server-built from the same
+  // rows via the existing selectors, rendered BELOW the untouched arena hook.
+  const statsModel = buildStatsBodyModel(rows);
 
-  return <Arena model={model} accurateAsOf={datasetGeneratedAt} />;
+  return (
+    <>
+      <Arena model={model} accurateAsOf={datasetGeneratedAt} />
+      <StatsBody model={statsModel} />
+    </>
+  );
 }

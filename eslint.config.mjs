@@ -10,6 +10,9 @@ export default tseslint.config(
       "playwright-report/**",
       "test-results/**",
       "next-env.d.ts",
+      // Design docs + the one-off mockup generator (standalone CJS Node script,
+      // not part of the Next app bundle).
+      "design/**",
     ],
   },
   js.configs.recommended,
