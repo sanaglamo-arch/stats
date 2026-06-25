@@ -130,7 +130,21 @@ function ColLabel({ children }: { children: React.ReactNode }) {
 }
 
 // ---- breakdown row helper (reused desktop + mobile) ------------------------
-function BreakdownRow({ name, expanded }: { name: string; expanded?: boolean }) {
+// `byLeague` shows the BOSS-NOTES §3 league-split: a STATIC labelled group inside
+// the already-open panel (NOT a second expander) — one row per named league, both
+// values + a per-league leader marker (read-only; never recomputes the verdict).
+function LeagueRow({ league }: { league: string }) {
+  return (
+    <div style={{ ...BOX, display: "grid", gridTemplateColumns: "1fr auto auto auto", gap: 8, alignItems: "center", fontSize: 12, background: "#f5f5f5" }}>
+      <span style={{ textAlign: "left" }}>{league}</span>
+      <span>val</span>
+      <span style={{ color: "#777" }}>·</span>
+      <span>val · [ leader ]</span>
+    </div>
+  );
+}
+
+function BreakdownRow({ name, expanded, byLeague }: { name: string; expanded?: boolean; byLeague?: boolean }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       <div style={{ ...BOX, display: "grid", gridTemplateColumns: "16px 1fr auto auto", gap: 8, alignItems: "center" }}>
@@ -141,8 +155,19 @@ function BreakdownRow({ name, expanded }: { name: string; expanded?: boolean }) 
       </div>
       {expanded ? (
         <div style={{ marginLeft: 24, display: "flex", flexDirection: "column", gap: 6 }}>
-          <Block label="[ sub-metric: career · intl · league · conversion → both values + per-metric leader ]" h={44} />
-          <div style={NOTE}>↑ tap row to expand/collapse in place (progressive disclosure — no navigation)</div>
+          <Block label="[ sub-metrics: career · international · UCL · conversion → both values + per-metric leader ]" h={44} />
+          {byLeague ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <ColLabel>By league — BOSS-NOTES §3 (static group inside the open panel — read-only evidence, no extra tap)</ColLabel>
+              <LeagueRow league="Premier League" />
+              <LeagueRow league="La Liga" />
+              <LeagueRow league="Serie A" />
+              <LeagueRow league="Ligue 1" />
+              <LeagueRow league="Primeira Liga · MLS · Saudi Pro League" />
+              <div style={NOTE}>each league: both values + a per-league leader marker · tallies into NOTHING (verdict stays the aggregate score) · neutral mode hides markers</div>
+            </div>
+          ) : null}
+          <div style={NOTE}>↑ tap row to expand/collapse in place (progressive disclosure — no navigation). League-split rides this SAME expand — 1 tap from landing, no new control.</div>
         </div>
       ) : null}
     </div>
@@ -193,7 +218,7 @@ export default function WireframePage() {
           <Block label="[ ⌧ Show / Hide winner toggle ] (default ON)" h={30} note="OFF → neutral, numbers-only" />
         </Row>
 
-        <BreakdownRow name="Goals" expanded />
+        <BreakdownRow name="Goals" expanded byLeague />
         <BreakdownRow name="Assists" />
         <BreakdownRow name="Trophies" />
         <BreakdownRow name="Ballon d'Or" />
@@ -225,7 +250,7 @@ export default function WireframePage() {
         />
         <Block label="[ ⌧ Show / Hide winner ] (full width, ≥44px)" h={40} />
         <Block label="[ category breakdown heading ]" h={26} style={{ background: "#f3f3f3" }} />
-        <BreakdownRow name="Goals" />
+        <BreakdownRow name="Goals" expanded byLeague />
         <BreakdownRow name="Assists" />
         <Block label="[ … remaining categories, full-width rows, tap to expand ]" h={40} />
         <Block
@@ -250,6 +275,7 @@ export default function WireframePage() {
           <Block label="[ LIVE card preview ]&#10;the real share-card, scaled&#10;(reflects current cats + winner toggle)" h={300} style={{ width: 220 }} />
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <Block label="[ editable caption — prefilled winner+score / neutral + hashtags ]" h={70} />
+            <Block label="[ ☐ Add 'by league' line ] (default OFF — BOSS-NOTES §3)" h={34} note="one fixed-height fact band: 'Scored in every league — PL · La Liga · Serie A · …' → ?league=1 · deterministic PNG, no per-league numbers on card" />
             <Block label="[ ► DOWNLOAD PNG ] (primary export — MVP)" h={48} style={{ background: "#cfcfcf", fontWeight: 700 }} note="loading → success (file) / inline error + retry" />
             <Row cols="1fr 1fr 1fr">
               <Block label="[ Native / Web-Share ]" h={40} />
