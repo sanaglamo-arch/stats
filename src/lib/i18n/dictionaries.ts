@@ -203,6 +203,7 @@ const en = {
   shareCategoriesWon: "Categories won",
   shareNeutralTitle: "The Matchup",
   shareNeutralSubtitle: "By the numbers — you decide",
+  shareByLeagueLabel: "Goals by league",
   shareFooterTag: "Settle the debate at CompareGOATs",
   // Caption template ({winner} / {score} substituted; {winner} dropped when neutral)
   shareCaptionWinner:
@@ -553,6 +554,7 @@ const ru: Dictionary = {
   shareCategoriesWon: "Категорий выиграно",
   shareNeutralTitle: "Противостояние",
   shareNeutralSubtitle: "По цифрам — решать вам",
+  shareByLeagueLabel: "Голы по лигам",
   shareFooterTag: "Закрой спор на CompareGOATs",
   shareCaptionWinner:
     "Месси против Роналду — кто настоящий GOAT? Мой вердикт: {winner} побеждает {score}. #CompareGOATs #MessiVsRonaldo #GOATdebate #Football",

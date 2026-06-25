@@ -121,6 +121,33 @@ export function ShareCard({ model, t }: { model: ShareModel; t: Dictionary }) {
         ))}
       </ul>
 
+      {/* One restrained "goals by league" strip (BOSS-NOTES §3): named leagues
+          tinted by their LOCAL goals leader — read-only evidence, never tallied.
+          Respects the winner toggle: neutral (no leader tint) when winner hidden. */}
+      {model.leagueChips.length > 0 ? (
+        <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-10 leading-tight">
+          <span className="text-[19px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+            {t.shareByLeagueLabel}
+          </span>
+          {model.leagueChips.map((c) => (
+            <span
+              key={c.labelKey}
+              className="text-[21px] font-bold tracking-[0.01em]"
+              style={{
+                color:
+                  showWinner && c.winner === "messi"
+                    ? "var(--color-messi-bright)"
+                    : showWinner && c.winner === "ronaldo"
+                      ? "var(--color-ronaldo-bright)"
+                      : "var(--color-text-secondary)",
+              }}
+            >
+              {t[c.labelKey]}
+            </span>
+          ))}
+        </div>
+      ) : null}
+
       {/* Footer brand + hashtag line */}
       <footer className="flex flex-col items-center gap-2">
         <span

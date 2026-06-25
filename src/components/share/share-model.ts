@@ -41,6 +41,19 @@ export type ShareModel = {
   lines: ShareCategoryLine[];
   /** How many categories were selected in total. */
   totalCategories: number;
+  /**
+   * One restrained "goals by league" strip (BOSS-NOTES §3 → share card): the
+   * named leagues with a LOCAL per-league goals leader. Read-only evidence —
+   * never tallied into the verdict. Empty when Goals isn't in the selection.
+   */
+  leagueChips: ShareLeagueChip[];
+};
+
+/** One league chip on the share card's by-league strip. */
+export type ShareLeagueChip = {
+  labelKey: keyof Dictionary;
+  /** Who out-scored in THIS league (local only). */
+  winner: RowWinner;
 };
 
 /** Max category lines on the card before it gets cramped (portrait band). */
@@ -76,6 +89,16 @@ export function buildShareModel(catsParam: string | null, showWinner: boolean): 
 
   const winner = verdict.winner === "tie" ? null : verdict.winner;
 
+  // Goals-by-league strip: read the per-league split already computed on the
+  // Goals category's league row (deterministic; local leaders only).
+  const goalsLeagueRow = categories
+    .find((c) => c.key === "goals")
+    ?.rows.find((r) => r.leagueSplit && r.leagueSplit.length > 0);
+  const leagueChips: ShareLeagueChip[] = (goalsLeagueRow?.leagueSplit ?? []).map((l) => ({
+    labelKey: l.labelKey,
+    winner: l.winner,
+  }));
+
   return {
     showWinner,
     winner: showWinner ? winner : null,
@@ -86,5 +109,6 @@ export function buildShareModel(catsParam: string | null, showWinner: boolean): 
     },
     lines,
     totalCategories: categories.length,
+    leagueChips,
   };
 }
