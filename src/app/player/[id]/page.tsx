@@ -47,6 +47,7 @@ export default async function PlayerProfilePage({
     notFound();
   }
 
-  const profile = buildPlayerProfile(dataSource.getAllRows(), id);
-  return <ProfileView profile={profile} />;
+  const rows = [...dataSource.getAllRows()];
+  const profile = buildPlayerProfile(rows, id);
+  return <ProfileView profile={profile} rows={rows} />;
 }
