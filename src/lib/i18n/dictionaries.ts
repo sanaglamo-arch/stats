@@ -402,6 +402,31 @@ const en = {
   statsEntryDeepCta: "Open the deep comparison",
   statsEntryProfileDesc: "Full stat page",
   statsFootnote: "Read-only showcase · the verdict lives only in the arena above · seed data (mvr), cross-checked · n/a is never fabricated.",
+
+  // ── DEEP HEAD-TO-HEAD (/compare, Phase 11 p11-4) ──────────────────────
+  // Raw shot-volume column headers (read off totals, not catalog metrics).
+  statShots: "Shots",
+  statShotsOnTarget: "Shots on target",
+  cmpMetaTitle: "Deep head-to-head — Messi vs Ronaldo · CompareGOATs",
+  cmpMetaDesc: "Every metric, every season and every competition for Messi and Ronaldo, side by side with deltas, who-leads markers and same-age curves. Read-only — the verdict lives on the arena.",
+  cmpTitle: "Deep head-to-head",
+  cmpSubtitle: "Every metric × every season × every competition — side by side. Read-only.",
+  cmpBack: "Back to the verdict",
+  cmpReadOnly: "Read-only. The verdict lives on the arena.",
+  cmpViewLabel: "Alignment",
+  cmpViewSeason: "By season",
+  cmpViewCareer: "Career",
+  cmpViewAge: "Same age",
+  cmpCompLabel: "Competition",
+  cmpCompAll: "All competitions",
+  cmpFocusLabel: "Focus metric",
+  cmpAgeTitle: "Same-age curves",
+  cmpAgeAxis: "Age",
+  cmpAgeNote: "Same-age slice from age during season; the line breaks where one side is n/a — never interpolated.",
+  cmpColAge: "Age",
+  cmpCareerHint: "Career totals across the selected competition, every metric. Δ and the ▲ marker show who leads — local evidence only, never a score.",
+  cmpTypeTotals: "Totals by competition type",
+  cmpScope: "{rows} rows · {seasons} seasons · {comps} competitions · ages {minAge}–{maxAge}",
 } as const;
 
 export type Dictionary = Record<keyof typeof en, string>;
@@ -768,6 +793,30 @@ const ru: Dictionary = {
   statsEntryDeepCta: "Открыть глубокое сравнение",
   statsEntryProfileDesc: "Полная стат-страница",
   statsFootnote: "Read-only витрина · вердикт живёт только на арене сверху · данные seed (mvr), кросс-проверка · н/д не выдумывается.",
+
+  // ── DEEP HEAD-TO-HEAD (/compare, Phase 11 p11-4) ──────────────────────
+  statShots: "Удары",
+  statShotsOnTarget: "Удары в створ",
+  cmpMetaTitle: "Глубокий head-to-head — Месси vs Роналду · CompareGOATs",
+  cmpMetaDesc: "Каждая метрика, каждый сезон и каждый турнир Месси и Роналду бок о бок: дельты, маркеры «кто ведёт» и кривые по возрасту. Только для чтения — вердикт живёт на арене.",
+  cmpTitle: "Глубокий head-to-head",
+  cmpSubtitle: "Каждая метрика × каждый сезон × каждый турнир — бок о бок. Только для чтения.",
+  cmpBack: "К вердикту",
+  cmpReadOnly: "Только для чтения. Вердикт живёт на арене.",
+  cmpViewLabel: "Выравнивание",
+  cmpViewSeason: "По сезонам",
+  cmpViewCareer: "Карьера",
+  cmpViewAge: "По возрасту",
+  cmpCompLabel: "Турнир",
+  cmpCompAll: "Все турниры",
+  cmpFocusLabel: "Ключевая метрика",
+  cmpAgeTitle: "Кривые по возрасту",
+  cmpAgeAxis: "Возраст",
+  cmpAgeNote: "Срез по возрасту в сезоне; линия рвётся там, где у одной стороны н/д — без интерполяции.",
+  cmpColAge: "Возраст",
+  cmpCareerHint: "Карьерные тоталы по выбранному турниру, все метрики. Δ и маркер ▲ показывают, кто ведёт — только локально, без счёта.",
+  cmpTypeTotals: "Тоталы по типам турниров",
+  cmpScope: "{rows} строк · {seasons} сезонов · {comps} турниров · возраст {minAge}–{maxAge}",
 };
 
 export const dictionaries: Record<Locale, Dictionary> = { en, ru };
