@@ -1,15 +1,16 @@
 "use client";
 
 import { AnimatedDelta } from "@/components/motion/animated-delta";
-import { competitionLabel } from "@/components/card/card-labels";
+import { competitionLabel, statLabel } from "@/components/card/card-labels";
 import type { Dictionary, Locale } from "@/lib/i18n/dictionaries";
 import type { MetricKey } from "@/lib/data";
-import type {
-  ColMap,
-  CompareColumn,
-  CompareTableModel,
-  CompareTableRow,
-  CompareTypeTotal,
+import {
+  COMPARE_COLUMNS,
+  type ColMap,
+  type CompareColumn,
+  type CompareTableModel,
+  type CompareTableRow,
+  type CompareTypeTotal,
 } from "./compare-model";
 
 /**
@@ -135,6 +136,83 @@ function TotalCells({
   );
 }
 
+/**
+ * Mobile (<sm) per-metric stack — the wide 26-column dual table is unreadable at
+ * 390px, so on phones we render a compact 4-cell row (label · Messi · Δ · Ronaldo)
+ * for the FOCUS metric only, switched via the existing focus select. Keeps the
+ * side-by-side comparison + leader ▲ + career total without a horizontal crush.
+ */
+function MobileFocusTable({
+  model,
+  focusKey,
+  t,
+  locale,
+  messiName,
+  ronaldoName,
+}: {
+  model: CompareTableModel;
+  focusKey: MetricKey;
+  t: Dictionary;
+  locale: Locale;
+  messiName: string;
+  ronaldoName: string;
+}) {
+  const focusCol = COMPARE_COLUMNS.find((c) => c.key === focusKey) ?? COMPARE_COLUMNS[0];
+  const cell = (side: ColMap | null, lead: boolean, tint: string, markerLeft: boolean) => {
+    if (side === null) return <span className="italic text-[var(--color-text-muted)] opacity-65">—</span>;
+    const v = side[focusKey] ?? null;
+    const marker = lead ? <span aria-hidden className="align-super text-[0.6em]">▲</span> : null;
+    return (
+      <span className={`${lead ? `${tint} font-black` : "font-semibold"} ${v === null ? "text-[var(--color-text-muted)]" : ""}`}>
+        {markerLeft && marker}
+        {fmtCell(v, focusCol, t.statsNa, locale)}
+        {!markerLeft && marker}
+      </span>
+    );
+  };
+  return (
+    <div className="glass-panel p-4">
+      <div className="mb-3 flex items-center justify-between gap-2 text-[0.6rem] font-bold uppercase tracking-[0.08em]">
+        <span className="text-[var(--color-messi-bright)]">{messiName}</span>
+        <span className="inline-flex items-center text-[var(--color-text-secondary)]">
+          {statLabel(t, focusKey)}
+          <HeaderMark col={focusCol} t={t} />
+        </span>
+        <span className="text-[var(--color-ronaldo-bright)]">{ronaldoName}</span>
+      </div>
+      <table className="tabular w-full">
+        <caption className="sr-only">{`${t.cmpTitle} — ${statLabel(t, focusKey)}`}</caption>
+        <tbody className="season-reveal">
+          {model.rows.map((row) => (
+            <tr key={row.key} className="season-row border-b border-[var(--color-border-glass)]/50 last:border-0">
+              <th scope="row" className="py-2 pr-2 text-left font-[family-name:var(--font-display)] text-[0.95rem] font-bold tracking-[0.03em]">
+                {row.key}
+              </th>
+              <td className="py-2 text-center text-[0.95rem]">{cell(row.messi, row.leader === "messi", HL_MESSI, true)}</td>
+              <td className="w-12 py-2 text-center text-xs">
+                <AnimatedDelta delta={row.delta} />
+              </td>
+              <td className="py-2 text-center text-[0.95rem]">{cell(row.ronaldo, row.leader === "ronaldo", HL_RONALDO, false)}</td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr className="border-t-2 border-[color-mix(in_srgb,var(--color-gold)_40%,transparent)] bg-[color-mix(in_srgb,var(--color-gold)_7%,transparent)] font-black">
+            <th scope="row" className="py-2.5 pr-2 text-left font-[family-name:var(--font-display)] text-[0.95rem] tracking-[0.03em] text-[var(--color-gold-bright)]">
+              {t.statsCareerRow}
+            </th>
+            <td className="py-2.5 text-center text-[0.95rem]">{fmtCell(model.total.messi[focusKey] ?? null, focusCol, t.statsNa, locale)}</td>
+            <td className="py-2.5 text-center text-xs">
+              <AnimatedDelta delta={model.total.delta} />
+            </td>
+            <td className="py-2.5 text-center text-[0.95rem]">{fmtCell(model.total.ronaldo[focusKey] ?? null, focusCol, t.statsNa, locale)}</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  );
+}
+
 export function CompareTable({
   model,
   columns,
@@ -159,7 +237,8 @@ export function CompareTable({
   const ronaldoLeads = (row: CompareTableRow) => row.leader === "ronaldo";
 
   return (
-    <div className="glass-panel overflow-x-auto p-0">
+    <>
+      <div className="hidden glass-panel overflow-x-auto p-0 sm:block">
       <table className="tabular w-full border-collapse text-sm" style={{ minWidth: `${minW}px` }}>
         <caption className="sr-only">{t.cmpTitle}</caption>
         <thead>
@@ -253,7 +332,18 @@ export function CompareTable({
           </tr>
         </tfoot>
       </table>
-    </div>
+      </div>
+      <div className="sm:hidden">
+        <MobileFocusTable
+          model={model}
+          focusKey={focusKey}
+          t={t}
+          locale={locale}
+          messiName={messiName}
+          ronaldoName={ronaldoName}
+        />
+      </div>
+    </>
   );
 }
 
