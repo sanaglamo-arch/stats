@@ -223,7 +223,7 @@ export function StatsBody({ model }: { model: StatsBodyModel }) {
             )}
 
             {cut === "totals" && (
-              <StaggerGroup className="grid grid-cols-2 gap-3 sm:grid-cols-4" step={0.06}>
+              <StaggerGroup className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <TotalStat label={t.statGoals} m={table.messiTotals.goals} r={table.ronaldoTotals.goals} nf={nf} />
                 <TotalStat label={t.statAssists} m={table.messiTotals.assists} r={table.ronaldoTotals.assists} nf={nf} />
                 <TotalStat label={t.statsColGA} m={table.messiTotals.ga} r={table.ronaldoTotals.ga} nf={nf} />

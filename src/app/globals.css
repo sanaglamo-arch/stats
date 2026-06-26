@@ -885,6 +885,101 @@ body {
   box-shadow: inset 2px 0 0 var(--gold-hairline);
 }
 
+/* ── ROBUST ON-MOUNT REVEAL (p11-3) ─────────────────────────────────────────
+   Content is VISIBLE BY DEFAULT (no inline opacity:0, no JS/IntersectionObserver
+   dependency). The premium rise/fade is a pure-CSS entrance that plays ONCE on
+   mount and ALWAYS completes at opacity:1 (fill-mode `both` → holds the `to`
+   state). No-JS, "IO never fired", slow/flaky devices, and SSR all render the
+   full body. The hidden frame lives only inside the @keyframes `from`, never as
+   a persistent style. Reduced-motion → animation removed (base state is already
+   visible). DESIGN §5 / robustness contract. */
+@keyframes stats-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes stats-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes bar-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Section / block rise+fade entrance. Optional per-block delay via custom prop. */
+.reveal-rise {
+  animation: stats-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) var(--reveal-delay, 0s) both;
+}
+
+/* Staggered grid/list: each direct child cascades in. The cascade lives in CSS
+   nth-child delays so it needs no JS index plumbing. */
+.reveal-stagger > * {
+  animation: stats-rise 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.reveal-stagger > *:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.reveal-stagger > *:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.reveal-stagger > *:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.reveal-stagger > *:nth-child(5) {
+  animation-delay: 0.2s;
+}
+.reveal-stagger > *:nth-child(n + 6) {
+  animation-delay: 0.24s;
+}
+
+/* Season-table row cascade — OPACITY-ONLY (never a transform, which would re-base
+   the sticky season-label cell). Applied to <tbody>; targets its <tr> children. */
+.season-reveal > tr {
+  animation: stats-fade 0.36s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.season-reveal > tr:nth-child(2) {
+  animation-delay: 0.03s;
+}
+.season-reveal > tr:nth-child(3) {
+  animation-delay: 0.06s;
+}
+.season-reveal > tr:nth-child(4) {
+  animation-delay: 0.09s;
+}
+.season-reveal > tr:nth-child(5) {
+  animation-delay: 0.12s;
+}
+.season-reveal > tr:nth-child(6) {
+  animation-delay: 0.15s;
+}
+.season-reveal > tr:nth-child(7) {
+  animation-delay: 0.18s;
+}
+.season-reveal > tr:nth-child(n + 8) {
+  animation-delay: 0.21s;
+}
+
+/* Divergent compare-bar fill grows from the centre seam. transform-origin is set
+   inline per side (Messi right→left, Ronaldo left→right). Default state (no anim /
+   reduced-motion) is the un-transformed full-width bar — i.e. VISIBLE. */
+.bar-grow {
+  animation: bar-grow 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -910,5 +1005,17 @@ body {
   }
   .arena-atmosphere::before {
     animation: none;
+  }
+
+  /* p11-3 reveal contract: kill the entrance animations entirely (incl. their
+     animation-delay, which the 0.01ms duration override above does NOT zero).
+     The base state is already visible (opacity:1, no transform), so content
+     shows immediately — never a delayed backwards-fill hidden frame. */
+  .reveal-rise,
+  .reveal-stagger > *,
+  .season-reveal > tr,
+  .bar-grow,
+  .leader-mark {
+    animation: none !important;
   }
 }

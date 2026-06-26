@@ -1,7 +1,5 @@
 "use client";
 
-import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { DURATION, EASE } from "@/lib/motion/tokens";
 import { AnimatedDelta } from "@/components/motion/animated-delta";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/dictionaries";
@@ -27,16 +25,11 @@ function fmt(n: number, locale: Locale): string {
 }
 
 /**
- * Season rows fade-cascade into view (opacity-only — NEVER a transform, which
- * would re-base the sticky season-label cell and break horizontal sticky). The
- * stagger is driven by the `<tbody>` container variants.
+ * Season rows fade-cascade in via the pure-CSS `.season-reveal` class (opacity-
+ * only — NEVER a transform, which would re-base the sticky season-label cell and
+ * break horizontal sticky). Rows are VISIBLE BY DEFAULT (no JS / IntersectionObserver),
+ * so they can never be left hidden; reduced-motion strips the cascade in CSS.
  */
-const ROW_STAGGER = 0.035;
-const tbodyVariants: Variants = { hidden: {}, show: { transition: { staggerChildren: ROW_STAGGER } } };
-const rowVariants: Variants = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { duration: DURATION.base, ease: EASE.out } },
-};
 
 export function StatTable({
   table,
@@ -51,7 +44,6 @@ export function StatTable({
   messiName: string;
   ronaldoName: string;
 }) {
-  const reduce = useReducedMotion();
   const totalsRow = (totals: SideTotals) => (
     <>
       <td className="tabular px-3 py-3 text-center">{totals.goals}</td>
@@ -124,19 +116,13 @@ export function StatTable({
             )}
           </tr>
         </thead>
-        <motion.tbody
-          initial={reduce ? false : "hidden"}
-          whileInView={reduce ? undefined : "show"}
-          viewport={reduce ? undefined : { once: true, margin: "0px 0px -8% 0px" }}
-          variants={reduce ? undefined : tbodyVariants}
-        >
+        <tbody className="season-reveal">
           {table.rows.map((row) => {
             const messiLeads = row.delta !== null && row.delta > 0;
             const ronaldoLeads = row.delta !== null && row.delta < 0;
             return (
-              <motion.tr
+              <tr
                 key={row.season}
-                variants={reduce ? undefined : rowVariants}
                 className="season-row border-b border-[var(--color-border-glass)]/60 last:border-0"
               >
                 <th
@@ -162,10 +148,10 @@ export function StatTable({
                   didNotPlay={t.statsDidNotPlay}
                   locale={locale}
                 />
-              </motion.tr>
+              </tr>
             );
           })}
-        </motion.tbody>
+        </tbody>
         <tfoot>
           <tr className="border-t-2 border-[color-mix(in_srgb,var(--color-gold)_40%,transparent)] bg-[color-mix(in_srgb,var(--color-gold)_7%,transparent)] font-black">
             <th

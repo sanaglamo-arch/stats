@@ -1,92 +1,49 @@
-"use client";
-
-import type { ReactNode } from "react";
-import { motion, useReducedMotion, type Variants } from "framer-motion";
-import { DURATION, EASE, STAGGER } from "@/lib/motion/tokens";
+import type { CSSProperties, ReactNode } from "react";
 
 /**
  * Scroll-reveal primitives — the shared entrance language for the whole product
- * (sections, cards, table rows). Everything animates transform + opacity only,
- * fires once on scroll-into-view, and collapses to a plain wrapper under
- * `prefers-reduced-motion`. `/compare` & `/player` inherit these unchanged.
+ * (sections, cards, table rows). `/compare` & `/player` inherit these unchanged.
+ *
+ * ROBUSTNESS (p11-3): these are PURE-CSS, on-mount reveals. Content is VISIBLE BY
+ * DEFAULT — there is no inline `opacity:0`, no JavaScript, and no
+ * IntersectionObserver, so it can never be left permanently hidden (no-JS, slow/
+ * flaky devices, headless render, reduced-motion all show the full body). The
+ * premium rise/fade lives entirely in `globals.css` (`@keyframes stats-rise`,
+ * fill-mode `both`) and ALWAYS completes at opacity:1; reduced-motion strips the
+ * animation, leaving the already-visible base state. The hidden frame exists only
+ * inside the keyframe `from`, never as a persisted style.
  */
 
-const VIEWPORT = { once: true, margin: "0px 0px -12% 0px" } as const;
-
-/** Shared "rise + fade" item variants — reused by div items AND table rows. */
-export const riseVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: DURATION.morph, ease: EASE.out } },
-};
-
-/** Container variants that stagger their children's `riseVariants`. */
-export function staggerContainer(step: number = STAGGER): Variants {
-  return { hidden: {}, show: { transition: { staggerChildren: step } } };
-}
-
-/**
- * Reveal — a single block that fades + rises into view on first scroll-into-view.
- * Replaces the old on-mount `Reveal` so content lower on the page animates as the
- * reader reaches it (not all at once on load).
- */
+/** A single block that rises + fades in once on mount. `delay` in seconds. */
 export function Reveal({
   children,
   className,
   delay = 0,
-  y = 18,
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
-  y?: number;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
+  const style = delay ? ({ "--reveal-delay": `${delay}s` } as CSSProperties) : undefined;
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={VIEWPORT}
-      transition={{ duration: DURATION.morph, ease: EASE.out, delay }}
-    >
+    <div className={`reveal-rise ${className ?? ""}`} style={style}>
       {children}
-    </motion.div>
+    </div>
   );
 }
 
-/** StaggerGroup — reveals its `StaggerItem` children in a cascade on scroll-in. */
+/** A container whose direct children cascade in (CSS nth-child stagger). */
 export function StaggerGroup({
   children,
   className,
-  step = STAGGER,
 }: {
   children: ReactNode;
   className?: string;
-  step?: number;
 }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
-  return (
-    <motion.div
-      className={className}
-      initial="hidden"
-      whileInView="show"
-      viewport={VIEWPORT}
-      variants={staggerContainer(step)}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={`reveal-stagger ${className ?? ""}`}>{children}</div>;
 }
 
-/** One staggered child of a `StaggerGroup`. */
+/** One child of a `StaggerGroup` — its cascade timing comes from the parent. */
 export function StaggerItem({ children, className }: { children: ReactNode; className?: string }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
-  return (
-    <motion.div className={className} variants={riseVariants}>
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }

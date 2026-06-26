@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { DURATION_MS, EASE } from "./tokens";
 
@@ -73,41 +73,21 @@ export function useCountUp(target: number, enabled: boolean): number {
 }
 
 /**
- * IntersectionObserver gate — flips to `true` the first time `ref` scrolls into
- * view, then stays true (it disconnects after the first hit). This is the shared
- * "reveal" trigger for the whole motion layer (CountUp, AnimatedBar,
- * AnimatedDelta) so they all fire on the same scroll-into-view contract.
+ * On-mount trigger — `false` during SSR / the first client render, then flips to
+ * `true` in a mount effect. The shared "play the entrance" gate for the JS-driven
+ * numeric primitives (CountUp, AnimatedDelta).
  *
- * SSR / no-IO safe: returns `true` immediately when IntersectionObserver is
- * unavailable, so content is never stuck at its pre-reveal state.
+ * ROBUSTNESS (p11-3): unlike an IntersectionObserver gate, this can NEVER leave
+ * content stuck hidden — the consumers (useCountUpReveal) render the FINAL value
+ * while the gate is `false`, so SSR, no-JS, and "observer never fired" all show
+ * the real number; the count-up is a pure enhancement that fires once on mount.
  */
-export function useInView(
-  ref: RefObject<Element | null>,
-  { threshold = 0.25, rootMargin = "0px 0px -8% 0px" }: { threshold?: number; rootMargin?: string } = {},
-): boolean {
-  const [inView, setInView] = useState(false);
-
+export function useMounted(): boolean {
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    if (typeof IntersectionObserver === "undefined") {
-      setInView(true);
-      return;
-    }
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setInView(true);
-          io.disconnect();
-        }
-      },
-      { threshold, rootMargin },
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, threshold, rootMargin]);
-
-  return inView;
+    setMounted(true);
+  }, []);
+  return mounted;
 }
 
 /**
